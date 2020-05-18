@@ -16,6 +16,7 @@ import { AuthService } from './core/auth.service';
 import { UserService } from './core/user.service';
 import { UserResolver } from './user/user.resolver';
 import { AuthGuard } from './core/auth.guard';
+import { LayoutModule } from './shared/layout/layout.module';
 
 @NgModule({
   declarations: [
@@ -28,6 +29,7 @@ import { AuthGuard } from './core/auth.guard';
     BrowserModule,
     AppRoutingModule,
     ReactiveFormsModule,
+    LayoutModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFirestoreModule, // imports firebase/firestore, only needed for database features
     AngularFireAuthModule, // imports firebase/auth, only needed for auth features

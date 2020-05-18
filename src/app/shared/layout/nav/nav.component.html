@@ -1,0 +1,40 @@
+<nav class="navbar navbar-dark bg-primary">
+  <a class="navbar-brand" tabindex="-1" [routerLink]="['/']">
+    <!-- <fa-icon [icon]=" [ 'fac', 'favicon'] "></fa-icon> --> {{title}}
+  </a>
+
+
+  <button *ngIf="!isLoggedIn()" routerLink="/user/login" routerLinkActive="active" class="btn btn-outline-secondary"
+    role="button" aria-label="inloggen " tabindex="-1">
+    <!-- <fa-icon [icon]=" [ 'fas', 'sign-in-alt'] "></fa-icon> -->
+    <span class="d-none d-sm-inline "> inloggen</span>
+  </button>
+  <button *ngIf="isLoggedIn()" routerLink="/user/logout" routerLinkActive="active" class="btn btn-outline-secondary"
+    role="button" tabindex="-1">
+    <!-- <fa-icon [icon]="[ 'fas', 'sign-out-alt'] "></fa-icon> -->
+    <span class="d-none d-sm-inline " aria-label="uitloggen "> uitloggen</span>
+  </button>
+
+  <!-- <button class="navbar-toggler navbar-toggler-right pointer" type="button" data-toggle="collapse
+    " data-target="#navbarResponsive "
+    aria-controls="navbarResponsive " aria-label="Toggle navigation " (click)="navbarCollapsed=! navbarCollapsed
+    " [attr.aria-expanded]="!navbarCollapsed ">
+    <span class="navbar-toggler-icon "></span>
+  </button>
+  <div class="collapse navbar-collapse " [ngbCollapse]="navbarCollapsed " id="navbarResponsive ">
+    <ul class="navbar-nav ">
+      <li *ngIf="isLoggedIn() " class="nav-item ">
+        <a class="nav-link " routerLink="/admin " routerLinkActive="active " (click)="navbarCollapsed=! navbarCollapsed ">admin</a>
+      </li>
+    </ul>
+
+    <ul class="nav navbar-nav ml-auto ">
+      <li *ngIf="!isLoggedIn() " class="nav-item ">
+        <a class="nav-link" routerLink="/user/login " routerLinkActive="active " (click)="navbarCollapsed=!navbarCollapsed ">inloggen</a>
+      </li>
+      <li *ngIf="isLoggedIn() " class="nav-item ">
+        <a class="nav-link" routerLink="/user/logout " routerLinkActive="active " (click)="navbarCollapsed=!navbarCollapsed ">uitloggen</a>
+      </li>
+    </ul>
+  </div> -->
+</nav>
