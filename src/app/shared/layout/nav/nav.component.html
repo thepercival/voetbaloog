@@ -4,12 +4,12 @@
   </a>
 
 
-  <button *ngIf="!isLoggedIn()" routerLink="/user/login" routerLinkActive="active" class="btn btn-outline-secondary"
+  <button *ngIf="!isLoggedIn()" routerLink="/user/login" routerLinkActive="active" class="btn btn-secondary"
     role="button" aria-label="inloggen " tabindex="-1">
     <!-- <fa-icon [icon]=" [ 'fas', 'sign-in-alt'] "></fa-icon> -->
     <span class="d-none d-sm-inline "> inloggen</span>
   </button>
-  <button *ngIf="isLoggedIn()" routerLink="/user/logout" routerLinkActive="active" class="btn btn-outline-secondary"
+  <button *ngIf="isLoggedIn()" routerLink="/user/logout" routerLinkActive="active" class="btn btn-secondary"
     role="button" tabindex="-1">
     <!-- <fa-icon [icon]="[ 'fas', 'sign-out-alt'] "></fa-icon> -->
     <span class="d-none d-sm-inline " aria-label="uitloggen "> uitloggen</span>
