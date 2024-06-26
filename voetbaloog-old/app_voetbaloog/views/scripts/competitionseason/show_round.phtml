@@ -1,0 +1,123 @@
+<?php $oPoules = $this->oRound->getPoules(); ?>
+<?php $bFirstPouleOfRound = true; $nIt = 0; ?>
+<?php foreach( $oPoules as $oPoule ): ?>
+	<?php
+	$oPoulePlaces = $oPoule->getPlaces();
+	$bShowGames = $oPoulePlaces->count() > 1;
+	?>
+	<?php if ( $oPoule->needsRanking() ): ?>
+		<div style="margin-top:5px; font-weight:bold; text-align:center;"><?= $oPoule->getDisplayName( true ) ?></div>
+		<div class="col-xs-12 col-sm-7 col-md-6" style="padding-left: 0px; padding-right: 0px;">
+			<table class="table table-striped">
+				<tr class="tableheader">
+					<th>datum</th>
+					<th>tijd</th>
+					<th class="visible-lg">plaats</th>
+					<th style="text-align:right;">thuisteam</th>
+					<th style="text-align:center;">uitslag</th>
+					<th>uitteam</th>
+				</tr>
+			<?php $oGames = $oPoule->getGames( true ); ?>
+			<tbody>
+				<?php foreach( $oGames as $oGame ): ?>
+				<tr>
+					<td><?= $oGame->getStartDateTime()->toString("j M") ?></td>
+					<td><?= $oGame->getStartDateTime()->toString("H:i") ?></td>
+					<td class="visible-lg"><?= $oGame->getLocation() !== null ? $oGame->getLocation()->getName() : null ?></td>
+					<td style="text-align: right;">
+					 	<?php $this->oPoulePlace = $oGame->getHomePoulePlace(); ?>
+						<?php $this->bAway = false; ?>
+						<?= $this->render("pouleplace/show.phtml"); ?>
+					</td>
+					<td style="text-align: center;">
+					<?php if ( $oGame->getState() === Voetbal_Factory::STATE_PLAYED ): ?>
+						<?php if ( $oGame->getHomeGoalsPenalty() > -1 ): ?>
+							<?= $oGame->getHomeGoalsPenalty() ?> - <?= $oGame->getAwayGoalsPenalty() ?> (p)
+						<?php elseif ( $oGame->getHomeGoalsExtraTime() > -1 ): ?>
+							<?= $oGame->getHomeGoalsExtraTime() ?> - <?= $oGame->getAwayGoalsExtraTime() ?> (nv)
+						<?php elseif ( $oGame->getHomeGoals() > -1 ): ?>
+							<?= $oGame->getHomeGoals() ?> - <?= $oGame->getAwayGoals(); ?>
+						<?php endif; ?>
+					<?php else: ?>
+					 -
+					<?php endif; ?>
+					</td>
+					<td>
+					 	<?php $this->oPoulePlace = $oGame->getAwayPoulePlace(); ?>
+						<?php $this->bAway = true; ?>
+						<?= $this->render("pouleplace/show.phtml"); ?>
+					</td>
+					<?php if ( $oPoule->needsRanking() == false ): ?>
+					<td style="text-align: center;"><?= $oPoule->getDisplayName( false ) ?></td>
+					<?php endif; ?>
+				</tr>
+				<?php endforeach; ?>
+			</tbody>
+			</table>
+		</div>
+		<div class="col-xs-10 col-sm-5 col-md-offset-3 col-md-3" id="cs-poulerank-id-<?= $oPoule->getId(); ?>" style="padding-left: 30px; padding-right: 0px;">
+			<?php $this->oPoule = $oPoule; ?>
+			<?= $this->render("competitionseason/pouleranking.phtml"); ?>
+		</div>
+		<div style="clear:both;"></div>
+	<?php else: ?>
+		<?php if ( $bShowGames === true ): ?>
+			<?php if ( $bFirstPouleOfRound === true ): ?>
+			<table class="table table-striped" style="text-align:center;">
+			<tr class="tableheader">
+				<th>datum</th>
+				<th>tijd</th>
+				<th class="visible-lg">plaats</th>
+				<th style="text-align:right;">thuisteam</th>
+				<th style="text-align:center;">uitslag</th>
+				<th>uitteam</th>
+				<th></th>
+			</tr>
+			<tbody>
+			<?php endif; ?>
+			<?php $oGames = $oPoule->getGames( true ); ?>
+				<?php foreach( $oGames as $oGame ): ?>
+				<tr>
+					<td><?= $oGame->getStartDateTime()->toString("j M") ?></td>
+					<td><?= $oGame->getStartDateTime()->toString("H:i") ?></td>
+					<td class="visible-lg"><?= $oGame->getLocation() !== null ? $oGame->getLocation()->getName() : null ?></td>
+					<td style="text-align: right;">
+					 	<?php $this->oPoulePlace = $oGame->getHomePoulePlace(); ?>
+						<?php $this->bAway = false; ?>
+						<?= $this->render("pouleplace/show.phtml"); ?>
+					</td>
+					<td style="text-align: center;">
+					<?php if ( $oGame->getState() === Voetbal_Factory::STATE_PLAYED ): ?>
+						<?php if ( $oGame->getHomeGoalsPenalty() > -1 ): ?>
+							<?= $oGame->getHomeGoalsPenalty() ?> - <?= $oGame->getAwayGoalsPenalty() ?> (p)
+						<?php elseif ( $oGame->getHomeGoalsExtraTime() > -1 ): ?>
+							<?= $oGame->getHomeGoalsExtraTime() ?> - <?= $oGame->getAwayGoalsExtraTime() ?> (nv)
+						<?php elseif ( $oGame->getHomeGoals() > -1 ): ?>
+							<?= $oGame->getHomeGoals() ?> - <?= $oGame->getAwayGoals(); ?>
+						<?php endif; ?>
+					<?php else: ?>
+					 -
+					<?php endif; ?>
+					</td>
+					<td style="text-align: left;">
+					 	<?php $this->oPoulePlace = $oGame->getAwayPoulePlace(); ?>
+						<?php $this->bAway = true; ?>
+						<?= $this->render("pouleplace/show.phtml"); ?>
+					</td>
+					<td style="text-align: center;"><?= $oPoule->getDisplayName( false ) ?></td>
+				</tr>
+				<?php endforeach; ?>
+			<?php if ( ++$nIt === $oPoules->count() ): ?>
+			</tbody>
+			</table>
+			<?php endif;?>
+		<?php else: ?>
+			<div style="text-align: center; margin-top: 5px; margin-bottom: 5px;">
+			<?php $this->oPoulePlace = $oPoulePlaces->first(); ?>
+			<?php $this->bAway = false; ?>
+			<?= $this->render("pouleplace/show.phtml"); ?>
+			</div>
+		<?php endif; ?>
+	<?php endif; ?>
+	<?php $bFirstPouleOfRound = false; ?>
+<?php endforeach; ?>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db>
+	<Additions>
+		<Version>V0.99</Version>
+		<Addition>
+			<Name>TableRemove</Name>
+			<table><Name>PoolInvitations</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Bets</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>RoundBetConfigs</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>PointsPerRoundPerUsersPerPool</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>PaymentsPerPool</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>MessagesPerUsersPerPool</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>UsersPerPool</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Pools</Name></table>
+		</Addition>
+	</Additions>
+</db>	

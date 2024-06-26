@@ -1,0 +1,56 @@
+<h2 style="text-align: center;">wijzig pool</h2>
+
+<?php if ( $this->oPool !== null ): ?>
+
+	<form name="poolusersform" method="POST" action="<?= $this->url ?>/">
+
+	<table class="table table-striped">
+	<tr class="tableheader">
+	<tr>
+		<th>deelnemer</th>
+		<th>betaald</th>
+		<th>admin</th>
+		<th><?= $this->oPool->getNrOfAvailableBets() ?> bets totaal</th>
+		<th>ipadres lastlogin</th>
+		<th>datumtijd lastlogin</th>
+		<th>emailadres</th>
+	</tr>
+
+	<?php $oPoolUsers = $this->oPool->getUsers() ?>
+	<?php foreach ( $oPoolUsers as $oPoolUser ): ?>
+		<tr>
+
+		<td><?= $oPoolUser->getUser()->getId() ?></td>
+
+		<?php $sSelected = ( $oPoolUser->getPaid() === true ) ? "checked" : null; ?>
+		<!--  <input type="checkbox" name="pooluser-"<?= $oPoolUser->getId() ?>" value="<?= $oPoolUser->getId() ?>" <?= $sSelected ?>> -->
+
+		<td><span class="<?= ( $oPoolUser->getPaid() === true ) ? "glyphicon glyphicon-thumbs-up" : null; ?>"></span></td>
+
+		<td><span class="<?= ( $oPoolUser->getAdmin() === true ) ? "glyphicon glyphicon-ok" : null; ?>"></span></td>
+
+		<td><?= $oPoolUser->getNrOfBets() ?> bets ingevuld</td>
+
+		<td><?= $oPoolUser->getUser()->getLatestLoginIpAddress() ?></td>
+		<?php
+		$sLatestLoginDateTime = "";
+		$oLatestLoginDateTime = $oPoolUser->getUser()->getLatestLoginDateTime();
+		if ( $oLatestLoginDateTime !== null )
+			$sLatestLoginDateTime = $oLatestLoginDateTime->toString("D d M Y G:i");
+		?>
+		<td><?= $sLatestLoginDateTime ?></td>
+		<td><?= $oPoolUser->getUser()->getEmailAddress() ?></td>
+
+		<tr>
+	<?php endforeach; ?>
+	</table>
+	<!--
+	<input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+	<input type="submit" name="btnupdate" value="opslaan">
+	-->
+</form>
+
+<?php endif ?>
+
+<hr>
+<a href="<?= $this->urlcontroller ?>/index/">terug naar overzicht</a>

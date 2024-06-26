@@ -1,0 +1,120 @@
+<?php $this->sHeaderName = "deelnemers"; ?>
+<?= $this->render("poolbeheer/header.phtml") ?>
+
+<div id="page-pool-admin-poolusers"></div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->successmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+
+<form method="POST" action="<?= $this->url ?>/">
+<div>
+
+<?php $nNrOfAvailableBets = $this->oPool->getNrOfAvailableBets( null, false, $this->oPool->getStartDateTime() ); ?>
+<?php $arrPoolUsersToRemind = array(); ?>
+<table class="table table-striped">
+	<tr class="tableheader">
+		<th>deelnemer</th><th>betaald <span class="glyphicon glyphicon-euro"></span></th><th><?= $nNrOfAvailableBets ?> voorspellingen totaal</th>
+		<?php if ( !$this->bCompetitionSeasonHasEnded ): ?>
+			<th>verwijder <span class="glyphicon glyphicon-remove"></span></th>
+		<?php endif; ?>
+	</tr>
+	<?php $oPoolUsers = $this->oPool->getUsers(); ?>
+	<?php foreach ( $oPoolUsers as $oPoolUser ): ?>
+	<tr>
+		<td><?= $oPoolUser->getUser()->getName() ?></td>
+
+		<td>
+			<input type="checkbox" name="pooluserpaid-<?= $oPoolUser->getId() ?>" value="<?= $oPoolUser->getId() ?>" <?php echo ( $oPoolUser->getPaid() ) ? 'checked' : null; ?> >
+		</td>
+
+		<?php $nNrOfPoolUserBets = $oPoolUser->getNrOfBets(); ?>
+		<?php
+			$sClass = null;
+			if ( $nNrOfPoolUserBets < $nNrOfAvailableBets ) {
+				$sClass = "class=\"danger\"";
+				$arrPoolUsersToRemind[] = $oPoolUser->getUser()->getName();
+			}
+		?>
+		<td <?= $sClass ?>><?= $nNrOfPoolUserBets ?> van de <?= $nNrOfAvailableBets ?> ingevuld</td>
+		<?php if ( !$this->bCompetitionSeasonHasEnded ): ?>
+			<td><input type="checkbox" name="pooluserremove-<?= $oPoolUser->getId() ?>" value="<?= $oPoolUser->getId() ?>" <?php echo ( $oPoolUser->getAdmin() ) ? 'disabled' : null; ?>></td>
+		<?php endif; ?>
+	</tr>
+	<?php endforeach ?>
+</table>
+<input type="submit" class="btn btn-default" name="btnupdateusers" value="opslaan">
+<button type="button" class="btn btn-default pull-right" id="btn-send-reminder-open-modal" value="opslaan"><span class="glyphicon glyphicon-envelope"></span> herinnering versturen</button>
+<input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+</div>
+</form>
+
+<?php
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "VoetbalOog_Round_BetConfig::BetTime", "EqualTo", VoetbalOog_BetTime::$nBeforeStartGame );
+$oOptions->addLimit(1);
+$oRoundBetConfigs = VoetbalOog_Round_BetConfig_Factory::createObjectsFromDatabaseExt( $this->oPool, $oOptions );
+$bBeforeGameBetTimes = $oRoundBetConfigs->count() > 0;
+?>
+<?php if ( !$this->bPoolHasEnded and !$bBeforeGameBetTimes ): ?>
+<!-- ReminderModal -->
+<div class="modal fade" id="reminderModal" tabindex="-1" role="dialog" aria-labelledby="reminderModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<form method="POST" action="<?= $this->url ?>/" class="form-horizontal" role="form">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="reminderModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					herinnering versturen
+				</span>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<label for="reminderemailheader" class="col-sm-3 control-label">onderwerp</label>
+					<div class="col-sm-9">
+						<input type="text" style="width:100%" name="reminderemailheader" value="herinnering voetbalpool <?= $this->oPool->getName() ?> ( <?= $this->oPool->getCompetitionSeason()->getAbbreviation() ?> )">
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="reminderemailcontent" class="col-sm-3 control-label">tekst deel 1</label>
+					<div class="col-sm-9">
+						<textarea rows=6 style="width:100%" name="reminderemailcontent" DISABLED>
+Beste pooldeelnemer,
+
+Je hebt nog niet alle voorspellingen ingevoerd. Binnekort verloopt de deadline.
+Ga naar <?= Zend_Registry::get("baseurl") ?> om al je voorspellingen in te voeren.
+						</textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="reminderemailcontentpost" class="col-sm-3 control-label">tekst deel 2</label>
+					<div class="col-sm-9">
+						<textarea rows=6 style="width:100%" name="reminderemailcontentpost">
+** vul hier zelf tekst toe **
+
+groet <?= $this->oUser->getName() ?>
+						</textarea>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="pooluserstoremind" class="col-sm-3 control-label">ontvangers</label>
+					<div class="col-sm-9">
+						<?= implode(",", $arrPoolUsersToRemind) ?>
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" name="btnsendreminderemail" value="submitted">verstuur</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			<input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+			<input type="hidden" name="pooluserstoremind" value="<?= implode(",", $arrPoolUsersToRemind) ?>">
+			</form>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<?php endif ?>

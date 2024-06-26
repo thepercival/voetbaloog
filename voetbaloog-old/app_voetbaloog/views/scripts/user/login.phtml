@@ -1,0 +1,110 @@
+
+<div class="page-header" style="text-align: center;">
+	<h2>inloggen</h2>
+</div>
+
+<?php
+
+// make recursive function!!!!
+$sGetParams = "previouscontroller/index/previousaction/index/";
+$sHiddenPostParams = "";
+{
+	if ( $this->arrCustomParams !== null and count( $this->arrCustomParams ) > 0 )
+	{
+		function hiddenP( $vtParam, $vtValue, &$sGetParamsP, &$sPostParams )
+		{
+			if ( is_array( $vtParam ) )
+			{
+				foreach( $vtParam as $szParamValue )
+				{
+					return hiddenP( $vtParam, $szParamValue, $sGetParamsP, $sPostParams );
+				}
+			}
+			else
+			{
+				$sPostParams .= "<input type=\"hidden\" name=\"".$vtParam."\" value=\"".$vtValue."\">";
+                $sGetParamsP .= $vtParam."/".$vtValue."/";
+			}
+		}
+
+		$sGetParams = "";
+		foreach( $this->arrCustomParams as $szParamId => $vtParamValue )
+		{
+			hiddenP( $szParamId, $vtParamValue, $sGetParams, $sHiddenPostParams );
+		}
+	}
+}
+?>
+
+<?php if( strlen( $this->loginmessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<?php echo $this->loginmessage ?>
+	</div>
+<?php endif ?>
+
+<form role="form" class="form-horizontal" name="loginform" action="<?= $this->formurl; ?>" method="post">
+	<div class="form-group">
+		<label for="username" class="col-xs-3 col-sm-4 control-label">emailadres</label>
+		<div class="col-xs-8 col-sm-6">
+			<input type="text" class="form-control" id="username" name="username" placeholder="gebruikersnaam" value="<?= strlen( $this->username ) > 0 ? $this->username : null ?>">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="password" class="col-xs-3 col-sm-4 control-label">wachtwoord</label>
+		<div class="col-xs-8 col-sm-6">
+			<input type="password" class="form-control" id="password" name="password" placeholder="wachtwoord">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="rememberme" class="col-xs-3 col-sm-4 control-label">onthoud mij</label>
+		<div class="col-xs-4 col-sm-6">
+			<input id="rememberme" name="rememberme" type="checkbox">
+		</div>
+	</div>
+	<div class="form-group">
+		<div class="col-xs-offset-3 col-xs-6 col-sm-offset-4 col-sm-6">
+			<button type="submit" name="btnlogin" value="submitted" class="btn btn-default">log in</button>
+		</div>
+	</div>
+	<?= $sHiddenPostParams; ?>
+</form>
+
+<div style="margin-top: 30px; text-align: center;">
+	<p class="lead">nog niet geregistreerd? registreer <a href="<?= $this->urlcontroller . "/register/" ?>">hier</a></p>
+</div>
+<div style="margin-top: 10px; text-align: center;">
+	<p class="lead" style="margin-bottom:0px; padding-bottom:10px;">wachtwoord vergeten? klik <a href="<?= $this->urlcontroller . "/forgetpasswordlink/" ?>">hier</a></p>
+</div>
+
+<?php if ( $this->bHidePopup !== true ): ?>
+<!-- JoinModal -->
+<div class="modal fade" id="joinModal" tabindex="-1" role="dialog" aria-labelledby="joinModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="joinModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					deelname pool <?= $this->poolname ?>
+				</span>
+			</div>
+			<div class="modal-body">
+				<h4>
+					Leuk dat je mee doet.<br><br>
+					Maak je deelname definitief door te registreren of door in te loggen als je al een account hebt.
+				</h4>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<?php endif; ?>
+
+<script type="text/javascript">
+	document.getElementById( "<?= strlen( $this->username ) === 0 ? "username" : "password" ?>" ).focus();
+	<?php if ( $this->bHidePopup !== true ): ?>
+		$('#joinModal').modal( {} );
+	<?php endif ?>
+</script>

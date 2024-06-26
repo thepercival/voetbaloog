@@ -1,0 +1,39 @@
+<?php
+if ( $this->oCompetitionSeason === null )
+	return;
+?>
+
+<h1 style='text-align:center;'><?php echo $this->oCompetitionSeason->getAbbreviation(); ?></h1>
+<div id="teamview" style="overflow:none;">
+	<?php echo $this->showTeam( "teamview", $this->oCompetitionSeason, $this->oTeamNetherlands, array() ); ?>
+</div>
+
+<br>
+<div>
+	<?php
+	/*
+		$oRss = null;
+		try
+		{
+			// $oRss = Zend_Feed::import('http://www.fifa.com/worldcup/news/rss.xml');
+			$oRss = Zend_Feed::import('http://www.vi.nl/WK-2010.htm?dbid=4223&typeofpage=84136');
+
+			echo "<fieldset><legend><a target=\"_blank\" href=\"".$oRss->link()."\">WK 2010 Nieuws</a></legend>";
+
+			$nCount = 0;
+			foreach ( $oRss as $oRssItem )
+			{
+				echo "<div><a target=\"_blank\" href=\"".$oRssItem->link()."\">".$oRssItem->title()."</a></div>";
+				if ( ++$nCount === 10 )
+					break;
+			}
+			echo "</fieldset>";
+		}
+		catch ( Zend_Feed_Exception $e)
+		{
+			echo "Exception caught importing feed: ".$e->getMessage()."<br>";
+		}
+	*/
+	?>
+
+</div>

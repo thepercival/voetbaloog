@@ -1,0 +1,16 @@
+<div class="container-fluid">
+	<h3 style="display: inline-block"><?= $this->oPool->getName() ?></h3>
+	<h5 style="display: inline-block"><?= $this->oCompetitionSeason->getName() ?></h5>
+	<?php if ( $this->subheader !== null ): ?>
+		<h5 class="hidden-xs pull-right" style="display: inline-block"><?= $this->subheader ?></h5>
+	<?php endif; ?>
+</div>
+<div class="container-fluid">
+	<div class="visible-xs">
+		<h2 style="display: inline-block"><?= $this->sHeaderName ?></h2>
+		<?php if ( $this->subheader !== null ): ?>
+			<h4 style="display: inline-block"><?= $this->subheader ?></h4>
+		<?php endif; ?>
+	</div>
+</div>
+<hr>

@@ -1,0 +1,80 @@
+<?php
+
+$cfgApp = new Zend_Config_Ini( APPLICATION_PATH.'/configs/config.ini', 'application');
+
+$sXML = null;
+$sXMLPath = null;
+$sBtnName = null;
+$sBtnValue = null;
+if ( substr( $cfgApp->version, 1 ) < 0.99 )
+{
+	$sXMLPath = GEN_APPLICATION_PATH."/model/installer/db_install.xml";
+	$sBtnName = "btnexecinstallxml";
+	$sBtnValue = "dbstructuur aanmaken";
+	// pas db.xml aan zodat deze ingelezen kan worden, pas ook installatie script aan!!!!
+}
+else if ( substr( $cfgApp->version, 1 ) == 0.99 )
+{
+	$sXMLPath = APPLICATION_PATH."/model/installer/db_install.xml";
+	$sBtnName = "btnexecinstallxml";
+	$sBtnValue = "dbstructuur aanmaken";
+	// pas db.xml aan zodat deze ingelezen kan worden, pas ook installatie script aan!!!!
+}
+else // > 0.99
+{
+	$sXMLPath = APPLICATION_PATH."/model/installer/db_update.xml";
+	$sBtnName = "btnexecupdatexml";
+	$sBtnValue = "dbstructuur updaten";
+}
+
+$objXMLDb = Source_XML_Reader::fileToSimpleXML( $sXMLPath );
+
+if ( $objXMLDb instanceof SimpleXMLElement )
+{
+	foreach ( $objXMLDb->children() as $xmlCollection )
+	{
+		if ( $xmlCollection->getName() === "Additions" )
+		{
+			$sVersionXML = (string) $xmlCollection->Version;
+			if ( $sVersionXML > $cfgApp->version )
+				$sXML .= "\t".$xmlCollection->asXML().PHP_EOL.PHP_EOL;
+		}
+	}
+}
+
+$sPath = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "config.ini";
+$bWritable = is_writable ( $sPath );
+?>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+    	<h3 class="panel-title">database structuur</h3>
+  	</div>
+  	<div class="panel-body">
+
+<?php if ( $bWritable === true ): ?>
+
+	<form method="POST" action="<?= $this->url ?>/">
+	<?php if( Zend_Registry::isRegistered( "dbxmllog" ) ): ?>
+		<?php $arrLogs = Zend_Registry::get("dbxmllog"); ?>
+		<?php foreach( $arrLogs as $arrLog ): ?>
+			<div class="alert alert-<?= ( $arrLog[0] === Zend_Log::EMERG ? "danger" : "success" ) ?>"><p class="alert-link"><?= $arrLog[1] ?></p></div>
+		<?php endforeach; ?>
+	<?php endif ?>
+	<div style="margin-bottom: 10px;">
+		<input type="submit" class="btn btn-default" name="<?= $sBtnName ?>" value="<?= $sBtnValue ?>">
+	</div>
+<?php else: ?>
+	<div class="alert alert-danger"><p class="alert-link">je hebt niet genoeg rechten om bestand <?= $sPath ?> aan te passen</p></div>
+	<div class="alert alert-danger"><p class="alert-link">je kunt dus bestand <?= $sXMLPath ?> niet verwerken</p></div>
+<?php endif; ?>
+	<div class="alert alert-info"><p class="alert-link">applicatie-versie: <?= $cfgApp->version ?></p></div>
+	<div>xml to update:</div>
+	<div>
+		<textarea class="form-control" cols=105 rows=20><?= $sXML ?></textarea>
+	</div>
+<?php if ( $bWritable === true ): ?>
+	</form>
+<?php endif; ?>
+	</div>
+</div>

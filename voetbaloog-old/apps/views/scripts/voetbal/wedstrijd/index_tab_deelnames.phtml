@@ -1,0 +1,110 @@
+<form method="POST" action="<?= $this->url ?>/">
+
+<?php if( $this->participationsavemessage !== null ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->participationsavemessage ?></p></div>
+<?php endif ?>
+<?php if( $this->participationerrormessage !== null ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->participationerrormessage ?></p></div>
+<?php endif ?>
+
+<?php
+$arrPlayers = array( "home" => array(), "away" => array() );
+{
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addOrder("Voetbal_Person::LastName", false );
+	$nHome = 0;
+	$oHomePlayers = $this->oGame->getHomePoulePlace()->getTeam()->getPlayerMemberships( $this->oGame->getStartDateTime(), $oOptions );
+	foreach( $oHomePlayers as $oHomePlayer )
+	{
+		$arrPlayers["home"][$nHome] = $oHomePlayer;
+		$nHome++;
+	}
+	$nAway = 0;
+	$oAwayPlayers = $this->oGame->getAwayPoulePlace()->getTeam()->getPlayerMemberships( $this->oGame->getStartDateTime(), $oOptions );
+	foreach( $oAwayPlayers as $oAwayPlayer )
+	{
+		$arrPlayers["away"][$nAway] = $oAwayPlayer;
+		$nAway++;
+	}
+	$nMax = ( $nHome > $nAway ) ? $nHome : $nAway;
+}
+?>
+
+<table class="table">
+<thead>
+	<tr>
+		<th class="hidden-xs hidden-sm" colspan="4"></th>
+		<th colspan="2"><?= $this->oGame->getHomePoulePlace()->getTeam()->getName() ?></th>
+		<th class="hidden-xs" colspan="3"></th>
+		<th>&nbsp;</th>
+		<th class="hidden-xs" colspan="3"></th>
+		<th colspan="2"><?= $this->oGame->getAwayPoulePlace()->getTeam()->getName() ?></th>
+		<th class="hidden-xs hidden-sm" colspan="4"></th>
+	</tr>
+	<tr>
+		<th class="hidden-xs"><span>in</span></th>
+		<th class="hidden-xs"><span>uit</span></th>
+		<th class="hidden-xs"><span>goals</span></th>
+		<th class="hidden-xs hidden-sm"><span>rood</span></th>
+		<th class="hidden-xs hidden-sm"><span>gele kaart 2</span></th>
+		<th class="hidden-xs hidden-sm"><span>gele kaart 1</span></th>
+		<th>basis</th>
+		<th>speler</th>
+		<th class="hidden-xs hidden-sm">rugnr</th>
+		<th>&nbsp;</th>
+		<th class="hidden-xs hidden-sm">rugnr</th>
+		<th>speler</th>
+		<th>basis</th>
+		<th class="hidden-xs hidden-sm"><span>gele kaart 1</span></th>
+		<th class="hidden-xs hidden-sm"><span>gele kaart 2</span></th>
+		<th class="hidden-xs hidden-sm"><span>rood</span></th>
+		<th class="hidden-xs"><span>goals</span></th>
+		<th class="hidden-xs"><span>uit</span></th>
+		<th class="hidden-xs"><span>in</span></th>
+	</tr>
+</thead>
+<tbody>
+	<?php for( $nI = 0 ; $nI < $nMax ; $nI++ ): ?>
+	<tr>
+		<?php $this->bHome = true; $this->oPlayer = null; ?>
+		<?php if ( array_key_exists( $nI, $arrPlayers["home"] ) ): ?>
+			<?php $this->oPlayer = $arrPlayers["home"][$nI]; ?>
+		<?php endif ?>
+		<?= $this->render("voetbal/wedstrijd/index_tab_deelname.phtml") ?>
+		<th>&nbsp;</th>
+		<?php $this->bHome = false; $this->oPlayer = null; ?>
+		<?php if ( array_key_exists( $nI, $arrPlayers["away"] ) ): ?>
+			<?php $this->oPlayer = $arrPlayers["away"][$nI]; ?>
+		<?php endif ?>
+		<?= $this->render("voetbal/wedstrijd/index_tab_deelname.phtml") ?>
+	</tr>
+	<?php endfor ?>
+</tbody>
+</table>
+
+<div class="modal fade" id="participationModal" tabindex="-1" role="dialog" aria-labelledby="participationModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="participationModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					meedoen wijzigen
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" role="form">
+			<div class="modal-body form-horizontal">
+				<div id="form-participation">
+					<span class="glyphicon glyphicon-refresh spin"></span>
+				</div>
+				<input type="hidden" name="id" value="<?= $this->oGame->getId() ?>">
+				<input type="hidden" name="activetabid" value="<?= $this->tabidplayermemberships?>">
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" name="btnsaveparticipation" value="submitted">opslaan</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>

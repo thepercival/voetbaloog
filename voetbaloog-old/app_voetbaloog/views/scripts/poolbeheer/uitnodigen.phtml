@@ -1,0 +1,127 @@
+<?php $this->sHeaderName = "uitnodigen"; ?>
+<?= $this->render("poolbeheer/header.phtml") ?>
+
+
+<div id="page-pool-admin-invite"></div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->successmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+
+<?php $sJoinDeadLine = $this->oPool->getStartDateTime()->toString("l j F") . " om " . $this->oPool->getStartDateTime()->toString("G:i")." uur"; ?>
+
+<h5>De uiterste inschrijfdatum voor de pool is <strong><?= $sJoinDeadLine ?></strong>.</h5>
+
+<style>
+.panel-linkemail {
+	position: relative;
+	padding: 45px 15px 15px;
+	margin: 0 0px 15px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ddd;
+	border-radius: 6px 6px 0 0;
+	box-shadow: none;
+}
+.panel-linkemail:after {
+	content: "Link";
+	position: absolute;
+	top: 15px;
+	left: 15px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #bbb;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+.panel-vbemail {
+	position: relative;
+	padding: 45px 15px 15px;
+	margin: 0 0px 15px;
+	border-style: solid;
+	border-width: 1px;
+	border-color: #ddd;
+	border-radius: 6px 6px 0 0;
+	box-shadow: none;
+}
+.panel-vbemail:after {
+	content: "Voorbeeld Email";
+	position: absolute;
+	top: 15px;
+	left: 15px;
+	font-size: 12px;
+	font-weight: bold;
+	color: #bbb;
+	text-transform: uppercase;
+	letter-spacing: 1px;
+}
+</style>
+
+
+<ul class="nav nav-tabs nav-pills" style='width: 100%' id="tabUitnodigenDetail">
+	<li style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#tabuitn_link" data-toggle="pill">link</a></li>
+	<li class="active" style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#tabuitn_email" data-toggle="pill">email</a></li>
+</ul>
+<div class="tab-content">
+	<div class="tab-pane" id="tabuitn_link">
+		<h5>Kopi&euml;er de link en ga naar je emailprogramma om mensen uit te nodigen.</h5>
+		<div class="panel-linkemail">
+			<textarea class="panel panel-default" rows="3" style="width:100%;" readonly disabled><?= $this->joinlink ?></textarea>
+		</div>
+	</div>
+	<div class="tab-pane active" id="tabuitn_email">
+		<h5>Kopi&euml;er de voorbeeld-email en ga naar je emailprogramma om mensen uit te nodigen.</h5>
+		<div class="panel-vbemail">
+			<div class="panel panel-default">
+				<!-- <div class="panel-heading" style="font-size: 12px;"><?= $this->messagesubject; ?></div> -->
+				<div class="panel-body" style="font-size: 12px;">
+Hoi,<br>
+<br>
+Voor het aankomende <?= $this->oPool->getCompetitionSeason()->getAbbreviation() ?> wil ik een voetbalpool gaan organiseren.<br>
+Hierbij wil ik je uitnodigen om ook mee te doen op <?= Zend_Registry::get("baseurl") ?>.<br>
+Met deze <a href="<?= $this->joinlink ?>">link</a> kun je je opgeven voor de pool <?= $this->oPool->getName() ?> tot uiterlijk <strong><?= $sJoinDeadLine ?></strong>.<br>
+<br>
+Veel succes en plezier!<br>
+<br>
+groet <?= $this->oUser->getName() ?>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<?php if( $this->bWelcome === true ): ?>
+	<!-- WelcomeModal -->
+	<div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="welcomeModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					pool aangemaakt
+				</span>
+				</div>
+				<div class="modal-body">
+					<h4>
+						Je hebt de pool <strong><?= $this->oPool->getName() ?></strong> ( <?= $this->oCompetitionSeason->getAbbreviation() ?> <img height="16" width="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/competitionseasons/<?= $this->oCompetitionSeason->getImageName() ?>-16.png"> ) nu aangemaakt.
+						Als organisator start je nu in het beheer-scherm.
+						Wanneer je op de link <strong><?= $this->oPool->getName() ?></strong> klikt, ga je naar het normale poolscherm.
+						<br><br>
+						veel plezier!
+					</h4>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+				</div>
+			</div><!-- /.modal-content -->
+		</div><!-- /.modal-dialog -->
+	</div><!-- /.modal -->
+<?php endif ?>
+
+<script>
+	var g_bWelcome = <?= $this->bWelcome ? "true" : "false" ?>;
+</script>

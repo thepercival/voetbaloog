@@ -1,0 +1,90 @@
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">wedstrijden wijzigen</h3>
+	</div>
+	<div class="panel-body">
+		<?php if ( $this->oCompetitionSeason->hasGames() ): ?>
+			<a href="<?= Zend_Registry::get("baseurl") ?>admingame/index/competitionseasonid/<?= $this->oCompetitionSeason->getId() ?>/" type="button" class="btn btn-default">naar westrijden beheer</a>
+		<?php else: ?>
+			<div class="alert alert-info"><p class="alert-link">er zijn geen wedstrijden om aan te passen</p></div>
+		<?php endif ?>
+	</div>
+</div>
+
+<?php
+$oDateTimePicker = Controls_Factory::createDateTimePicker( "defaultgamedatetime" );
+$oDateTimePicker->showPart( Controls_DateTimePicker::$m_nShowDateTime );
+$oDateTimePicker->putStartHour( 18 );
+$oDateTimePicker->putDateTime( Agenda_Factory::createDate() );
+?>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">wedstrijden genereren</h3>
+	</div>
+
+	<div class="panel-body">
+		<?php if( strlen( $this->creategameserrormessage ) > 0 ): ?>
+			<div class="alert alert-danger"><p class="alert-link"><?= $this->creategameserrormessage ?></p></div>
+		<?php endif ?>
+		<?php if( strlen( $this->creategamessavemessage ) > 0 ): ?>
+			<div class="alert alert-success"><p class="alert-link"><?= $this->creategamessavemessage ?></p></div>
+		<?php endif ?>
+		<?php if ( $this->oCompetitionSeason->hasGames() === false ): ?>
+			<?php
+				$oOptions = Construction_Factory::createOptions();
+				$oOptions->addFilter( "Voetbal_Round::CompetitionSeason", "EqualTo", $this->oCompetitionSeason );
+				$bCanCreateGames = ( Voetbal_PoulePlace_Factory::getNrOfObjectsFromDatabase( $oOptions ) >= 2 );
+			?>
+			<?php if ( $bCanCreateGames ): ?>
+				<form class="form-horizontal" role="form" name="creategamesform" method="POST" action="<?= $this->url ?>/">
+				<div class="form-group">
+					<label for="defaultgamedatetime" class="col-sm-2 control-label">datumtijd</label>
+					<div class="col-sm-10">
+					<?= $oDateTimePicker ?>
+					</div>
+				</div>
+				<div class="form-group">
+					<div class="col-sm-offset-2 col-sm-10">
+						<button type="submit" class="btn btn-default" name="btncreategames" value="submitted">genereer</button>
+					</div>
+				</div>
+				<input type="hidden" name="competitionseasonid" value="<?= $this->oCompetitionSeason->getId() ?>">
+				<input type="hidden" name="activetabid" value="games">
+				</form>
+			<?php else: ?>
+			<div class="alert alert-info"><p class="alert-link">er zijn niet genoeg pouleplekken om wedstrijden te kunnen genereren</p></div>
+			<?php endif ?>
+		<?php else: ?>
+			<div class="alert alert-info"><p class="alert-link">je kunt alleen wedstrijden genereren als er nog geen wedstrijden zijn voor dit competitieseizoen</p></div>
+		<?php endif ?>
+	</div>
+</div>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title">wedstrijden verwijderen</h3>
+	</div>
+	<div class="panel-body">
+		<?php if( strlen( $this->removegameserrormessage ) > 0 ): ?>
+			<div class="alert alert-danger"><p class="alert-link"><?= $this->removegameserrormessage ?></p></div>
+		<?php endif ?>
+		<?php if( strlen( $this->removegamessavemessage ) > 0 ): ?>
+			<div class="alert alert-success"><p class="alert-link"><?= $this->removegamessavemessage ?></p></div>
+		<?php endif ?>
+		<?php if ( $this->bAllowRemoveGames === true and $this->oCompetitionSeason->hasGames() ): ?>
+			<form class="form-horizontal" role="form" name="creategamesform" method="POST" action="<?= $this->url ?>/">
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-default" name="btnremovegames" value="submitted">verwijder</button>
+				</div>
+			</div>
+			<input type="hidden" name="competitionseasonid" value="<?= $this->oCompetitionSeason->getId() ?>">
+			<input type="hidden" name="activetabid" value="games">
+			</form>
+		<?php else: ?>
+			<div class="alert alert-info"><p class="alert-link">je kunt alleen wedstrijden verwijderen wanneer er geen pools aan dit competitieseizoen zijn gekoppeld en er wedstrijden zijn</p></div>
+		<?php endif ?>
+	</div>
+</div>

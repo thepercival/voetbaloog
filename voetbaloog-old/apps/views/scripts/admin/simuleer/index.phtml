@@ -1,0 +1,12 @@
+<?php
+$oUserComboBox = Controls_Factory::createComboBox( "newuserid" );
+$oUserComboBox->putObjectPropertyToShow( "**RAD_Auth_User::Name**" );
+$oUserComboBox->putSource( $this->oUsers );
+?>
+
+<div>
+	<form method="POST" action="<?= $this->url ?>/">
+		<?= $oUserComboBox ?>
+		<input type="submit" name="btnswitchuser" value="van gebruiker verwisselen">
+	</form>
+</div>

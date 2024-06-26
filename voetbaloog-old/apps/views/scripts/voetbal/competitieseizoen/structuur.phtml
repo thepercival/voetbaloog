@@ -1,0 +1,231 @@
+<ul class="progress-indicator">
+    <li class="completed">
+        <a href="<?= $this->url ?>/<?= $this->extraurlparams ?>subject/teams/" style=""><span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>teams<?= $this->oCompetitionSeason->hasGames() ? ", velden & scheidsrechters" : null ?></a>
+    </li>
+    <li class="completed">
+        <span class="bubble"></span><i class="glyphicon glyphicon-check"></i>structuur
+    </li>
+	<li class="<?= !$this->oCompetitionSeason->hasGames() ? 'danger' : null ?>">
+		<a href="<?= $this->url ?>/<?= $this->extraurlparams ?>subject/planning/" style=""><span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>planning</a>
+	</li>
+</ul>
+
+<div ng-controller="CompSeasonCtrl as csstructure" model="csstructure.csid" ng-init="csstructure.csid=<?= $this->oCompetitionSeason->getId() ?>">
+
+	<div class="container-fluid row">
+		<h3 class="pull-left" style="display: inline-block">{{ csstructure.competitionseason.name }} <span ng-if="csstructure.competitionseason.public" class="glyphicon glyphicon-cloud" title="gepubliceerd"></span><span ng-if="!csstructure.competitionseason.public" class="glyphicon glyphicon-lock" title="nog niet gepubliceerd, klik rechts op instellingen"></span></h3>
+		<h3 class="pull-right"><button class="btn btn-default btn-sm"><span class="glyphicon glyphicon-cog"></span></button></h3>
+	</div>
+	<hr>
+	<div ng-repeat="round in csstructure.competitionseason.rounds">
+		<div ng-if="$first || csstructure.getNrOfPoulePlaces( round ) > 1" class="row panel panel-round">
+			<div class="col-xs-3 col-sm-2 panel-heading" style="text-align: center;">
+				<div style="margin-bottom: 12px;" ng-bind-html="csstructure.getRoundName( round )"></div>
+				<div class="btn-group-vertical">
+					<label class="btn btn-default" ng-click="csstructure.updateRoundType( round )" ng-model="round.type" uib-btn-radio="csstructure.roundtype_poule"><span class="hidden-xs glyphicon {{ round.type == csstructure.roundtype_poule ? 'glyphicon-check' : null }}"></span> poule</label>
+					<label class="btn btn-default" ng-click="csstructure.updateRoundType( round )" ng-model="round.type" uib-btn-radio="csstructure.roundtype_knockout"><span class="hidden-xs glyphicon {{ round.type == csstructure.roundtype_knockout ? 'glyphicon-check' : null }}"></span> k.o.</label>
+				</div>
+				<div ng-if="round.type == csstructure.roundtype_poule" style="color: #888888; margin-top: 10px; font-size: 80%">{{ csstructure.getNrOfToPoulePlaces( round ) }} team(s) naar volgende ronde</div>
+			</div>
+			<div class="col-xs-9 col-sm-10 panel-body" style="padding-left: 0px; padding-right: 0px; min-height: 140px;">
+				<div class="container-fluid">
+					<div class="row" style="margin-left:0; margin-right:0;">
+						<div class="col-xs-2 col-sm-1" align="center" style="height:{{ round.type == csstructure.roundtype_poule ? 200 : 1 }}px; padding-left: 0px; padding-right: 0px; padding-bottom: 15px;">
+							<div ng-if="round.number == 0" style="margin-bottom: 20px">
+								<button role="button" class="btn btn-default btn-sm" ng-click="csstructure.popPoule( round )"><span class="glyphicon glyphicon-minus"></span></button>
+								<br>
+								<button role="button" class="btn btn-default btn-sm" style="margin-top:5px;" ng-click="csstructure.addPoule( round )"><span class="glyphicon glyphicon-plus"></span></button>
+							</div>
+							<div ng-if="round.type == csstructure.roundtype_poule" class="horizontal-slider" ya-no-ui-slider='round.nrofqualifiersoptions' ya-no-ui-slider-events="round.nrofqualifiersevents" style="height:{{ round.number == 0 ? 60 : 100 }}%;"></div>
+						</div>
+						<div class="col-xs-10 col-sm-11" align="center" style="padding-left: 15px; padding-right: 0px;">
+							<div ng-repeat="poule in round.poules" style="display:inline-block;">
+								<div align="center" class="panel panel-default panel-poule" style="width: 150px;">
+									<div class="panel-heading">
+										<h4>
+											<span class="label label-default">{{ csstructure.getPouleName( poule, true ) }}</span>
+										</h4>
+									</div>
+									<div class="panel-body" style="">
+										<div>
+											<button ng-if="round.type == csstructure.roundtype_poule && round.number == 0" role="button" class="btn btn-default btn-sm" ng-click="csstructure.popPoulePlace( poule )"><span class="glyphicon glyphicon-minus"></span></button>
+											<button ng-if="round.type == csstructure.roundtype_poule && round.number == 0" role="button" class="btn btn-default btn-sm" ng-click="csstructure.addPoulePlace( poule )"><span class="glyphicon glyphicon-plus"></span></button>
+										</div>
+										<div style="width: 150px;">
+											<div ng-repeat="pouleplace in poule.places" class="pull-left label label-default {{ csstructure.getPoulePlaceClassName( pouleplace ) }}" style="{{ round.number > 0 ? 'cursor: pointer;' : null }} font-size: 18px; margin: 2px;" ui-draggable="{{ round.number > 0 }}" drag="{ ppnumber : {{ pouleplace.number }}, pnumber : {{ poule.number }}, rnumber : {{ round.number }} }" drag-channel="{{ round.number }}" drop-channel="{{ round.number }}" ui-on-drop="csstructure.onDrop( { ppnumber : {{ pouleplace.number }}, pnumber : {{ poule.number }}, rnumber : {{ round.number }} }, $data)" drop-validate="csstructure.dropValidate( { ppnumber : {{ pouleplace.number }}, pnumber : {{ poule.number }}, rnumber : {{ round.number }} }, $data)">{{ csstructure.getPoulePlaceName( pouleplace ) }}</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div ng-if="!$first && csstructure.getNrOfPoulePlaces( round ) == 1" align="center">
+			<span ng-repeat="pouleplace in round.poules[0].places" class="label label-default" style="font-size: 18px; margin: 2px;">winnaar {{ csstructure.getPoulePlaceName( pouleplace ) }}</span>
+			<!-- <span class="flaticon-football79"></span> -->
+		</div>
+	</div>
+	<!--
+	<div class="row" style="margin-left:0px; margin-right:0px; text-align: center;">
+		<div class="col-xs-6">
+			<span class="glyphicon glyphicon-arrow-down badge-inv-0"></span>
+		</div>
+		<div class="col-xs-6">
+			<span class="glyphicon glyphicon-arrow-down badge-inv-0"></span>
+		</div>
+	</div>
+	-->
+<!--
+	<div ng-controller="ModalDemoCtrl">
+		<div style="text-align: center;">
+			<button role="button" class="btn btn-default" ng-click="open('md')"><span class="glyphicon glyphicon-circle-arrow-down"></span>&nbsp;voeg {{ competitionseason.rounds.length == 0 ? 'eerste' : 'volgende' }} ronde toe&nbsp;<span class="glyphicon glyphicon-circle-arrow-down"></span></button>
+		</div>
+		<script type="text/ng-template" id="modaladdfirstround.html">
+			<div class="modal-header">
+				<h3 class="modal-title">ronde toevoegen</h3>
+			</div>
+			<div class="modal-body">
+
+				<div class="form-group">
+					<label class="col-xs-6 control-label">naam</label>
+					<div class="col-xs-6">
+						<p class="form-control-static">
+							<span>{{ roundnr + 1 }}<sup>{{ roundnr == 0 ? "ste" : "de" }}</sup> ronde</span>
+						</p>
+					</div>
+				</div>
+				<div ng-if="competitionseason.rounds.length > 0">
+					<div class="form-group">
+						<label class="col-xs-6 control-label">aantal teams vorige ronde</label>
+						<div class="col-xs-3">
+							<p class="form-control-static">3</p>
+						</div>
+						<div class="col-xs-3"></div>
+					</div>
+     			</div>
+				<div ng-if="competitionseason.rounds.length == 0">
+					<div class="form-group">
+						<label for="addround-nrofteams" class="col-xs-6 control-label">aantal teams</label>
+						<div class="col-xs-3">
+							<select class="form-control" id="addround-nrofteams" name="addround-nrofteams"
+									ng-model="nrofteams" ng-options="obj.value as obj.text for obj in optionsNrOfTeams"
+									ng-change="updateNrOfTeams( nrofteams )" >
+							</select>
+						</div>
+						<div class="col-xs-3"></div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="addround-type" class="col-xs-6 control-label">type</label>
+					<div class="col-xs-6">
+						<label class="btn btn-primary" ng-model="roundtype" uib-btn-radio="'poule'"><span class="glyphicon {{ roundtype == 'poule' ? 'glyphicon-check' : null }}"> poule</label>
+						<label class="btn btn-primary" ng-model="roundtype" uib-btn-radio="'knockout'"><span class="glyphicon {{ roundtype == 'knockout' ? 'glyphicon-check' : null }}"> knockout</label>
+					</div>
+				</div>
+				<div ng-hide="roundtype == 'knockout'" class="form-group">
+					<label for="addround-nrofpoules" class="col-xs-6 control-label">aantal poules</label>
+					<div class="col-xs-3">
+						<select class="form-control" id="addround-nrofpoules" name="addround-nrofpoules"
+								ng-model="nrofpoules" ng-options="obj.value as obj.text for obj in optionsNrOfPoules"
+								ng-change="updateNrOfPoules( nrofpoules )" >
+						</select>
+					</div>
+					<div class="col-xs-3"></div>
+				</div>
+				<div class="form-group">
+					<label for="addround-semicompetition" class="col-xs-6 control-label">halve competitie</label>
+					<div class="col-xs-2 col-sm-1">
+						<input class="form-control" style="text-align: left;" type="checkbox" id="addround-semicompetition" name="addround-semicompetition" CHECKED>
+					</div>
+					<div class="col-xs-4 col-sm-5">
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+				<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+			</div>
+		</script>
+		<script type="text/ng-template" id="modaladdnextround.html">
+			<div class="modal-header">
+				<h3 class="modal-title">volgende ronde toevoegen</h3>
+			</div>
+			<div class="modal-body">
+
+				<div class="form-group">
+					<label class="col-xs-6 control-label">naam</label>
+					<div class="col-xs-6">
+						<p class="form-control-static">
+							<span>{{ roundnr + 1 }}<sup>{{ roundnr == 0 ? "ste" : "de" }}</sup> ronde</span>
+						</p>
+					</div>
+				</div>
+				<div ng-if="competitionseason.rounds.length > 0">
+					<div class="form-group">
+						<label class="col-xs-6 control-label">aantal teams vorige ronde</label>
+						<div class="col-xs-3">
+							<p class="form-control-static">3</p>
+						</div>
+						<div class="col-xs-3"></div>
+					</div>
+				</div>
+				<div ng-if="competitionseason.rounds.length == 0">
+					<div class="form-group">
+						<label for="addround-nrofteams" class="col-xs-6 control-label">aantal teams</label>
+						<div class="col-xs-3">
+							<select class="form-control" id="addround-nrofteams" name="addround-nrofteams"
+									ng-model="nrofteams" ng-options="obj.value as obj.text for obj in optionsNrOfTeams"
+									ng-change="updateNrOfTeams( nrofteams )" >
+							</select>
+						</div>
+						<div class="col-xs-3"></div>
+					</div>
+				</div>
+				<div class="form-group">
+					<label for="addround-type" class="col-xs-6 control-label">type</label>
+					<div class="col-xs-6">
+						<label class="btn btn-primary" ng-model="roundtype" uib-btn-radio="'poule'"><span class="glyphicon {{ roundtype == 'poule' ? 'glyphicon-check' : null }}"> poule</label>
+						<label class="btn btn-primary" ng-model="roundtype" uib-btn-radio="'knockout'"><span class="glyphicon {{ roundtype == 'knockout' ? 'glyphicon-check' : null }}"> knockout</label>
+					</div>
+				</div>
+				<div ng-hide="roundtype == 'knockout'" class="form-group">
+					<label for="addround-nrofpoules" class="col-xs-6 control-label">aantal poules</label>
+					<div class="col-xs-3">
+						<select class="form-control" id="addround-nrofpoules" name="addround-nrofpoules"
+								ng-model="nrofpoules" ng-options="obj.value as obj.text for obj in optionsNrOfPoules"
+								ng-change="updateNrOfPoules( nrofpoules )" >
+						</select>
+					</div>
+					<div class="col-xs-3"></div>
+				</div>
+				<div class="form-group">
+					<label for="addround-semicompetition" class="col-xs-6 control-label">halve competitie</label>
+					<div class="col-xs-2 col-sm-1">
+						<input class="form-control" style="text-align: left;" type="checkbox" id="addround-semicompetition" name="addround-semicompetition" CHECKED>
+					</div>
+					<div class="col-xs-4 col-sm-5">
+
+					</div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button class="btn btn-primary" type="button" ng-click="ok()">OK</button>
+				<button class="btn btn-warning" type="button" ng-click="cancel()">Cancel</button>
+			</div>
+		</script>
+	</div>
+-->
+	<hr>
+	<form ng-submit="csstructure.processStructureForm()">
+		<div style="text-align: center; margin-top:10px;">
+			<div ngif="csstructure.savestate != undefined" class="alert alert-{{ csstructure.savestate.type }}"><p class="alert-link">{{ csstructure.savestate.message }}</p></div>
+			<button role="button" class="btn btn-primary save-structure"><span class="glyphicon glyphicon-save"></span>&nbsp;opslaan</button>
+		</div>
+	</form>
+	<hr>
+
+</div>

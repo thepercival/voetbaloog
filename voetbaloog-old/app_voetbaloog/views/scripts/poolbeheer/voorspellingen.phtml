@@ -1,0 +1,40 @@
+<?php $this->sHeaderName = "voorspel-instellingen"; ?>
+<?= $this->render("poolbeheer/header.phtml") ?>
+
+<div id="page-pool-admin-betconfig"></div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->successmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+
+<?php
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "VoetbalOog_Round_BetConfig::Pool", "EqualTo", $this->oPool );
+$bBetsDone = ( VoetbalOog_Bet_Factory::getNrOfObjectsFromDatabase( $oOptions ) > 0 );
+?>
+
+<?php if( $this->bPoolHasStarted ): ?>
+	<div class="alert alert-warning"><p class="alert-link">de voorspelinstellingen kunnen niet meer gewijzigd worden, omdat de pool al is begonnen</p></div>
+<?php elseif( $bBetsDone ): ?>
+	<div class="alert alert-warning"><p class="alert-link">de voorspelinstellingen kunnen niet meer gewijzigd worden, omdat er al voorspellingen zijn gedaan voor deze pool</p></div>
+<?php endif ?>
+
+<div class="tab-pane" id="betconfigs">
+	<form method="POST" action="<?= Zend_Registry::get("baseurl") ?>voorspelinstellingen/verwerken/">
+		<div id="betconfigdiv" style="max-width: 600px;">
+			<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+		</div>
+		<input type="hidden" id="competitionseasonid" name="competitionseasonid" value="<?= $this->oCompetitionSeason->getId() ?>">
+		<input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+	</form>
+</div>
+
+<script>
+	var g_nCompetitionSeasonId = <?= $this->oCompetitionSeason->getId() ?>;
+	var g_nPoolId = <?= $this->oPool->getId() ?>;
+	var g_bPoolHasStarted = <?= $this->bPoolHasStarted ? "true" : "false" ?>;
+	var g_bBetsDone = <?= $bBetsDone ? "true" : "false" ?>;
+</script>

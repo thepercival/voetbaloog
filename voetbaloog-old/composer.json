@@ -1,0 +1,22 @@
+{
+  "name": "thepercival/voetbaloog",
+  "description": "website om voetbal-voorspellingen voor het EK en WK bij te houden",
+  "require": {
+    "php": ">=8.3",
+    "ext-soap": "*"
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true,
+  "require-dev": {
+    "phpstan/phpstan": "^0.12"
+  },
+  "scripts": {
+    "start": [
+      "Composer\\Config::disableProcessTimeout",
+      "php -S localhost:8002 -t pub_voetbaloog/"
+    ],
+    "stan": [
+      "XDEBUG_MODE=off vendor/bin/phpstan analyse -c phpstan.neon"
+    ]
+  }
+}

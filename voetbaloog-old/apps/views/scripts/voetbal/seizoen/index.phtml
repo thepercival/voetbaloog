@@ -1,0 +1,74 @@
+<div id="page-admin-season" class="page-default-admin"></div>
+<h2 style="text-align: center;">seizoen-overzicht</h2>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->savemessage ?></p></div>
+<?php endif ?>
+
+<table class="table">
+<thead>
+	<tr>
+		<th></th>
+		<th class="hidden-xs">id</th>
+		<th>naam</th>
+		<th><span class="visible-xs">start</span><span class="hidden-xs">startdatum</span></th>
+		<th><span class="visible-xs">eind</span><span class="hidden-xs">einddatum</span></th>
+		<?php if ( $this->bHasImport === true ): ?>
+			<th>externid</th>
+		<?php endif; ?>
+		<th><button role="button" class="btn btn-xs btn-default edit"><span class="glyphicon glyphicon-plus"></span></button></th>
+	</tr>
+</thead>
+<tbody>
+	<?php foreach ( $this->oSeasons as $oSeason ): ?>
+	<tr>
+		<td><button role="button" class="btn btn-xs btn-default edit" data-id="<?= $oSeason->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>
+		<td class="hidden-xs"><?= $oSeason->getId() ?></td>
+		<td><?= $oSeason->getName() ?></td>
+		<td><?= $oSeason->getStartDateTime() !== null ? $oSeason->getStartDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null ?></td>
+		<td><?= $oSeason->getEndDateTime() !== null ? $oSeason->getEndDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null ?></td>
+		<?php if ( $this->bHasImport === true ): ?>
+			<td><?= Import_Factory::getIdFromExternId( $oSeason->getExternId() ) ?></td>
+		<?php endif; ?>
+		<td><a href="<?= $this->url ?>/?btnsave=remove&seasonid=<?= $oSeason->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+	</tr>
+	<?php endforeach ?>
+</tbody>
+</table>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="editModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="form-title"></span>
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" role="form">
+			<div class="modal-body form-horizontal">
+				<div id="form-content"></div>
+				<span id="form-waiting" class="glyphicon glyphicon-refresh spin"></span>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" id="btnsave" name="btnsave" value="">opslaan</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<style>
+.datepicker{z-index:1151 !important;}
+</style>
+<script type="text/javascript">
+	var g_sEntity = 'seizoen';
+	var g_nEditId = <?= $this->editid !== null ? $this->editid : "null" ?>;
+	var g_bAutoFill = false;
+</script>
+

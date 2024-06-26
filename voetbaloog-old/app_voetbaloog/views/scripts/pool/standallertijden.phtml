@@ -1,0 +1,47 @@
+<div id="page-pool-stand-allertijden" style="max-width: 800px;">
+	<?php $this->sHeaderName = "stand aller tijden"; ?>
+	<?= $this->render("pool/header.phtml") ?>
+
+	<div>
+		<div class="alert alert-info pull-left">
+			<p class="alert-link">1 punt per deelnemer die je onder je laat per deelname aan een pool</p>
+		</div>
+			<span class="hidden-xs pull-right">
+				<button type="button" class="btn btn-success btn-show-records" data-type="pos"><span class="glyphicon glyphicon-thumbs-up"></span> records</button>
+				<button type="button" class="btn btn-danger btn-show-records" data-type="neg"><span class="glyphicon glyphicon-thumbs-down"></span> records</button>
+			</span>
+		<div style="clear:both;"></div>
+		<?= $this->showAllTimes( $this->oPool ); ?>
+	</div>
+</div>
+
+<!-- RecordsModal -->
+<div class="modal fade" id="recordsModal" tabindex="-1" role="dialog" aria-labelledby="recordsModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="recordsModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="recordsModelHeader"></span>
+				</span>
+			</div>
+			<div class="modal-body">
+				<div id="records-positive" data-viewed="" style='text-align:center;'>
+					<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+				</div>
+				<div id="records-negative" data-viewed="" style='text-align:center;'>
+					<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	var g_nPoolId = <?= $this->oPool->getId(); ?>;
+	var g_nPoolUserId = <?= $this->oPoolUser !== null ? $this->oPoolUser->getId() : "null" ?>;
+</script>

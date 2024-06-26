@@ -1,0 +1,116 @@
+<h2>importeer wedstrijden ( <?= $this->importModuleName ?> )</h2>
+
+<div class="alert alert-info">
+    <p class="alert-link">
+    <ul>
+        <li>alleen wedstijden voor competitieseizoenen, waarbij de teams voor de eerste ronde allemaal bekend zijn, kunnen worden geimporteerd</li>
+        <li>alleen wedstijden voor eerste ronde( rondenummer zou variable gemaakt kunnen worden via select )</li>
+    </ul>
+    </p>
+</div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+    <div class="alert alert-success">
+        <p class="alert-link"><?= $this->successmessage ?></p>
+    </div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+    <div class="alert alert-danger">
+        <p class="alert-link"><?= $this->errormessage ?></p>
+    </div>
+<?php endif ?>
+
+<form method="POST" action="<?= $this->url ?>/" role="form" class="form-horizontal">
+    <div class="form-group">
+        <label for="name" class="col-xs-3 col-sm-4 control-label">competitieseizoen</label>
+        <div class="col-xs-9 col-sm-4">
+            <select name="csid" class="form-control" onchange="this.form.submit();">
+                <options>
+                    <option value=""></option>
+                    <?php foreach( $this->oCompetitionSeasons as $oCompetitionSeason ): ?>
+                        <option value="<?= $oCompetitionSeason->getId() ?>" <?= $oCompetitionSeason === $this->oCompetitionSeason ? "SELECTED" : null ?> ><?= $oCompetitionSeason->getName() ?></option>
+                    <?php endforeach ?>
+                </options>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-offset-3 col-sm-offset-4 col-xs-9 col-sm-4">
+            <button type="submit" class="btn btn-default" name="btnimport" value="submitted">importeer</button>
+        </div>
+    </div>
+</form>
+
+<?php if( $this->oCompetitionSeason === null ){ return; } ?>
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">url:</div>
+        <div style="float:left;"><?= $this->externalurl ?></div>
+        <div style="clear:both;"></div>
+    </li>
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">cache:</div>
+        <div style="float:left;"><?= (int) ( $this->externalurlcache / 60 ) ?> minuten</div>
+        <div style="clear:both;"></div>
+    </li>
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">bond:</div>
+        <div style="float:left;"><?= $this->oCompetitionSeason->getAssociation() !== null ? $this->oCompetitionSeason->getAssociation()->getName() : null ?></div>
+        <div style="clear:both;"></div>
+    </li>
+</ul>
+
+<textarea style="width:100%; height:200px;" name="teamsjson"><?= json_encode( $this->arrGamesToImport, JSON_PRETTY_PRINT ); ?></textarea>
+
+<table class="table">
+    <thead>
+    <tr><th>actie</th><th>externe code</th><th>thuis</th><th>uit</th><th>datumtijd</th><th>lokale datumtijd</th></tr>
+    </thead>
+    <tbody>
+    <?php if( $this->arrGamesToImport === null or count( $this->arrGamesToImport ) === 0 ): ?>
+        <tr><td colspan="4">geen wedstrijden gevonden</td></tr>
+    <?php else: ?>
+        <?php foreach( $this->arrGamesToImport as $oGameToImport ): ?>
+            <?php
+            $oOptions = Construction_Factory::createOptions();
+            $oOptions->addFilter("Voetbal_Game::ExternId", "EqualTo", Import_Factory::$m_szExternPrefix . $oGameToImport->externid );
+            $oGame = Voetbal_Game_Factory::createObjectFromDatabase( $oOptions );
+
+            $bGameExists = ( $oGame !== null );
+            $oImportDateTime = Agenda_Factory::createDateTime( $oGameToImport->startdatetime );
+            $bDateTimeChanged = ( $bGameExists and $oGame->getStartDateTime() != $oImportDateTime );
+            $bChanged =  $bDateTimeChanged;
+            ?>
+            <tr>
+                <td>
+                    <?php if ( !$bGameExists ): ?>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    <?php elseif ( $bChanged ): ?>
+                        <span class="glyphicon glyphicon-edit"></span>
+                    <?php endif; ?>
+                </td>
+                <td><?= $bGameExists ? '<a href="'.Zend_Registry::get("baseurl").'voetbal/wedstrijd/index/?id='.$oGame->getId().'">'.$oGameToImport->externid."</a>" : $oGameToImport->externid ?></td>
+                <?php
+                $oHomePoulePlace = Voetbal_PoulePlace_Factory::createObjectByExternTeamId( $this->oCompetitionSeason, $oGameToImport->hometeamexternid );
+                $oAwayPoulePlace = Voetbal_PoulePlace_Factory::createObjectByExternTeamId( $this->oCompetitionSeason, $oGameToImport->awayteamexternid );
+                ?>
+                <?php
+                    $sHomeNotEqual = false;
+                    if ( $oGame !== null and  Import_Factory::getIdFromExternId( $oGame->getHomePoulePlace()->getTeam()->getExternId() ) != $oGameToImport->hometeamexternid ){
+                        $sHomeNotEqual = true;
+                    }
+                    $sAwayNotEqual = false;
+                    if ( $oGame !== null and  Import_Factory::getIdFromExternId( $oGame->getAwayPoulePlace()->getTeam()->getExternId() ) != $oGameToImport->awayteamexternid ){
+                        $sAwayNotEqual = true;
+                    }
+                ?>
+                <td style="<?= $sHomeNotEqual ? "color:red;" : ""?>"><?= $oHomePoulePlace->getTeam()->getName() ?></td>
+                <td style="<?= $sAwayNotEqual ? "color:red;" : ""?>"><?= $oAwayPoulePlace->getTeam()->getName() ?></td>
+                <td><?= $oGameToImport->startdatetime ?></td>
+                <td style="<?= $bDateTimeChanged ? "color:red;" : null ?>"><?= $bGameExists ? $oGame->getStartDateTime() : null ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    </tbody>
+</table>

@@ -1,0 +1,33 @@
+<script>
+	function initbstree()
+	{
+		<?php echo $this->jsDataTree; ?>
+
+		myTree = new Bs_Tree();
+		myTree.imageDir = '<?php echo $this->blueshoesjsdir; ?>javascript/components/tree/img/win98/';
+		myTree.checkboxSystemImgDir = '<?php echo $this->blueshoesjsdir; ?>javascript/components/checkbox/img/bobby/';
+		myTree.useCheckboxSystem      = true;
+		myTree.checkboxSystemWalkTree = 3;
+		myTree.initByArray( treeData );
+		myTree.drawInto('<?php echo $this->treedivid; ?>');
+	}
+
+	initbstree();
+
+</script>
+
+<fieldset><legend>Objecten</legend>
+<form name="changerolesform" method="POST" action="<?php echo $this->url; ?>/">
+<?php echo $this->editmessage; ?>
+<div id="<?php echo $this->treedivid; ?>"></div>
+<input type="submit" name="btnsave" value="opslaan">
+<input type="hidden" name="userid" value="<?php echo $this->objSelectedUser->getId(); ?>">
+<?php
+if ( $this->hiddenparams !== null )
+{
+	foreach( $this->hiddenparams as $vtId => $vtValue )
+		echo "<input type=\"hidden\" name=\"".$vtId."\" value=\"".$vtValue."\">";
+}
+?>
+</form>
+</fieldset>

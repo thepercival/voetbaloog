@@ -1,0 +1,61 @@
+<div id="page-home"></div>
+<div class="container">
+	<div class="row">
+		<?php if( strlen( $this->mainerrormessage ) > 0 ): ?>
+			<div class="alert alert-danger"><p class="alert-link"><?= $this->mainerrormessage ?></p></div>
+		<?php endif ?>
+        <?php if( strlen( $this->mainsuccessmessage ) > 0 ): ?>
+            <div class="alert alert-success"><p class="alert-link"><?= $this->mainsuccessmessage ?></p></div>
+        <?php endif ?>
+        <div class="col-xs-12 col-sm-6">
+			<h2 style="text-align: center;">pools</h2>
+			<?php if( $this->oUser !== null ): ?>
+				<?php if( $this->oUserPools->count() > 0 ): ?>
+					<table class="table table-striped">
+					<?php foreach ( $this->oUserPools as $oPool ): ?>
+						<tr href="<?= Zend_Registry::get("baseurl") ?>pool/index/poolid/<?= $oPool->getId() ?>/">
+							<td class="clickable-cell"><?= $oPool->getName()?></td>
+							<td class="clickable-cell"><img height="16" width="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/competitionseasons/<?= $oPool->getCompetitionSeason()->getImageName() ?>-16.png"><?= $oPool->getCompetitionSeason()->getAbbreviation() ?></td>
+						</tr>
+					<?php endforeach ?>
+					</table>
+				<?php endif ?>
+				<?php if ( $this->oAvailableCompSeason !== null ): ?>
+					<div style="text-align:center;">
+						<a style="padding-top: 10px; padding-bottom: 10px;" href="<?= Zend_Registry::get("baseurl") ?>pool/aanmaken/" class="btn btn-default" role="button">nieuwe pool organiseren</a>
+					</div>
+				<?php elseif ( $this->oUserPools->count() === 0 ) : ?>
+					<div class="alert alert-warning">helaas, op dit moment zijn er geen competities meer beschikbaar waarvoor je een eigen pool kunt organiseren</div>
+				<?php endif; ?>
+			<?php else: ?>
+				<div class="alert alert-warning" style="text-align: center;">
+					<h4>meedoen met een pool of een nieuwe pool organiseren?</h4>
+					<span>ga naar <a href="<?= Zend_Registry::get("baseurl") ?>user/login/" type="button"> inloggen</a> of <a href="<?= Zend_Registry::get("baseurl") ?>user/register/"> registreren</a></span>
+				</div>
+			<?php endif ?>
+
+		<?php if( $this->oAllPools->count() > 0 ): ?>
+			<?php $oNow = Agenda_Factory::createDateTime(); ?>
+			<?php if ( $this->oUser !== null ): ?>
+				<hr>
+				<h3 style="text-align: center;">overige pools</h3>
+				<div class="alert alert-warning" style="text-align: center;">
+					<span>om aan deze pools mee te kunnen doen, heb je een uitnodiging van de organisator nodig</span>
+				</div>
+			<?php endif; ?>
+			<table class="table table-striped">
+			<?php foreach ( $this->oAllPools as $oPool ): ?>
+				<tr href="<?= Zend_Registry::get("baseurl") ?>pool/index/poolid/<?= $oPool->getId() ?>/">
+					<td class="clickable-cell"><?= $oPool->getName() ?></td>
+					<td class="clickable-cell"><img height="16" width="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/competitionseasons/<?= $oPool->getCompetitionSeason()->getImageName() ?>-16.png"><?= $oPool->getCompetitionSeason()->getAbbreviation() ?></td>
+				</tr>
+			<?php endforeach ?>
+			</table>
+		<?php endif ?>
+		</div>
+		<div class="col-xs-12 col-sm-6" style="font-size: 120%">
+			<?= $this->render( "news/index.phtml" ); ?>
+		</div>
+		<div style="clear:both;"></div>
+	</div>
+</div>

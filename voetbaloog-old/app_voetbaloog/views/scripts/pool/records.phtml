@@ -1,0 +1,91 @@
+<?php
+
+$sRowClassPrefix = "pu-";
+
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "Voetbal_Season::StartDateTime", "SmallerThanOrEqualTo", $this->oPool->getCompetitionSeason()->getSeason()->getStartDateTime() );
+$oOptions->addFilter( "VoetbalOog_Pool::Name", "EqualTo", $this->oPool->getName() );
+$oOptions->addOrder( "Voetbal_Season::StartDateTime", false );
+$oPools = VoetbalOog_Pool_Factory::createObjectsFromDatabase( $oOptions );
+
+// result-streaks
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "VoetbalOog_Pool::Id", "EqualTo", $oPools );
+$oStreaks = VoetbalOog_Bet_Factory::getStreaksFromDatabase( VoetbalOog_Bet_Result::$nId, $this->bPositive, $oOptions );
+$sHeader = "langste reeksen ".(!$this->bPositive ? "niet-" : null )."correcte resultaten";
+$sTitleRow = "<tr><th class=\"headAT2\" colspan=3>".$sHeader."</th></tr>";
+?>
+
+<div style="border:1px solid black; margin-top:5px; margin-left:5px;">
+<table class="table table-striped pu-highlight">
+	<tbody>
+		<tr><th colspan="3">langste reeksen <?= !$this->bPositive ? "niet-" : null ?> correcte resultaten</th></tr>
+		<tr class="tableheader"><th>deelnemer</th><th style='text-align:right;'>aantal</th><th style='text-align:center;'>periode</th></tr>
+	<?php foreach( $oStreaks as $oStreak ): ?>
+		<?php $arrStreak = $oStreak->getValue(); ?>
+		<tr class="<?= $sRowClassPrefix . $arrStreak[0] ?>">
+			<td style='text-align:left;'><?= $arrStreak[1] ?></td>
+			<td style='text-align:right;'><?= $arrStreak[2] ?></td>
+			<td><?= $arrStreak[3]->getStartDateTime()->toString("d M Y")." - ".$arrStreak[3]->getEndDateTime()->toString("d M Y") ?></td>
+		</tr>
+	<?php endforeach; ?>
+	</tbody>
+</table>
+</div>
+<?php
+// score-streaks
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "VoetbalOog_Pool::Id", "EqualTo", $oPools );
+$oStreaks = VoetbalOog_Bet_Factory::getStreaksFromDatabase( VoetbalOog_Bet_Score::$nId, $this->bPositive, $oOptions );
+?>
+<div style="border:1px solid black; margin-top:5px; margin-left:5px;">
+<table class="table table-striped pu-highlight" style="margin-bottom: 0px;">
+	<tbody>
+		<tr><th colspan="3">langste reeksen <?= !$this->bPositive ? "niet-" : null ?> correcte standen</th></tr>
+		<tr class="tableheader"><th>deelnemer</th><th style='text-align:right;'>aantal</th><th style='text-align:center;'>periode</th></tr>
+	<?php foreach( $oStreaks as $oStreak ): ?>
+		<?php $arrStreak = $oStreak->getValue(); ?>
+		<tr class="<?= $sRowClassPrefix . $arrStreak[0] ?>">
+			<td style='text-align:left;'><?= $arrStreak[1] ?></td>
+			<td style='text-align:right;'><?= $arrStreak[2] ?></td>
+			<td><?= $arrStreak[3]->getStartDateTime()->toString("d M Y")." - ".$arrStreak[3]->getEndDateTime()->toString("d M Y") ?></td>
+		</tr>
+	<?php endforeach; ?>
+	</tbody>
+</table>
+</div>
+<?php
+// qualifyng
+$oCompetitionSeasons = Voetbal_CompetitionSeason_Factory::createObjects();
+{
+	$oNow = Agenda_Factory::createDateTime();
+	foreach ( $oPools as $oPool )
+	{
+		$oCompetitionSeason = $oPool->getCompetitionSeason();
+		if ( $oCompetitionSeason->getState() === Voetbal_Factory::STATE_PLAYED or $oNow > $oPool->getStartDateTime() )
+			$oCompetitionSeasons->add( $oCompetitionSeason );
+	}
+}
+$oOptions = Construction_Factory::createOptions();
+$oOptions->addFilter( "VoetbalOog_Pool::Name", "EqualTo", $this->oPool->getName() );
+$oOptions->addFilter( "Voetbal_Round::CompetitionSeason", "EqualTo", $oCompetitionSeasons );
+$oQualifyingGroups = VoetbalOog_Bet_Factory::getQualifyingFromDatabase( $this->bPositive, $oOptions );
+?>
+<?php foreach( $oQualifyingGroups as $oQualifyingGroup ): ?>
+<div style="border:1px solid black; margin-top:5px; margin-left:5px;">
+<table class="table table-striped pu-highlight">
+	<tbody>
+		<tr><th colspan="3"><?= (!$this->bPositive ? "laagste" : "hoogste" )." aantal laatste ".$oQualifyingGroup->getId() ?></th></tr>
+		<tr class="tableheader"><th>deelnemer</th><th style='text-align:right;'>aantal</th><th style='text-align:center;'>ronde</th></tr>
+	<?php foreach( $oQualifyingGroup as $oQualifying ): ?>
+		<?php $arrStreak = $oQualifying->getValue(); ?>
+		<tr class="<?= $sRowClassPrefix . $arrStreak[0] ?>">
+			<td style='text-align:left;'><?= $arrStreak[1] ?></td>
+			<td style='text-align:right;'><?= $arrStreak[2] ?></td>
+			<td><?= $arrStreak[3]->getName()." ".$arrStreak[3]->getCompetitionSeason()->getAbbreviation() ?></td>
+		</tr>
+	<?php endforeach; ?>
+	</tbody>
+</table>
+</div>
+<?php endforeach; ?>

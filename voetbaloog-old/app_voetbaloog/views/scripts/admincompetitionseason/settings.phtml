@@ -1,0 +1,184 @@
+<?php
+
+	$sChecked = "";
+	$sReadOnly = "";
+	if ( $this->oCompetitionSeason->getPublic() === true )
+	{
+		$sChecked = "CHECKED";
+	}
+	if ( ( $this->oCompetitionSeason->hasGames() === false and $this->oCompetitionSeason->hasGames( true ) )
+		or $this->oCompetitionSeason->getStartDateTime() < Agenda_Factory::createDateTime()
+		or $this->nNrOfPools > 0
+	)
+	{
+		$sReadOnly = "DISABLED";
+	}
+
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addOrder( "Voetbal_Association::Name", false );
+	$oAssociations = Voetbal_Association_Factory::createObjectsFromDatabase( $oOptions );
+
+	$oAssociationComboBox = Controls_Factory::createComboBox("associationid");
+	$oAssociationComboBox->putSource( $oAssociations );
+	$oAssociationComboBox->putCSSClass( "settingscombobox" );
+	$oAssociationComboBox->addAttribute( "title=\"niets geselecteerd\"" );
+	$oAssociationComboBox->putObjectToSelect( $this->oCompetitionSeason->getAssociation() );
+	$oAssociationComboBox->putObjectPropertyToShow( "**Voetbal_Association::Name** ( **Voetbal_Association::Description** )" );
+
+	$oNrOfMinutesGame = Patterns_Factory::createNumbers( 20, 90 );
+	$oNrOfMinutesGameComboBox = Controls_Factory::createComboBox( "nrofminutesgame" );
+	$oNrOfMinutesGameComboBox->putCSSClass( "settingscombobox" );
+	$oNrOfMinutesGameComboBox->putSource( $oNrOfMinutesGame );
+	if ( $this->nrofminutesgame !== null )
+		$oNrOfMinutesGameComboBox->putObjectToSelect( $oNrOfMinutesGame[$this->nrofminutesgame] );
+	else
+		$oNrOfMinutesGameComboBox->putObjectToSelect( $oNrOfMinutesGame[ $this->oCompetitionSeason->getNrOfMinutesGame() ] );
+	$oNrOfMinutesGameComboBox->putObjectPropertyToShow("**::Id**");
+
+	$oNrOfMinutesExtraTime = Patterns_Factory::createNumbers( 2, 30 );
+	$oNrOfMinutesExtraTimeComboBox = Controls_Factory::createComboBox( "nrofminutesextratime" );
+	$oNrOfMinutesExtraTimeComboBox->putCSSClass( "settingscombobox" );
+	$oNrOfMinutesExtraTimeComboBox->putSource( $oNrOfMinutesExtraTime );
+	if ( $this->nrofminutesextratime !== null )
+		$oNrOfMinutesExtraTimeComboBox->putObjectToSelect( $oNrOfMinutesExtraTime[$this->nrofminutesextratime] );
+	else
+		$oNrOfMinutesExtraTimeComboBox->putObjectToSelect( $oNrOfMinutesExtraTime[ $this->oCompetitionSeason->getNrOfMinutesExtraTime() ] );
+	$oNrOfMinutesExtraTimeComboBox->putObjectPropertyToShow("**::Id**");
+
+	$oWinPointsAfterGame = Patterns_Factory::createNumbers( 1, 3 );
+	$oWinPointsAfterGameComboBox = Controls_Factory::createComboBox( "winpointsaftergame" );
+	$oWinPointsAfterGameComboBox->putCSSClass( "settingscombobox" );
+	$oWinPointsAfterGameComboBox->putSource( $oWinPointsAfterGame );
+	if ( $this->winpointsaftergame !== null )
+		$oWinPointsAfterGameComboBox->putObjectToSelect( $oWinPointsAfterGame[$this->winpointsaftergame] );
+	else
+		$oWinPointsAfterGameComboBox->putObjectToSelect( $oWinPointsAfterGame[ $this->oCompetitionSeason->getWinPointsAfterGame() ] );
+	$oWinPointsAfterGameComboBox->putObjectPropertyToShow("**::Id**");
+
+	$oWinPointsAfterExtraTime = Patterns_Factory::createNumbers( 1, 3 );
+	$oWinPointsAfterExtraTimeComboBox = Controls_Factory::createComboBox( "winpointsafterextratime" );
+	$oWinPointsAfterExtraTimeComboBox->putCSSClass( "settingscombobox" );
+	$oWinPointsAfterExtraTimeComboBox->putSource( $oWinPointsAfterExtraTime );
+	if ( $this->winpointsafterextratime !== null )
+		$oWinPointsAfterExtraTimeComboBox->putObjectToSelect( $oWinPointsAfterExtraTime[$this->winpointsafterextratime] );
+	else
+		$oWinPointsAfterExtraTimeComboBox->putObjectToSelect( $oWinPointsAfterExtraTime[ $this->oCompetitionSeason->getWinPointsAfterExtraTime() ] );
+	$oWinPointsAfterExtraTimeComboBox->putObjectPropertyToShow("**::Id**");
+
+	$oPromotionRules = VoetbalOog_Ranking::getPromotionRuleDescriptions();
+	$oPromotionRuleComboBox = Controls_Factory::createComboBox( "promotionrule" );
+	$oPromotionRuleComboBox->putCSSClass( "settingscombobox" );
+	$oPromotionRuleComboBox->putSource( $oPromotionRules );
+	if ( $this->promotionrule !== null )
+		$oPromotionRuleComboBox->putObjectToSelect( $oPromotionRules[$this->promotionrule] );
+	else
+		$oPromotionRuleComboBox->putObjectToSelect( $oPromotionRules[ $this->oCompetitionSeason->getPromotionRule() ] );
+	$oPromotionRuleComboBox->putObjectPropertyToShow("**::Id**");
+
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "Voetbal_Game::State", "EqualTo", Voetbal_Factory::STATE_PLAYED );
+	$oGames = $this->oCompetitionSeason->getGames( true, $oOptions );
+	$bWritable = ( $oGames->count() === 0 );
+?>
+
+<?php if( strlen( $this->settingssavemessage ) > 0 ): ?>
+	<div class="alert alert-success">
+		<p class="alert-link"><?= $this->settingssavemessage ?></p>
+	</div>
+<?php endif ?>
+<?php if( strlen( $this->settingserrormessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<p class="alert-link"><?= $this->settingserrormessage ?></p>
+	</div>
+<?php endif ?>
+
+<!-- PromotionInfoModal -->
+<div class="modal fade" id="promotionInfoModal" tabindex="-1" role="dialog" aria-labelledby="promotionInfoModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="promotionInfoModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					promotie-regel informatie
+				</span>
+			</div>
+			<div class="modal-body">
+				<table class="table table-striped">
+				<tr class="tableheader">
+					<th>nr</th>
+					<th>omschrijving</th>
+				</tr>
+					<?php foreach ( $oPromotionRules as $oPromotionRule ): ?>
+					<tr>
+						<td><?= $oPromotionRule->getId() ?></td>
+						<td><?= $oPromotionRule->getValue() ?></td>
+					</tr>
+					<?php endforeach ?>
+				</table>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<?php if ( $bWritable ): ?>
+	<form name="settingsform" method="POST" action="<?= $this->url ?>/" class="form-horizontal" role="form">
+<?php endif; ?>
+
+<div class="form-group">
+	<label for="associationid" class="col-sm-6 control-label">bond</label>
+	<div class="col-sm-6">
+	<?= $oAssociationComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label style="padding-top: 3px;" for="public" class="col-sm-6 control-label">gepubliceerd</label>
+	<div class="col-sm-6">
+		<input type="checkbox" name="public" <?= $sChecked ?> <?= $sReadOnly ?>><p class="text-info" style="font-weight: bolder;">Alle wedstrijden moeten een startdatum hebben<br>en het toernooi mag nog niet begonnen zijn</p>
+	</div>
+</div>
+<div class="form-group">
+	<label for="nrofminutesgame" class="col-sm-6 control-label">aantal minuten reguliere speeltijd</label>
+	<div class="col-sm-6">
+	<?= $oNrOfMinutesGameComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="nrofminutesextratime" class="col-sm-6 control-label">aantal minuten verlenging</label>
+	<div class="col-sm-6">
+	<?= $oNrOfMinutesExtraTimeComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="winpointsaftergame" class="col-sm-6 control-label">aantal punten bij winst na reguliere speeltijd</label>
+	<div class="col-sm-6">
+	<?= $oWinPointsAfterGameComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="winpointsafterextratime" class="col-sm-6 control-label">aantal punten bij winst na verlenging</label>
+	<div class="col-sm-6">
+	<?= $oWinPointsAfterExtraTimeComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="promotionrule" class="col-sm-6 control-label">promotieregel</label>
+	<div class="col-sm-6">
+		<?= $oPromotionRuleComboBox ?> <a id="promotioninfo" role="button" onclick="$('#promotionInfoModal').modal( {} );" class="btn btn-default"><span class="glyphicon glyphicon-info-sign"></span></a>
+	</div>
+</div>
+
+<?php if ( $bWritable ): ?>
+	<div class="form-group">
+		<div class="col-sm-offset-6 col-sm-6">
+			<button type="submit" class="btn btn-default" name="btnupdatesettings" value="submitted">opslaan</button>
+		</div>
+	</div>
+	<input type="hidden" name="competitionseasonid" value="<?= $this->oCompetitionSeason->getId() ?>">
+	<input type="hidden" name="activetabid" value="settings">
+	</form>
+<?php endif; ?>
+

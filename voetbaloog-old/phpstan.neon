@@ -1,0 +1,12 @@
+parameters:
+    level: 2
+    bootstrapFiles:
+        - %rootDir%/../../../phpstan-bootstrap.php
+    inferPrivatePropertyTypeFromConstructor: true
+    paths:
+        - %rootDir%/../../../app_voetbaloog/library
+        - %rootDir%/../../../library
+    excludes_analyse:
+        - %rootDir%/../../../library/Voetbal/Extern/VoetbalCom.php
+        - %rootDir%/../../../library/Voetbal/Extern/FCUpdate.php
+        - %rootDir%/../../../library/Source/SOAP/Reader.php

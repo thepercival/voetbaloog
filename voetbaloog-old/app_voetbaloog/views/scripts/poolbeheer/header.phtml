@@ -1,0 +1,19 @@
+<div class="container">
+    <div class="row">
+        <div class="col-xs-12">
+            <div>
+                <h3 style="display: inline-block">beheer</h3>
+                <h3 style="display: inline-block">
+                    <a class="inverted" href="<?= Zend_Registry::get( "baseurl" ) ?>pool/index/poolid/<?= $this->oPool->getId() ?>/">
+                        <?= $this->oPool->getName() ?>
+                    </a>
+                </h3>
+                <h5 style="display: inline-block"><?= $this->oCompetitionSeason->getName() ?></h5>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container-fluid">
+    <h2 class="visible-xs"><?= $this->sHeaderName ?></h2>
+</div>
+<hr>

@@ -1,0 +1,50 @@
+<?php
+/**
+ * prerequisites :
+ * $this->bWritable
+ * $this->oCompetitionSeason
+ * $this->oRBCOwner
+ *
+ */
+?>
+
+<table class="table">
+	<thead>
+		<tr class="tableheader">
+			<th>ronde</th>
+			<th>soort</th>
+			<th>deadline</th>
+			<th style="text-align: right">pnt</th>
+		</tr>
+	</thead>
+	<tbody>
+	<?php $oRounds = $this->oCompetitionSeason->getRounds(); ?>
+	<?php foreach( $oRounds as $oRound ): ?>
+		<?php
+			$oOptions = Construction_Factory::createOptions();
+			$oOptions->addFilter("VoetbalOog_Round_BetConfig::Round", "EqualTo", $oRound );
+			$oBetConfigs = VoetbalOog_Round_BetConfig_Factory::createObjectsFromDatabaseExt( $this->oRBCOwner, $oOptions );
+		?>
+		<?php $nI = 0; ?>
+		<?php foreach( $oBetConfigs as $oBetConfig ): ?>
+			<tr>
+				<?php if ( $nI++ === 0): ?>
+					<td rowspan="<?= $oBetConfigs->count() ?>"><?= $oRound->getName() ?></td>
+				<?php endif; ?>
+                <td><?= VoetbalOog_BetType_Factory::getDescription( $oBetConfig->getBetType() ); ?></td>
+				<td><?= VoetbalOog_BetTime::getDescription( $oBetConfig->getBetTime() ); ?></td>
+				<td style="text-align: right"><?= $oBetConfig->getPoints(); ?></td>
+			</tr>
+		<?php endforeach; ?>
+	<?php endforeach; ?>
+	</tbody>
+	<?php if( $this->bWritable ): ?>
+		<tfoot>
+		<tr class="tableheader">
+			<th colspan="4" style="text-align: center;">
+				<input type="submit" class="btn btn-default" name ="btnsavebetconfigs" value ="alles opslaan">
+			</th>
+		</tr>
+		</tfoot>
+	<?php endif; ?>
+</table>

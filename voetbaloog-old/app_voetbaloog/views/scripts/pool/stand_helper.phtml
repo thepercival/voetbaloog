@@ -1,0 +1,244 @@
+<?php
+
+function setPayments( $oPool, $nStake, &$arrEurosPerPlace, &$arrUsersPerPlace )
+{
+	$bHasStarted = ( Agenda_Factory::createDateTime() > $oPool->getStartDateTime() );
+
+	$bByRanking = true;
+	$oPoolUsers = $oPool->getUsers( $bByRanking );
+
+	$arrUsersPerPlace = array();
+	$nPreviousPoints = null;
+	$nCurrentPlace = 0;
+	$nDeltaToPreviousPlace = null;
+	foreach ( $oPoolUsers as $oPoolUser )
+	{
+		$nCurrentPlace++;
+
+		$nPoints = $oPoolUser->getPoints();
+
+		if ( $nPreviousPoints === $nPoints )
+			$nDeltaToPreviousPlace++;
+		else
+			$nDeltaToPreviousPlace = 0;
+
+		$nPlace = $nCurrentPlace - $nDeltaToPreviousPlace;
+		if ( array_key_exists( $nPlace, $arrUsersPerPlace ) === false )
+			$arrUsersPerPlace[$nPlace] = 1;
+		else
+		{
+			$arrUsersPerPlace[$nPlace] = $arrUsersPerPlace[$nPlace] + 1;
+		}
+
+		$nPreviousPoints = $nPoints;
+	}
+
+	$arrEurosPerPlace = array();
+	$nNrOfUsers = $oPoolUsers->count();
+	$oPayments = $oPool->getPayments();
+	$nTotalTimesStake = 0;
+	$nRestPaymentPlace = null;
+	$oPaymentsToRemove = VoetbalOog_Pool_Payment_Factory::createObjects();
+	foreach( $oPayments as $oPayment )
+	{
+		$nPlace = $oPayment->getPlace();
+		$nWin = 0;
+		$nTimesStake = $oPayment->getTimesStake();
+		if ( $nTimesStake === -1 )
+		{
+			$nRestPaymentPlace = $nPlace;
+		}
+		else if ( array_key_exists( $nPlace, $arrUsersPerPlace ) )
+		{
+			$nWin = $nStake * $nTimesStake;
+			$nTotalTimesStake += $nTimesStake;
+		}
+		else if ( $nPlace > $nNrOfUsers and $bHasStarted === true )
+		{
+			$oPaymentsToRemove->add( $oPayment );
+		}
+		if ( $nWin > 0 )
+			$arrEurosPerPlace[$nPlace] = $nWin;
+	}
+
+	if ( $nRestPaymentPlace !== null and $oPaymentsToRemove->count() === 0 )
+	{
+		$nRestTimesStake = $nNrOfUsers - $nTotalTimesStake;
+		if ( $nRestTimesStake >= 0 )
+			$arrEurosPerPlace[$nRestPaymentPlace] = $nStake * $nRestTimesStake;
+		else if ( $bHasStarted === true )
+		{
+			foreach( $oPayments as $oPayment )
+			{
+				if ( $nRestPaymentPlace !== $oPayment->getPlace() )
+					$oPaymentsToRemove->add( $oPayment );
+			}
+		}
+	}
+	if ( $oPaymentsToRemove->count() > 0 )
+	{
+		$oPayments->removeCollection( $oPaymentsToRemove );
+
+		$oDbWriter = VoetbalOog_Pool_Payment_Factory::createDbWriter();
+		$oPaymentsToRemove->addObserver( $oDbWriter );
+		$oPaymentsToRemove->flush();
+		$oDbWriter->write();
+
+		setPayments( $oPool, $nStake, $arrEurosPerPlace, $arrUsersPerPlace );
+	}
+}
+
+function getPayment( $nPlace, $nStake, &$arrEurosPerPlace, $arrUsersPerPlace )
+{
+	if ( $nStake > 0
+	     and array_key_exists( $nPlace, $arrEurosPerPlace )
+	         and array_key_exists( $nPlace, $arrUsersPerPlace )
+	)
+		return $arrEurosPerPlace[$nPlace] / $arrUsersPerPlace[$nPlace];
+
+	return null;
+}
+
+$arrEurosPerPlace = array();
+$arrUsersPerPlace = array();
+
+$oRounds = $this->oCompetitionSeason->getRounds();
+$bByRanking = true;
+$oNow = Agenda_Factory::createDateTime();
+$bShowAvailablePoints = ( $oNow < $this->oCompetitionSeason->getEndDateTime() );
+$bShowWarningAvailablePoints = ( $oNow < $this->oPool->getStartDateTime() );
+$oPoolUsers = $this->oPool->getUsers( $bByRanking );
+$sCurrency = ( $this->oCompetitionSeason->getSeason()->getName() < 2002 ) ? "&#131;" : "&euro;";
+
+$nPoolAvailablePoints = 0;
+if ( $bShowAvailablePoints ) {
+	$nPoolAvailablePoints = $this->oPool->getAvailablePoints();
+}
+?>
+
+<table id="table-standings" class="table table-striped pu-highlight">
+	<tr class="tableheader">
+		<th></th>
+		<th><?= $sCurrency ?></th>
+		<th style="text-align:right;">pl.</th>
+		<th>deelnemer</th>
+		<?php $sUrl = Zend_Registry::get("baseurl")."pool/voorspellingen/poolid/".$this->oPool->getId()."/"; ?>
+		<?php foreach ( $oRounds as $oRound ): ?>
+			<th class="hidden-xs" style="text-align:right;"><a href="<?= $sUrl ?>roundnr/<?= $oRound->getNumber() ?>/" class="customlink"><?= $oRound->getDisplayName() ?></a></th>
+		<?php endforeach; ?>
+		<th style="text-align:right;"><span class="hidden-xs">totaal</span><a class="visible-xs customlink" href="<?= $sUrl ?>">tot.</a></th>
+		<?php if ( $bShowAvailablePoints === true ): ?>
+		<th style="text-align:right;">max</th>
+		<?php endif; ?>
+		<?php if ( $this->oPool->getStake() > 0 ): ?>
+		<th align="center" style="text-align:right;">
+			<button type="button" class="btn btn-default btn-xs pull-right btn-stand-info"><?= $sCurrency ?></button>
+		</th>
+		<?php endif; ?>
+	</tr>
+	<?php
+	$nLessestPoints = -1;
+	$oWorstPoolUser = $oPoolUsers->getIteratorReversed()->current();
+	if ( $oWorstPoolUser !== null )
+		$nLessestPoints = $oWorstPoolUser->getPoints();
+
+	$nStake = $this->oPool->getStake();
+	if ( $nStake > 0 )
+		setPayments( $this->oPool, $nStake, $arrEurosPerPlace, $arrUsersPerPlace );
+
+	$nRanking = 0;
+	$nPreviousPoints = null;
+	$nRankingDelta = 0;
+	?>
+	<?php foreach ( $oPoolUsers as $oPoolUser ): ?>
+		<?php
+		$nPoints = $oPoolUser->getPoints();
+		if ( $nPreviousPoints !== $nPoints )
+		{
+			$nRanking++;
+			$nRanking += $nRankingDelta;
+			$nRankingDelta = 0;
+		}
+		else {
+			$nRankingDelta++;
+		}
+		$sRowClassPrefix = "pu-";
+		$sClassName = $sRowClassPrefix . $oPoolUser->getUser()->getId();
+		?>
+		<tr class="<?= $sClassName ?>" data-pooluserid="<?= $oPoolUser->getId() ?>">
+			<td>
+				<?php if ( $nRanking < 4 ): ?>
+				<img width="16" height="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/ranking/rank_<?= $nRanking ?>.png" alt="rank_<?- $nRanking ?>">
+				<?php elseif ( $nRanking > 3 and $nLessestPoints === $nPoints ): ?>
+				<img width="16" height="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/ranking/rank_0.png" title="rode lantaarn drager">
+				<?php endif; ?>
+			</td>
+			<td>
+				<?php if ( $oPoolUser->getPaid() === true ): ?>
+				<span class="glyphicon glyphicon-ok" title="betaald"></span>
+				<?php endif; ?>
+			</td>
+			<td style="text-align:right;"><?= $nRanking ?></td>
+			<?php
+			$sNameTotal = $oPoolUser->getUser()->getName();
+			$arrNrOfWins = $oPoolUser->getNrOfWins();
+			foreach( $arrNrOfWins as $sCSWin )
+				$sNameTotal .= "<span class=\"glyphicon glyphicon-star\" title=\"".$sCSWin."\"></span>";
+			?>
+			<td class="pooluser-name"><?= $sNameTotal ?></td>
+			<?php foreach ( $oRounds as $oRound ): ?>
+			<td class="hidden-xs" style="text-align:right;"><?= $oPoolUser->getPoints( $oRound ) ?></td>
+			<?php endforeach; ?>
+			<td style="text-align:right; font-weight:bold;"><?= $nPoints ?></td>
+			<?php if ( $bShowAvailablePoints === true ): ?>
+			<?php $nAvailablePoints = $oPoolUser->getMaxPoints(); ?>
+			<td class="<?= ( ( $bShowWarningAvailablePoints and $nAvailablePoints < $nPoolAvailablePoints ) ? "danger" : null ) ?>" style="text-align:right;"><?= $nAvailablePoints ?></td>
+			<?php endif; ?>
+			<?php if ( $this->oPool->getStake() > 0 ): ?>
+			<td style="text-align:right;"><?= round( getPayment( $nRanking, $nStake, $arrEurosPerPlace, $arrUsersPerPlace ), 2 ) ?></td>
+			<?php endif; ?>
+		</tr>
+		<?php $nPreviousPoints = $nPoints; ?>
+	<?php endforeach; ?>
+</table>
+
+<?php if ( $this->oPool->getStake() > 0 ): ?>
+	<!-- StandInfoModal -->
+	<div class="modal fade" id="standInfoModal" tabindex="-1" role="dialog" aria-labelledby="standInfoModalLabel" aria-hidden="true">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="standInfoModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					stand informatie
+				</span>
+				</div>
+				<div class="modal-body">
+					<?php $sCurrency = ( $this->oPool->getCompetitionSeason()->getSeason()->getName() < 2002 ) ? "&#131;" : "&euro;"; ?>
+					<h5>Inleg is <?= $sCurrency ?> <?= $this->oPool->getStake() ?>. Bij gelijke stand worden de prijzen verdeeld.</h5>
+					<table class="table table-striped">
+						<tr class="tableheader"><th colspan=2>winstuitkeringen</th></tr>
+						<?php $oPayments = $this->oPool->getPayments(); ?>
+						<?php foreach ( $oPayments as $oPayment ): ?>
+							<tr>
+								<td>
+									<?php if ( $oPayment->getPlace() < 4 ): ?>
+										<img width="16" height="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/ranking/rank_<?= $oPayment->getPlace() ?>.png">
+									<?php elseif ( $nI < 1 ): ?>
+										<img width="16" height="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/ranking/rank_0.png" title="rode lantaarn drager">
+									<?php endif; ?>
+								</td>
+								<?php $vtTimesStake = $oPayment->getTimesStake(); ?>
+								<td><?= ( $vtTimesStake === -1 ) ? "overige inleg" : $vtTimesStake . "x de inleg"; ?></td>
+							</tr>
+						<?php endforeach; ?>
+					</table>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+				</div>
+			</div>
+		</div>
+	</div>
+<?php endif; ?>

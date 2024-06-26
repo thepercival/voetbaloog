@@ -1,0 +1,166 @@
+<fieldset>
+<legend>Ontvangers toevoegen</legend>
+<table>
+
+<?php
+	// naam is gelijk , comp anders
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "VoetbalOog_Pool::CompetitionSeason", "NotEqualTo", $this->oPool->getCompetitionSeason() );
+	$oOptions->addFilter( "VoetbalOog_Pool::Name", "EqualTo", $this->oPool->getName() );
+	$oPools = VoetbalOog_Pool_Factory::createObjectsFromDatabase( $oOptions );
+
+	if ( $oPools->count() > 0 )
+	{
+		$oUCComboBox = Controls_Factory::createComboBox( "addpool" );
+		$oUCComboBox->putSource( $oPools );
+		$oUCComboBox->putObjectPropertyToShow("**VoetbalOog_Pool::CompetitionSeason::Name**");
+
+		echo "
+			<tr>
+				<td>uit vorige pool</td>
+				<td>:</td>
+				<td>".$oUCComboBox."</td>
+			</tr>
+			<tr>
+				<td>&nbsp;</td>
+				<td>&nbsp;</td>
+				<td>en/of</td>
+			</tr>
+		";
+	}
+
+?>
+	<tr>
+		<td>Naam</td>
+		<td>:</td>
+		<td><input type="text" id="addreceivername" name="addreceivername"></td>
+	</tr>
+	<tr>
+		<td>Emailadres</td>
+		<td>:</td>
+		<td><input type="text" id="addreceiveremailaddress" name="addreceiveremailaddress"></td>
+	</tr>
+	<tr>
+		<td></td>
+		<td></td>
+		<td><input type="button" name="btnAddReceiver" onclick="return addReceiver();" value="voeg ontvanger(s) toe"></td>
+	</tr>
+</table>
+</fieldset>
+
+<table id="emailreceivers">
+
+</table>
+
+<script type="text/javascript">
+
+	g_nReceiverNumber = 0;
+	g_arrReceiverUsers = new Array();
+
+	function addReceiver()
+	{
+		var oSelectPools = document.getElementById("addpool");
+		if ( oSelectPools != undefined )
+		{
+			var sPoolId = document.getElementById("addpool").value;
+			if ( sPoolId != null && sPoolId.length > 0 )
+				addReceiverRows( sPoolId );
+		}
+
+		var oReceiverEmailAddress = document.getElementById("addreceiveremailaddress");
+		var oReceiverName = document.getElementById("addreceivername");
+
+		if ( oReceiverEmailAddress.value !== null && oReceiverEmailAddress.value.length > 0 && oReceiverName.value !== null && oReceiverName.value.length > 0 )
+			addReceiverRow( oReceiverName.value, oReceiverEmailAddress.value );
+
+		oReceiverEmailAddress.value = '';
+		oReceiverName.value = '';
+		if ( oSelectPools != undefined )
+			oSelectPools.selectedIndex = -1;
+
+		return false;
+	}
+
+	function addReceiverRows( sPoolId )
+	{
+		var oPoolUsers = getAjaxPoolUsers( sPoolId );
+		for ( var nI in oPoolUsers )
+		{
+			var oPoolUser = oPoolUsers[nI];
+			addReceiverRow( oPoolUser.getUser().getId(), null );
+		}
+	}
+
+	function getAjaxPoolUsers( sPoolId )
+	{
+		var oPoolUsers = new Object();
+
+		$.ajax({
+			url: g_sPubMap + 'pooluser/ajax/',
+			data: { ajaxaction : 'getfrompool', poolid : sPoolId },
+			async : false
+		}).done(function( json ) {
+			oPoolUsers = VoetbalOog_Pool_User_Factory().createObjectsFromJSON( json );
+		});
+
+		return oPoolUsers;
+	}
+
+	function deleteRow( r )
+	{
+		var i = r.parentNode.parentNode.rowIndex;
+		document.getElementById('emailreceivers').deleteRow(i);
+	}
+
+	function addReceiverRow( sName, sEmailAddress )
+	{
+		if ( g_arrReceiverUsers.indexOf ( sName ) >= 0 )
+			return;
+
+		g_arrReceiverUsers.push( sName );
+
+		var oTable = document.getElementById( 'emailreceivers' );
+
+		var lastRow = oTable.rows.length;
+		// if there's no header row in the table, then iteration = lastRow + 1
+		var row = oTable.insertRow( lastRow );
+
+		// text cell name
+		var textCellName = row.insertCell(0);
+		var el = document.createElement('input');
+		el.type = 'text';
+		el.id = 'emailreceiver_' + g_nReceiverNumber;
+		el.name = el.id;
+		el.value = sName;
+		el.style.width = '100px';
+		// el.disabled = true;
+		el.readOnly = 'readonly';
+		textCellName.appendChild(el);
+
+		// text cell emailaddress
+		var textCellEmailAddress = row.insertCell(1);
+		var el = document.createElement('input');
+		el.type = 'text';
+		el.id = 'emailreceiveraddress_' + g_nReceiverNumber;
+		el.name = el.id;
+		if ( sEmailAddress == null || sEmailAddress.length == 0 )
+			sEmailAddress = 'automatisch';
+		el.value = sEmailAddress;
+		el.style.width = '200px';
+		// el.disabled = true;
+		el.readOnly = 'readonly';
+		textCellEmailAddress.appendChild(el);
+
+		// remove link
+		var linkCellRemove = row.insertCell(2);
+		removeLink = document.createElement('a');
+		removeLink.setAttribute('href', '#' );
+		removeLink.onclick = function(){ deleteRow( this ); g_arrReceiverUsers.splice( g_arrReceiverUsers.indexOf ( sName ), 1 ); return false; };
+		var mytext = document.createTextNode('X');
+		removeLink.appendChild(mytext);
+		linkCellRemove.appendChild(removeLink);
+
+		g_nReceiverNumber++;
+	}
+
+</script>

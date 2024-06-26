@@ -1,0 +1,26 @@
+<div id="page-competitionseason-index"></div>
+
+<?php if ( $this->oCompetitionSeason === null ): ?>
+	<div class="alert alert-danger"><p class="alert-link">competitieseizoen niet gevonden</p></div>
+	<?php return; ?>
+<?php endif; ?>
+
+<div class="container-fluid">
+	<h3 style="display: inline-block"><?= $this->oCompetitionSeason->getName() ?></h3>
+</div>
+<hr>
+<div id='csview'></div>
+
+<?php
+$nDataFlag = Voetbal_JSON::$nCompetitionSeason_Rounds;
+$nDataFlag += Voetbal_JSON::$nRound_Poules;
+$nDataFlag += Voetbal_JSON::$nPoule_Games;
+
+$jsonCompetitionSeason = Voetbal_CompetitionSeason_Factory::convertObjectToJSON( $this->oCompetitionSeason, $nDataFlag );
+?>
+
+<script type="text/javascript">
+	var g_jsonCompetitionSeason = <?= $jsonCompetitionSeason ?>;
+	var g_oNow = new Date( <?= $this->tsJSNow ?> );
+	var g_oRankableControl = null;
+</script>

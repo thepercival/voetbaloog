@@ -1,0 +1,38 @@
+
+<div class="panel panel-default">
+	<form action="<?= $this->url ?>/" method="post" id="poolaanmakenform" class="form-horizontal" role="form">
+	<div class="panel-body">
+		<div class="form-group">
+			<label for="step3_competitionseasonid" class="col-sm-3">competitie</label>
+			<div id="step3_competitionseasonid" class="col-sm-9"></div>
+		</div>
+		<div class="form-group">
+			<label for="step3_poolname" class="col-sm-3">naam</label>
+			<div id="step3_poolname" class="col-sm-9"></div>
+		</div>
+		<div id=formgroup-newname class="form-group">
+			<label for="stake" class="col-sm-3">inleg</label>
+			<div class="input-group" class="col-sm-9">
+				<span class="input-group-addon"><span class="glyphicon glyphicon-euro"></span></span>
+				<input type="number" min=0 max=50 class="form-control" id="stake" name="stake" placeholder="0">
+				<span class="input-group-addon">.00</span>
+			</div>
+		</div>
+	</div>
+	<div class="panel-footer">
+		<div class="pull-left">
+			<button id="btn_step3_previous" type="button" class="btn btn-default"><span class="glyphicon glyphicon-circle-arrow-left"></span> vorige</button>
+		</div>
+		<div class="pull-right">
+			<button id="btn_step3_finish" name="btn_step3_finish" value="submitted" type="submit" class="btn btn-default">voltooien <span class="glyphicon glyphicon-flag"></span></button>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+	</form>
+</div>
+
+<script type="text/javascript">
+
+
+
+</script>

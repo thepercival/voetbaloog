@@ -1,0 +1,64 @@
+<div style='float:left;'>
+
+<?php if( strlen( $this->staffmembershiplisterrormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->staffmembershiplisterrormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->staffmembershiplistsavemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->staffmembershiplistsavemessage ?></p></div>
+<?php endif ?>
+
+<?php if ( $this->oStaffMemberMembership !== null ): ?>
+		<a type="button" class="btn btn-default" href="<?= $this->urlcontroller ?>/update/teamid/<?= $this->oTeam->getId() ?>/activetabid/"<?= $this->tabidstaffmemberships ?>/">toevoegen</a>
+<?php endif ?>
+
+<?php if ( $this->oStaffMemberMemberships->count() > 0 ): ?>
+
+<?php
+	$this->oStaffMemberMemberships->uasort(
+		function( $oStaffMemberMembershipA, $oStaffMemberMembershipB )
+		{
+			if ( $oStaffMemberMembershipA->getStartDateTime() < $oStaffMemberMembershipB->getStartDateTime() )
+				return -1;
+			elseif ( $oStaffMemberMembershipA->getStartDateTime() > $oStaffMemberMembershipB->getStartDateTime() )
+				return 1;
+			return ( $oStaffMemberMembershipA->getImportance() < $oStaffMemberMembershipB->getImportance() ? -1 : 1 );
+		}
+	);
+?>
+
+	<table class="table">
+	<thead>
+		<tr>
+			<th></th>
+			<th>naam</th>
+			<th>startdatum</th>
+			<th>einddatum</th>
+			<th>functie<br>nr.</th>
+			<th></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ( $this->oStaffMemberMemberships as $oStaffMemberMembership ): ?>
+		<tr class="<?= ( $this->oStaffMemberMembership === $oStaffMemberMembership ) ? "warning" : null ?>">
+			<td><a href="<?= $this->urlcontroller ?>/update/teamid/<?= $this->oTeam->getId() ?>/activetabid/<?= $this->tabidstaffmemberships ?>/staffmembershipid/<?= $oStaffMemberMembership->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a></td>
+			<td><?= $oStaffMemberMembership->getClient()->getFullName() ?></td>
+			<td><?= $oStaffMemberMembership->getStartDateTime()->toString("d M Y") ?></td>
+			<?php $oEndDate = $oStaffMemberMembership->getEndDateTime(); ?>
+			<td><?= ( $oEndDate !== null ) ? $oEndDate->toString("d M Y") : null ?></td>
+			<td><?= ( $oStaffMemberMembership->getFunctionX() > 0 ) ? $oStaffMemberMembership->getFunctionX() : null ?></td>
+			<td><a href="<?= $this->urlcontroller ?>/update/teamid/<?= $this->oTeam->getId() ?>/activetabid/<?= $this->tabidstaffmemberships ?>/btndeletestaffmembership/true/staffmembershipid/<?= $oStaffMemberMembership->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+		</tr>
+		<?php endforeach ?>
+	</tbody>
+	</table>
+<?php endif ?>
+</div>
+
+<div style='float:left; margin-left:30px;'>
+<form name="updatestaffmembershipform" method="POST" enctype="multipart/form-data" action="<?= $this->url ?>/" class="form-horizontal" role="form">
+<?= $this->render( "voetbal/team/lid/begeleider.phtml" ); ?>
+<input type="hidden" name="activetabid" value="<?= $this->tabidstaffmemberships ?>">
+</form>
+</div>
+
+<div style='clear:both;'></div>

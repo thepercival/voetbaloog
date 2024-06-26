@@ -1,0 +1,35 @@
+<h2 style="text-align: center;">pools-overzicht</h2>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->savemessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->confirmationmessage ) > 0 ): ?>
+	<div class="alert alert-info"><p class="alert-link"><?= $this->confirmationmessage ?></p></div>
+<?php endif ?>
+
+<?php if ( $this->oPools !== null and $this->oPools->count() > 0 ): ?>
+
+	<table class="table table-striped">
+	<tr class="tableheader">
+		<th></th>
+		<th>id</th>
+		<th>naam</th>
+		<th>competitie</th>
+		<th></th>
+	</tr>
+		<?php foreach ( $this->oPools as $oPool ): ?>
+		<tr>
+			<td><a href="<?= $this->urlcontroller ?>/update/poolid/<?= $oPool->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a></td>
+			<td><?= $oPool->getId() ?></td>
+			<td><?= $oPool->getName() ?></td>
+			<td><?= $oPool->getCompetitionSeason()->getAbbreviation() ?></td>
+			<td><a href="<?= $this->urlcontroller ?>/delete/poolid/<?= $oPool->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+		</tr>
+		<?php endforeach ?>
+	</table>
+<?php else: ?>
+	<p>Er zijn geen pools gevonden.</p>
+<?php endif; ?>

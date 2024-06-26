@@ -1,0 +1,90 @@
+<style>
+    .panel-round {
+        background-color: <?= APPLICATION_NAME === "superelf" ? "#A5C663" : "#3c3c3c" ?>;
+        border-radius: 4px;
+        margin-left: 0px;
+        margin-right: 0px;
+        margin-bottom: 10px;
+    }
+    .panel-round > .panel-heading{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        /*color: white;*/
+        padding: 10px;
+    }
+    .panel-round > .panel-body{
+        padding-bottom: 0px;
+        /*background-color: yellow;*/
+        border-radius: 0 4px 4px 0;
+    }
+    .panel-poule{
+        margin-left: 5px;
+        margin-right: 5px;
+    }
+    .panel-poule>.panel-body{
+        padding-top: 5px;
+        padding-bottom: 5px;
+        padding-left: 4px;
+        padding-right:4px;
+    }
+    .panel-default>.panel-heading{
+        padding-right: 0px;
+        padding-left: 5px;
+        padding-top: 5px;
+        padding-bottom: 5px;
+    }
+    .panel-poule>.panel-heading>h4{
+        margin-top: 0px;
+        margin-bottom: 5px;
+    }
+    .panel-default>.panel-heading .badge-0, .badge-0{
+        background-color: red;
+        color: white;
+    }
+    .badge-inv-0{
+        color: red;
+    }
+    .panel-default>.panel-heading .badge-1, .badge-1{
+        background-color: blue;
+        color: white;
+    }
+    .badge-inv-1{
+        color: blue;
+    }
+    .panel-default>.panel-heading .badge-2, .badge-2{
+        background-color: green;
+        color: white;
+    }
+    .noUi-connect{
+        background-color: #77b300;
+
+    }
+    .noUi-background{
+        background-color: black;
+    }
+    .noUi-target{
+        border: 1px solid #3c3c3c;
+    }
+    .noUi-handle{
+        background-color: #3c3c3c;
+        box-shadow: none;
+        border: 1px solid #888888;
+    }
+    .noUi-handle:before, .noUi-handle:after{
+        display: none;
+    }
+    .noUi-vertical .noUi-handle {
+        width: 32px;
+        height: 12px;
+        left: -8px;
+        top: -5px;
+    }
+</style>
+
+<?php if ( $this->subject === "teams" ): ?>
+    <?= $this->render("voetbal/competitieseizoen/teams.phtml"); ?>
+<?php elseif ( $this->subject === "structure" ): ?>
+    <?= $this->render("voetbal/competitieseizoen/structuur.phtml"); ?>
+<?php else: ?>
+    <?= $this->render("voetbal/competitieseizoen/wedstrijden.phtml"); ?>
+<?php endif; ?>

@@ -1,0 +1,150 @@
+<?php
+
+$sTextBtn = "toevoegen";
+$sBtnId = "btnaddstaffmembership";
+
+if ( $this->oStaffMemberMembership !== null )
+{
+	$sTextBtn = "wijzig";
+	$sBtnId = "btnupdatestaffmembership";
+
+	if ( $this->staffmembershippersonid === null )
+		$this->staffmembershippersonid = $this->oStaffMemberMembership->getClient()->getId();
+	if ( $this->staffmembershipstartdatetime === null )
+		$this->staffmembershipstartdatetime = $this->oStaffMemberMembership->getStartDateTime();
+	if ( $this->staffmembershipenddatetime === null )
+		$this->staffmembershipenddatetime = $this->oStaffMemberMembership->getEndDateTime();
+	if ( $this->staffmembershipfunctionx === null )
+		$this->staffmembershipfunctionx = $this->oStaffMemberMembership->getFunctionX();
+	if ( $this->staffmembershipimportance === null )
+		$this->staffmembershipimportance = $this->oStaffMemberMembership->getImportance();
+}
+
+$oPersonComboBox = Controls_Factory::createComboBox( "staffmembershippersonid" );
+{
+	$oPersonComboBox->removeEmptyRow();
+
+	$oNames = Patterns_Factory::createValuables();
+	$oPersons = Voetbal_Person_Factory::createObjectsFromDatabase();
+	foreach( $oPersons as $oPerson )
+	{
+		$oNames->add( Patterns_Factory::createValuable( $oPerson->getId(), $oPerson->getFullName( RAD_Person::CALLTYPE_FULLNAME_ORDER ) ) );
+	}
+	$oNames->uasort(
+		function( $oNameA, $oNameB )
+		{
+			return ( $oNameA->getValue() < $oNameB->getValue() ? -1 : 1 );
+		}
+	);
+
+	$oPersonComboBox->putSource( $oNames );
+	if ( $this->staffmembershippersonid !== null )
+		$oPersonComboBox->putObjectToSelect( $oNames[ $this->staffmembershippersonid ] );
+	$oPersonComboBox->putObjectPropertyToShow("**::Value**");
+}
+
+$sStartDateTime = $this->staffmembershipstartdatetime !== null ? $this->staffmembershipstartdatetime->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+$sEndDateTime = $this->staffmembershipenddatetime !== null ? $this->staffmembershipenddatetime->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+
+$oFunctionXComboBox = Controls_Factory::createComboBox( "staffmembershipfunctionx" );
+{
+	$oFunctionXComboBox->removeEmptyRow();
+	$oFunctionXComboBox->putSource( $this->oFunctions );
+	if ( $this->staffmembershipfunctionx !== null )
+		$oFunctionXComboBox->putObjectToSelect( $this->oFunctions[ $this->staffmembershipfunctionx ] );
+	$oFunctionXComboBox->putObjectPropertyToShow("**::Id**");
+}
+
+$oImportanceComboBox = Controls_Factory::createComboBox( "staffmembershipimportance" );
+{
+	$oImportanceComboBox->removeEmptyRow();
+	$oNumbers = Patterns_Factory::createNumbers( 1, 10 );
+	$oImportanceComboBox->putSource( $oNumbers );
+	if ( $this->staffmembershipimportance !== null )
+		$oImportanceComboBox->putObjectToSelect( $oNumbers[ $this->staffmembershipimportance ] );
+	$oImportanceComboBox->putObjectPropertyToShow("**::Id**");
+}
+?>
+<h3>begeleider lidmaatschap <?= $sTextBtn ?></h3>
+
+<?php if( strlen( $this->staffmembershipsavemessage ) > 0 ): ?>
+	<div class="alert alert-success">
+		<p class="alert-link"><?= $this->staffmembershipsavemessage ?></p>
+	</div>
+<?php endif ?>
+<?php if( strlen( $this->staffmembershiperrormessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<p class="alert-link"><?= $this->staffmembershiperrormessage ?></p>
+	</div>
+<?php endif ?>
+
+<div class="form-group">
+	<label for="staffmembershippersonid" class="col-sm-2 control-label">persoon</label>
+	<div class="col-sm-10">
+	<?= $oPersonComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-xs-2 control-label">startdatum</label>
+	<div class="col-sm-6">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" name="staffmembershipstartdatetime" value="<?= $sStartDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-xs-2 control-label">einddatum</label>
+	<div class="col-sm-6">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" name="staffmembershipenddatetime" value="<?= $sEndDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="staffmembershipfunctionx" class="col-sm-2 control-label">functie</label>
+	<div class="col-sm-10">
+		<?= $oFunctionXComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="staffmembershipimportance" class="col-sm-2 control-label">belangrijkheid</label>
+	<div class="col-sm-10">
+		<?= $oImportanceComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="staffmembershipphoto" class="col-sm-2 control-label">foto</label>
+	<div class="col-sm-10">
+		<p class="text-info" style="font-weight: bolder;">min. breedte : 480px, min. hoogte : 640px<br>min. verhouding : breedte 3, lengte 4<br>max. verhouding : breedte 3, lengte 5</p>
+		<input type="file" name="staffmembershipphoto" type="image/*">
+	</div>
+</div>
+
+<?php if ( $this->oStaffMemberMembership !== null ): ?>
+	<div class="form-group">
+		<label for="" class="col-sm-2 control-label">foto</label>
+		<div class="col-sm-10">
+			<img src="<?= Zend_Registry::get("baseurl") ?>image/generatecaptcha/staffmembershipid/<?= $this->oStaffMemberMembership->getId() ?>/" style="width:100px;" alt="foto">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="removestaffmembershipphoto" class="col-sm-2 control-label">verwijder foto</label>
+		<div class="col-sm-10">
+			<input type="checkbox" name="removestaffmembershipphoto">
+		</div>
+	</div>
+<?php endif; ?>
+
+<div class="form-group">
+	<div class="col-sm-offset-2 col-sm-10">
+	<?php if ( $this->oStaffMemberMembership !== null ): ?>
+		<input type="hidden" name="staffmembershipid" value="<?= $this->oStaffMemberMembership->getId() ?>">
+	<?php endif; ?>
+	<input type="hidden" name="teamid" value="<?= $this->oTeam->getId() ?>">
+	<button type="submit" class="btn btn-default" name="<?= $sBtnId ?>" value="<?= $sTextBtn ?>"><?= $sTextBtn ?></button>
+	</div>
+</div>
+
+<input type="hidden" name="MAX_FILE_SIZE" value="500000"> <!-- 500KB -->

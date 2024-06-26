@@ -1,0 +1,220 @@
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-3 control-label">naam</label>
+	<div class="col-xs-3 col-sm-3">
+		<input type="text" class="form-control" id="firstname" name="firstname" value="<?= $this->oPerson !== null ? $this->oPerson->getFirstName() : ( $this->arrExportedPlayer !== null ? $this->arrExportedPlayer["firstname"] : null ) ?>" placeholder="voornaam">
+	</div>
+	<div class="col-xs-2 col-sm-2">
+		<input type="text" class="form-control" id="insertion" name="insertion" value="<?= $this->oPerson !== null ? $this->oPerson->getNameInsertions() :  ( $this->arrExportedPlayer !== null ? $this->arrExportedPlayer["nameinsertions"] : null ) ?>">
+	</div>
+	<div class="col-xs-4 col-sm-4">
+		<input type="text" class="form-control" id="lastname" name="lastname" value="<?= $this->oPerson !== null ? $this->oPerson->getLastName() :  ( $this->arrExportedPlayer !== null ? $this->arrExportedPlayer["lastname"] : null ) ?>" placeholder="achternaam">
+	</div>
+</div>
+
+<?php
+	$oDateOfBirth = null;
+	if ( $this->oPerson !== null )
+		$oDateOfBirth = $this->oPerson->getDateOfBirth();
+	else if ( $this->arrExportedPlayer !== null )
+		$oDateOfBirth = Agenda_Factory::createDate( $this->arrExportedPlayer["dateofbirth"] );
+?>
+<?php $sBirthDate = $oDateOfBirth !== null ? $oDateOfBirth->toString( Agenda_DateTime::STR_NICEDATE ) : Agenda_Factory::createDate("1984-01-01")->toString( Agenda_DateTime::STR_NICEDATE ) ; ?>
+<div class="form-group">
+	<label for="startdate" class="col-xs-3 col-sm-3 control-label">geboren</label>
+	<div class="col-xs-9 col-sm-5">
+		<div class="input-group date">
+			<input type="text" name="dateofbirth" value="<?= $sBirthDate ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="externid" class="col-xs-3 col-sm-3 control-label"><?= Import_Factory::$m_szExternPrefix ?></label>
+	<div class="col-xs-9 col-sm-5">
+		 <input type="text" class="form-control" name="externid" value="<?= $this->oPerson !== null ? Import_Factory::getIdFromExternId( $this->oPerson->getExternId() ) : ( $this->arrExportedPlayer !== null ? $this->arrExportedPlayer["externid"] : null ) ?>">
+	</div>
+</div>
+<?php
+$oValidatedDateTime = null;
+if ( $this->oPerson !== null )
+	$oValidatedDateTime = $this->oPerson->getValidatedDateTime();
+// else if ( $this->arrExportedPlayer !== null )
+	// $oDateOfBirth = Agenda_Factory::createDate( $this->arrExportedPlayer["dateofbirth"] );
+?>
+<?php $sValidatedDateTime = $oValidatedDateTime !== null ? $oValidatedDateTime->toString( Agenda_DateTime::STR_NICEDATE ) : null; ?>
+<div class="form-group">
+	<label for="validateddatetime" class="col-xs-3 col-sm-3 control-label">gevalideerd</label>
+	<div class="col-xs-9 col-sm-5">
+		<p class="form-control-static"><?= $sValidatedDateTime ?></p>
+	</div>
+</div>
+
+<?php
+$oPlayerMembership = null;
+$oNow = Agenda_Factory::createDateTime();
+if ( $this->oPerson !== null ) {
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter("Voetbal_Team_Membership_Player::Client", "EqualTo", $this->oPerson);
+	$oOptions->addOrder("Voetbal_Team_Membership_Player::StartDateTime", true );
+	$oPlayerMemberships = Voetbal_Team_Membership_Player_Factory::createObjectsFromDatabase($oOptions);
+	if ( $oPlayerMemberships->count() > 0 ) {
+		$oPlayerMembership = $oPlayerMemberships->first();
+		?>
+		<hr>
+		<?php foreach( $oPlayerMemberships as $oPlayerMembership ): ?>
+		<div class="form-group" style="margin-bottom: 0px;">
+			<label for="teams" class="col-xs-3 col-sm-3 control-label"><?= $oPlayerMembership->getProvider()->getName() ?></label>
+			<?php $bCurrent = ( $oPlayerMembership->getEndDateTime() === null or $oPlayerMembership->getEndDateTime() > $oNow); ?>
+			<?php $sEndDateTime = ( $oPlayerMembership->getEndDateTime() === null ? "&infin;" : $oPlayerMembership->getEndDateTime()->toString( Agenda_DateTime::STR_SQLDATE ) ); ?>
+			<div class="col-xs-3 col-sm-3">
+				<p class="form-control-static"><?= substr( $oPlayerMembership->getLine(), 0, 1 ) ?> <?= $oPlayerMembership->getStartDateTime()->toString( Agenda_DateTime::STR_SQLDATE ) ?> </p>
+			</div>
+			<div class="col-xs-5 col-sm-5">
+				<?php if( $bCurrent ): ?>
+					<?php $oEndDateTime = ( $oPlayerMembership->getEndDateTime() !== null ? $oPlayerMembership->getEndDateTime() : $oNow ); ?>
+					<?php $sEndDateTimeNice = $oEndDateTime->toString( Agenda_DateTime::STR_NICEDATE ); ?>
+				<div class="input-group date">
+					<input type="text" name="endplayermembershipenddatetime" value="<?= $sEndDateTimeNice ?>" class="form-control">
+					<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+				</div>
+				<?php endif; ?>
+				<?php if( !$bCurrent ): ?>
+				<p class="form-control-static"><?= $sEndDateTime ?></p>
+				<?php endif; ?>
+			</div>
+			<div class="col-xs-1">
+			<?php if( $oPlayerMembership->getEndDateTime() === null or $oPlayerMembership->getEndDateTime() > $oNow): ?>
+				<button type="submit" class="btn-default btn-xs" name="btnendplayermembership" value="submitted"><span class="glyphicon glyphicon-stop"></span></button>
+				<input type="hidden" name="endplayermembershipid" value="<?= $oPlayerMembership->getId() ?>">
+			<?php endif; ?>
+			</div>
+		</div>
+		<?php endforeach ?>
+		<hr>
+		<?php
+	}
+}
+$oOptions = Construction_Factory::createFiltersForTimeSlots( "Voetbal_Season", Agenda_Factory::createDateTime(), Agenda_TimeSlot::EXCLUDE_NONE, true );
+$oOptions->addLimit( 1 );
+$oCompetitionSeason = Voetbal_CompetitionSeason_Factory::createObjectFromDatabase( $oOptions );
+
+$oTeamComboBox = Controls_Factory::createComboBox( "playermembershipteamid" );
+{
+	$oTeams = $oCompetitionSeason->getTeams();
+	$oTeamComboBox->putSource( $oTeams );
+	if ( $this->arrExportedPlayer !== null and array_key_exists("teamid", $this->arrExportedPlayer ) )
+		$oTeamComboBox->putObjectToSelect( $oTeams[ $this->arrExportedPlayer["teamid"] ] );
+	else if ( $this->newteamid > 0 )
+		$oTeamComboBox->putObjectToSelect( $oTeams[ $this->newteamid ] );
+	$oTeamComboBox->putCSSClass( "form-control" );
+	$oTeamComboBox->putObjectPropertyToShow("**Voetbal_Team::Name**");
+}
+
+$sStartDateTime = null;
+if ( $oPlayerMembership !== null and $oPlayerMembership->getEndDateTime() !== null )
+	$sStartDateTime = $oPlayerMembership->getStartDateTime()->toString( Agenda_DateTime::STR_NICEDATE );
+else {
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "Voetbal_Round::CompetitionSeason", "EqualTo", $oCompetitionSeason );
+	$oOptions->addFilter( "Voetbal_Game::State", "EqualTo", Voetbal_Factory::STATE_SCHEDULED );
+	$oOptions->addOrder( "Voetbal_Game::StartDateTime", false );
+	$oOptions->addLimit( 1 );
+	$oGame = Voetbal_Game_Factory::createObjectFromDatabase( $oOptions );
+	if ( $oGame !== null ) {
+		$sStartDateTime =  $oGame->getStartDateTime()->toString( Agenda_DateTime::STR_NICEDATE );
+	}
+	else {
+		$sStartDateTime =  $oNow->toString( Agenda_DateTime::STR_NICEDATE );
+	}
+}
+
+$oLineComboBox = Controls_Factory::createComboBox( "playermembershipline" );
+{
+	$oLineComboBox->removeEmptyRow();
+	$oLineComboBox->putCSSClass( "form-control" );
+	$oLines = Voetbal_Team_Factory::getAvailableLines();
+	$oLineComboBox->putSource( $oLines );
+    $oLine = null;
+	if ( $oPlayerMembership !== null and $oPlayerMembership->getLine() !== null )
+        $oLine = $oLines[ $oPlayerMembership->getLine()->getId() ];
+	else if ( $this->arrExportedPlayer !== null and array_key_exists("line", $this->arrExportedPlayer ) )
+        $oLine = $oLines[ $this->arrExportedPlayer["line"] ];
+    else if ( $this->oPerson !== null )  // get line from most recent playermembership
+    {
+        $oOptions = Construction_Factory::createOptions();
+        $oOptions->addFilter( "Voetbal_Team_Membership_Player::Client", "EqualTo", $this->oPerson );
+        $oOptions->addOrder( "Voetbal_Team_Membership_Player::StartDateTime", true );
+        $oOptions->addLimit( 1 );
+        $oMostRecentPlayerMembership = Voetbal_Team_Membership_Player_Factory::createObjectFromDatabase( $oOptions );
+        if ( $oMostRecentPlayerMembership !== null and $oMostRecentPlayerMembership->getLine() !== null )
+            $oLine = $oLines[ $oMostRecentPlayerMembership->getLine()->getId() ];
+
+    }
+    if ( $oLine !== null )
+        $oLineComboBox->putObjectToSelect( $oLine );
+	$oLineComboBox->putObjectPropertyToShow("**::Name**");
+}
+
+$oBackNumberComboBox = Controls_Factory::createComboBox( "playermembershipbacknumber" );
+{
+	$oBackNumberComboBox->putCSSClass( "form-control" );
+	$oBackNumbers = Patterns_Factory::createNumbers( 1, Voetbal_Team_Membership_Player::MAX_BACKNUMBER );
+	$oBackNumberComboBox->putSource( $oBackNumbers );
+	if ( $oPlayerMembership !== null )
+		$oBackNumberComboBox->putObjectToSelect( $oBackNumbers[ $oPlayerMembership->getBackNumber() ] );
+	else if ( $this->arrExportedPlayer !== null and array_key_exists("backnumber", $this->arrExportedPlayer ) )
+		$oBackNumberComboBox->putObjectToSelect( $oBackNumbers[ $this->arrExportedPlayer["backnumber"] ] );
+
+	$oBackNumberComboBox->putObjectPropertyToShow("**::Id**");
+}
+?>
+
+<div class="form-group">
+	<label style="text-align:center;" class="col-xs-12 control-label">nieuw</label>
+</div>
+<div class="form-group">
+	<label for="playermembershipteamid" class="col-xs-3 col-sm-3 control-label">team</label>
+	<div class="col-xs-9 col-sm-5">
+		<?= $oTeamComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-3 control-label">startdatum</label>
+	<div class="col-xs-9 col-sm-5">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" id="playermembershipstartdatetime" name="playermembershipstartdatetime" value="<?= $sStartDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-3 control-label">einddatum</label>
+	<div class="col-xs-9 col-sm-5">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" id="playermembershipenddatetime" name="playermembershipenddatetime" value="" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="playermembershipline" class="col-xs-3 col-sm-3 control-label">linie</label>
+	<div class="col-xs-9 col-sm-5">
+	<?= $oLineComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="playermembershipbacknumber" class="col-xs-3 col-sm-3 control-label">rugnr.</label>
+	<div class="col-xs-9 col-sm-5">
+		<div class="input-group">
+			<?= $oBackNumberComboBox ?>
+			<span class="input-group-addon refresh" style="cursor:pointer;" data-selectid="playermembershipbacknumber" data-teamselectid="playermembershipteamid"><i class="glyphicon glyphicon-refresh"></i></span>
+		</div>
+	</div>
+</div>
+<?php if ( $this->oPerson !== null ): ?>
+	<input type="hidden" name="personid" value="<?= $this->oPerson->getId() ?>">
+	<input type="hidden" name="playermembershippersonid" value="<?= $this->oPerson->getId() ?>">
+<?php endif; ?>
+<?php if( $oPlayerMembership !== null ): ?>
+	<input type="hidden" name="oldplayermembershipid" value="<?= $oPlayerMembership->getId() ?>">
+<?php endif; ?>

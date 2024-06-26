@@ -1,0 +1,129 @@
+<?php $this->sHeaderName = "voorspellingen"; ?>
+<?= $this->render("pool/header.phtml") ?>
+
+<div id="page-pool-bets"></div>
+
+<div class="container-fluid">
+	<div class="col-xs-2" style="padding-left: 0px;">
+		<?php if ( $this->bShowCopy == true /* and  m_nNrOfBetsDone > 0 */): ?>
+		<a role="button" id="btn-copy-bets" class="btn btn-default"><span class="glyphicon glyphicon-duplicate"></span></a>
+		<?php endif; ?>
+	</div>
+	<div class="col-xs-8" style="text-align: center">
+		<button id="btntogglebetconfig" class="btn btn-info">punteninformatie <span class="glyphicon glyphicon-info-sign"></span></button>
+	</div>
+	<div class="col-xs-2" style="padding-right: 0px; text-align: right;">
+		<?php if ( $this->bShowRead === true or $this->bShowEdit === true ): ?>
+			<?php if ( $this->bCordova != true ): ?>
+				<a target="_blank" class="btn btn-default" href="<?= $this->urlcontroller ?>/<?= $this->bShowRead ? "totaaloverzichtpdf" : "mijnvoorspellingenpdf" ?>/poolid/<?= $this->oPool->getId() ?>/"><span class="glyphicon glyphicon-print"></span></a>
+			<?php endif; ?>
+		<?php endif; ?>
+	</div>
+</div>
+
+<hr>
+
+<?php
+$nDataFlag = VoetbalOog_JSON::$nPool_CompetitionSeason;
+{
+	$nDataFlag += Voetbal_JSON::$nCompetitionSeason_Rounds;
+
+	$oFirstRound = $this->oPool->getCompetitionSeason()->getRounds()->first();
+	if ( $oFirstRound !== null and $oFirstRound->getState() === Voetbal_Factory::STATE_PLAYED )
+		$nDataFlag += Voetbal_JSON::$nCompetitionSeason_TeamsInTheRace;
+	$nDataFlag += Voetbal_JSON::$nRound_Poules;
+	$nDataFlag += Voetbal_JSON::$nPoule_Games;
+	$nDataFlag += VoetbalOog_JSON::$nPool_BetConfigs;
+
+	$nDataFlag += VoetbalOog_JSON::$nPool_Users;
+	$nDataFlag += VoetbalOog_JSON::$nPoolUser_Bets;
+
+	$nDataFlag += VoetbalOog_JSON::$nRoundBetConfig_SameTeams;
+}
+// Needs to be set to get bets in JSON ( security )
+VoetbalOog_Bet_Factory::putSessionUser( $this->oUser );
+$jsonPool = json_encode( json_decode( VoetbalOog_Pool_Factory::convertObjectToJSON( $this->oPool, $nDataFlag ) ) );
+?>
+
+<?php if( $this->bShowRead === true and $this->bShowEdit === true ): ?>
+	<ul class="nav nav-tabs nav-pills" style='width: 100%' id="betsTab">
+		<li class="active" style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#betsread" data-toggle="pill">bekijken</a></li>
+		<li style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#betsedit" data-toggle="pill">invullen</a></li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="betsread"><?= $this->render( "pool/bets_read.phtml" ); ?></div>
+		<div class="tab-pane" id="betsedit"><?= $this->render( "pool/bets_edit.phtml" ); ?></div>
+	</div>
+<?php elseif( $this->bShowRead === true ): ?>
+	<?= $this->render( "pool/bets_read.phtml" ); ?>
+<?php elseif( $this->bShowEdit === true ): ?>
+	<?= $this->render( "pool/bets_edit.phtml" ); ?>
+<?php else: ?>
+	<div class="alert alert-danger"><p class="alert-link">je kan nog geen voorspellingen bekijken.</p></div>
+<?php endif; ?>
+
+<!-- PointsModal -->
+<div class="modal fade" id="pointsModal" tabindex="-1" role="dialog" aria-labelledby="pointModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="pointModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					punten informatie
+				</span>
+			</div>
+			<div class="modal-body">
+				<div id="betconfiginfo" data-loaded="0">
+					<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<?php if( $this->bWelcome === true ): ?>
+<!-- WelcomeModal -->
+<div class="modal fade" id="welcomeModal" tabindex="-1" role="dialog" aria-labelledby="welcomeModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="welcomeModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					inschrijving geslaagd
+				</span>
+			</div>
+			<div class="modal-body">
+				<h4>
+					Je bent ingeschreven voor de pool <strong><?= $this->oPool->getName() ?></strong> ( <?= $this->oCompetitionSeason->getAbbreviation() ?> <img height="16" width="16" src="<?= Zend_Registry::get("baseurl") ?>public/images/competitionseasons/<?= $this->oCompetitionSeason->getImageName() ?>-16.png"> ).<br><br>
+					Je kunt nu je voorspellingen gaan invullen.<br><br>
+					Om te zien hoe je je punten kunt verdienen kun je op <a onclick="return false;" href="#" class="btn btn-md btn-info">punten <span class="glyphicon glyphicon-info-sign"></span></a> drukken.
+				</h4>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+		</div><!-- /.modal-content -->
+	</div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+<?php endif ?>
+
+<script type="text/javascript">
+	var g_oPool = VoetbalOog_Pool_Factory().createObjectFromJSON( <?= $jsonPool  ?>);
+	var g_sBetTabId = <?= strlen( $this->betsactivetabid ) > 0 ? "'".$this->betsactivetabid."'" : "null" ?>;
+	var g_bBetsEditable = <?= $this->bShowEdit ? "true" : "false" ?>;
+	var g_bBetsReadable = <?= $this->bShowRead ? "true" : "false" ?>;
+	var g_nBetViewRoundNr = <?= $this->nRoundNr !== null ? $this->nRoundNr : "null" ?>;
+	var g_oRankableControl = null;
+	var bWelcome = <?= $this->bWelcome ? "true" : "false" ?>;
+	var g_nCompetitionSeasonId = <?= $this->oPool->getCompetitionSeason()->getId() ?>; var g_oCompetitionSeason = null;
+	var g_nPoolUserId = <?= $this->oPoolUser !== null ? $this->oPoolUser->getId() : "null" ?>; g_oPoolUser = null;
+	var sBetEditControlId = '<?= $this->sbeteditcontrolid; ?>';
+	var g_oNow = new Date( <?= $this->tsJSNow ?> );
+	var g_oNowPlusHalfHour = new Date( g_oNow.getTime() );
+	var g_oNowMinHalfHour = new Date( g_oNow.getTime() );
+</script>

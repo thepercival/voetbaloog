@@ -1,0 +1,40 @@
+    <div class="center-block" id="page-admin-game" style="max-width:800px;">
+        <div class="container-fluid">
+        <h3 style="display: inline-block">beheer wedstrijd</h3>
+        <?php if ( $this->bHasImport and $this->oGame !== null ): ?>
+        <h5 style="display: inline-block"><?= Import_Factory::getIdFromExternId( $this->oGame->getExternId() ); ?></h5>
+        <?php endif; ?>
+    </div>
+
+	<?php if ( strlen( $this->successmessage ) > 0 ): ?>
+        <div class="alert alert-success"><p class="alert-link"><?= $this->successmessage; ?></p></div>
+    <?php endif ?>
+    <?php if ( strlen( $this->errormessage ) > 0 ): ?>
+        <div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage; ?></p></div>
+    <?php endif ?>
+
+    <script type="text/javascript">
+        var nSelectedGameId = <?= $this->oGame !== null ? $this->oGame->getId() : "null" ?>;
+    </script>
+
+    <?php if ( $this->oGame !== null ): ?>
+        <?php $oHomePoulePlace = $this->oGame->getHomePoulePlace(); ?>
+        <?php $oAwayPoulePlace = $this->oGame->getAwayPoulePlace(); ?>
+        <hr>
+        <?php if ( $oHomePoulePlace->getTeam() !== null and $oAwayPoulePlace->getTeam() !== null ): ?>
+        <ul class="nav nav-pills" style='width: 100%;' id="myTab">
+            <li class="active" style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#<?= $this->tabidmain ?>" data-toggle="pill">basisgegevens</a></li>
+            <li style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#<?= $this->tabidplayermemberships ?>" data-toggle="pill">spelers</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="<?= $this->tabidmain ?>"><?= $this->render( "voetbal/wedstrijd/index_tab_main.phtml" ); ?></div>
+            <div class="tab-pane" id="<?= $this->tabidplayermemberships ?>"><?= $this->render( "voetbal/wedstrijd/index_tab_deelnames.phtml" ); ?></div>
+        </div>
+        <?php else : ?>
+            <?= $this->render( "voetbal/wedstrijd/index_tab_main.phtml" ); ?>
+        <?php endif; ?>
+        <hr>
+        <a class="btn btn-default" href="<?= Zend_Registry::get("baseurl") ?>voetbal/competitieseizoen/index/?id=<?= $this->oCompetitionSeason->getId() ?>&subject=planning"><span class="glyphicon glyphicon-hand-left"></span> ga naar <?= $this->oCompetitionSeason->getName() ?></a>
+    <?php endif; ?>
+</div>

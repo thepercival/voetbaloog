@@ -1,0 +1,37 @@
+<div id="page-admin-team">
+
+<h2 style="text-align: center;">wijzig team <?php if( $this->oTeam !== null ): ?><span class="spriteteam-16 sprite-<?= $this->oTeam->getImageName() ?>-16" style="display: inline-block;">&nbsp;</span> <?= $this->oTeam->getName() ?><?php endif ?></h2>
+
+<?php if ( $this->oTeam !== null ): ?>
+	<?php $nNrOfPersons = Voetbal_Person_Factory::getNrOfObjectsFromDatabase(); ?>
+	<?php if ( $nNrOfPersons > 0 ): ?>
+	<hr>
+	<ul class="nav nav-pills" style='width: 100%' id="myTab">
+		<li class="active" style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#<?= $this->tabidplayermemberships ?>" data-toggle="pill">spelers</a></li>
+		<li style="display: table-cell; width: 50%; margin-left: 0px;"><a href="#<?= $this->tabidstaffmemberships ?>" data-toggle="pill">begeleiding</a></li>
+	</ul>
+	<div class="tab-content">
+		<div class="tab-pane active" id="<?= $this->tabidplayermemberships ?>">
+			<?= $this->render( "voetbal/team/update_tab_spelers.phtml" ); ?>
+		</div>
+		<div class="tab-pane" id="<?= $this->tabidstaffmemberships ?>">
+			<?= $this->render( "voetbal/team/update_tab_begeleiders.phtml" ); ?>
+		</div>
+	</div>
+	<?php else: ?>
+	<div class="alert alert-info"><p class="alert-link">wanneer er pesonen aan de applicatie zijn toegevoegd, kunnen er spelers en/of begeleiders aan het team gekoppeld worden</p></div>
+	<?php endif ?>
+<?php endif ?>
+
+<a role="button" class="btn btn-default" style="margin-left: 5px; margin-bottom: 5px;" href="<?= $this->urlcontroller ?>/index/"><span class="glyphicon glyphicon-hand-left"></span> naar overzicht</a>
+
+</div>
+
+<style>
+.datepicker{z-index:1151 !important;}
+</style>
+
+<script type="text/javascript">
+	var nNrOfPersons = <?= (int) $nNrOfPersons; ?>;
+	var sActiveTabId = "<?= $this->activetabid ?>";
+</script>

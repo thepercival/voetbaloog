@@ -1,0 +1,28 @@
+<?php if ( $this->oCompetitionSeason === null ): ?>
+<div class="alert alert-danger"><p class="alert-link">competitieseizoen niet gevonden</p></div>
+<?php return; ?>
+<?php endif; ?>
+
+<div class="container-fluid">
+	<h3 style="display: inline-block"><?= $this->oCompetitionSeason->getName() ?></h3>
+</div>
+<hr>
+<div id='csview'>
+	<div class="panel-group" id="csaccordion" style='margin-bottom: 5px;'>
+	<?php $oRounds = $this->oCompetitionSeason->getRounds(); ?>
+	<?php foreach( $oRounds as $oRound ): ?>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h4 class="panel-title">
+				<a data-toggle="collapse" data-roundid="<?= $oRound->getId() ?>" data-loaded="0" href="#collapse-round<?= $oRound->getId() ?>"><?= $oRound->getDisplayName() ?></a>
+				</h4>
+			</div>
+			<div id="collapse-round<?= $oRound->getId() ?>" class="panel-collapse collapse">
+				<div id="collapsebody-round<?= $oRound->getId() ?>" class="panel-body" style="padding: 0px;">
+					<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+				</div>
+			</div>
+		</div>
+	<?php endforeach; ?>
+	</div>
+</div>

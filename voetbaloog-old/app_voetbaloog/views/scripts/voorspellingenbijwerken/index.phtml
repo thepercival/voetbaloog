@@ -1,0 +1,86 @@
+<div id="page-admin-bets"></div>
+<h1>voorspellingen bijwerken</h1>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+<div class="alert alert-danger"><?= $this->errormessage ?></div>
+<?php endif ?>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+<div class="alert alert-success"><?= $this->successmessage ?></div>
+<?php endif ?>
+
+<table class="table">
+	<thead>
+	<tr>
+		<th></th>
+		<th class="hidden-xs">id</th>
+		<th>competitie</th>
+		<th>seizoen</th>
+		<th>pools</th>
+		<th class="hidden-xs">bond</th>
+		<th class="hidden-xs">gepubliceerd</th>
+	</tr>
+	</thead>
+	<tbody>
+	<?php foreach ( $this->oCompetitionSeasons as $oCompetitionSeason ): ?>
+		<tr>
+			<td><button data-csid= "<?= $oCompetitionSeason->getId() ?>" class="btn btn-default btn-xs btn-updatebets"><span class="glyphicon glyphicon-refresh"></span></button></td>
+
+			<td class="hidden-xs"><?= $oCompetitionSeason->getId() ?></td>
+			<td>
+				<span class="hidden-xs"><?= $oCompetitionSeason->getCompetition()->getName() ?></span>
+				<span class="visible-xs"><?= $oCompetitionSeason->getCompetition()->getAbbreviation() ?></span>
+			</td>
+			<td><?= $oCompetitionSeason->getSeason()->getName() ?></td>
+			<td>12</td>
+			<td class="hidden-xs"><?= ( $oCompetitionSeason->getAssociation() !== null ) ? $oCompetitionSeason->getAssociation()->getName() : null; ?></td>
+			<td class="hidden-xs"><?= $oCompetitionSeason->getPublic() ? "<span class=\"glyphicon glyphicon-ok\"></span>" : null ?></td>
+		</tr>
+	<?php endforeach ?>
+	</tbody>
+</table>
+
+<?php
+$oStartDateTime = Agenda_Factory::createDateTime();
+$oStartDateTime->modify("-3 hours");
+$sStartDateTime = $oStartDateTime->toString( Agenda_DateTime::STR_NICEDATE );
+?>
+
+<div class="modal fade" id="updateBetsModal" tabindex="-1" role="dialog" aria-labelledby="updateBetsModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="updateBetsModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					voorspellingen bijwerken
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->urlcontroller ?>/verwerken/" class="form-horizontal" role="form">
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="gamedatetime" class="col-xs-3 col-sm-2 control-label">datumtijd</label>
+						<div class="col-xs-9 col-sm-4" style="padding-right: 0px;">
+							<div class="input-group date" style="width: 180px;">
+								<input type="text" name="gamedatetime" value="<?= $sStartDateTime ?>" class="form-control">
+								<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+							</div>
+						</div>
+						<div class="col-xs-offset-3 col-xs-9 col-sm-offset-0 col-sm-4">
+							<?= $this->ShowTime( "gamedatetime", $oStartDateTime ); ?>
+						</div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-default" name="btn-updatebets" value="save">voorspellingen bijwerken</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+				</div>
+				<input type="hidden" id="competitionseasonid" name="competitionseasonid" value="">
+			</form>
+		</div>
+	</div>
+</div>
+
+<style>
+	.datepicker{z-index:1151 !important;}
+</style>

@@ -1,0 +1,54 @@
+<div id="page-admincompetition-update"></div>
+<h2 style="text-align: center;">wijzig competitie</h2>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->savemessage ?></p></div>
+<?php endif ?>
+
+<?php if ( $this->oCompetition !== null ): ?>
+
+	<form class="form-horizontal" role="form" name="updateform" method="POST" action="<?= $this->urlcontroller ?>/update/">
+	<div class="form-group">
+		<label for="name" class="col-sm-2 control-label">naam</label>
+		<div class="col-sm-10 col-md-4">
+			<input type="text" class="form-control" id="name" name="name" value="<?= $this->oCompetition->getName() ?>" placeholder="naam">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="abbreviation" class="col-sm-2 control-label">afkorting</label>
+		<div class="col-sm-10 col-md-4">
+			<input type="text" class="form-control" id="abbreviation" name="abbreviation" value="<?= $this->oCompetition->getAbbreviation() ?>" placeholder="afkorting">
+		</div>
+	</div>
+	<?php if ( $this->bHasImport === true ): ?>
+		<div class="form-group">
+			<label for="externid" class="col-sm-2 control-label">externid</label>
+			<div class="col-sm-10 col-md-4">
+				<div class="input-group">
+					<div class="input-group-addon">extern-</div>
+					<input type="text" class="form-control" id="externid" name="externid" value="<?= Import_Factory::getIdFromExternId( $this->oCompetition->getExternId() ) ?>" placeholder="externid">
+				</div>
+
+			</div>
+		</div>
+	<?php endif; ?>
+	<div class="form-group">
+		<div class="col-sm-offset-2 col-sm-10">
+			<button type="submit" class="btn btn-default" name="btnupdate" value="submitted">opslaan</button>
+		</div>
+	</div>
+	<input type="hidden" name="competitionid" value="<?= $this->oCompetition->getId() ?>">
+	</form>
+
+<?php endif ?>
+
+<hr>
+
+<h4 style="text-align: center;">competitieseizoenen</h4>
+<?= $this->render( 'voetbal/competitie/update_season.phtml'); ?>
+
+<hr>
+<a role="button" class="btn btn-default" style="margin-left: 5px; margin-bottom: 5px;" href="<?= $this->urlcontroller ?>/index/"><span class="glyphicon glyphicon-hand-left"></span> overzicht</a>

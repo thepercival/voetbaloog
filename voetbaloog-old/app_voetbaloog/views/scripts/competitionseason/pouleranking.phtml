@@ -1,0 +1,28 @@
+<?php
+	$oPoulePlaces = $this->oPoule->getPlacesByRank();
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "Voetbal_Game::State", "EqualTo", Voetbal_Factory::STATE_PLAYED );
+	$oOptions->addFilter( "Voetbal_Poule::Id", "EqualTo", $this->oPoule );
+	$oGames = Voetbal_Game_Factory::createObjectsFromDatabase( $oOptions );
+?>
+<table class="table">
+	<tr class="tableheader">
+		<th style='text-align:right'>pl</th>
+		<th>team</th>
+		<th style='text-align:right'>g</th>
+		<th style='text-align:right'>p</th>
+		<th style='text-align:right'>v</th>
+		<th style='text-align:right'>t</th>
+	</tr>
+<?php foreach( $oPoulePlaces as $oPoulePlace ): ?>
+	<?php $nPenaltyPoints = $oPoulePlace->getPenaltyPoints(); ?>
+	<tr>
+		<td style='line-height:16px; text-align:right'><?= $oPoulePlace->getRanking() ?></td>
+		<td style='line-height:16px;'><span class="spriteteam-16 sprite-<?= $oPoulePlace->getTeam()->getImageName() ?>-16" style="display: inline-block;">&nbsp;</span> <?= $oPoulePlace->getTeam()->getName() ?> <?= $nPenaltyPoints !== 0 ? -$nPenaltyPoints : null ?></td>
+		<td style='line-height:16px; text-align:right'><?= $oPoulePlace->getNrOfPlayedGames( $oGames ) ?></td>
+		<td style='line-height:16px; text-align:right'><?= $oPoulePlace->getPoints( $oGames ) - $nPenaltyPoints ?></td>
+		<td style='line-height:16px; text-align:right'><?= $oPoulePlace->getNrOfGoalsScored( $oGames ) ?></td>
+		<td style='line-height:16px; '><?= $oPoulePlace->getNrOfGoalsReceived( $oGames ) ?></td>
+	</tr>
+<?php endforeach; ?>
+</table>

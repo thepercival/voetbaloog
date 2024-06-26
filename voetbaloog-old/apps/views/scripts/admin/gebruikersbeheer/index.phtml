@@ -1,0 +1,7 @@
+<?= $this->render('admin/gebruikersbeheer/select.phtml'); ?>
+
+<?php if ( $this->objSelectedUser !== null ): ?>
+    <?= $this->render('admin/gebruikersbeheer/edit_remove.phtml'); ?>
+<?php else: ?>
+    <?= $this->render('admin/gebruikersbeheer/add.phtml'); ?>
+<?php endif; ?>

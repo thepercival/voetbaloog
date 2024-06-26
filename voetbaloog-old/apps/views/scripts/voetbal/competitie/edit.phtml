@@ -1,0 +1,27 @@
+<div class="form-group">
+    <label for="name" class="col-xs-3 col-sm-4 control-label">naam</label>
+    <div class="col-xs-8 col-sm-6">
+        <input type="text" class="form-control" id="name" name="name" maxlength="<?= Voetbal_Competition::MAX_NAME_LENGTH ?>" value="<?= $this->oCompetition !== null ? $this->oCompetition->getName() : null ?>" placeholder="naam">
+    </div>
+</div>
+<div class="form-group">
+    <label for="abbreviation" class="col-xs-3 col-sm-4 control-label">afkorting</label>
+    <div class="col-xs-8 col-sm-6">
+        <input type="text" class="form-control" id="abbreviation" name="abbreviation" value="<?= $this->oCompetition !== null ? $this->oCompetition->getAbbreviation() : null ?>" placeholder="afkorting">
+    </div>
+</div>
+<?php if ( $this->bHasImport === true ): ?>
+    <div class="form-group">
+        <label for="externid" class="col-xs-3 col-sm-4 control-label">externid</label>
+        <div class="col-xs-8 col-sm-6">
+            <div class="input-group">
+                <div class="input-group-addon">extern-</div>
+                <input type="text" class="form-control" id="externid" name="externid" value="<?= $this->oCompetition !== null ? Import_Factory::getIdFromExternId( $this->oCompetition->getExternId() ) : null ?>" placeholder="externid">
+            </div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if ( $this->oCompetition !== null ): ?>
+    <input type="hidden" name="competition" value="<?= $this->oCompetition->getId() ?>">
+<?php endif; ?>

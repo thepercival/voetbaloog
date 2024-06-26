@@ -1,0 +1,63 @@
+<div id="page-admin-association" class="page-default-admin"></div>
+<h2 style="text-align: center;">bond-overzicht</h2>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->savemessage ?></p></div>
+<?php endif ?>
+
+<table class="table">
+	<thead>
+	<tr>
+		<th></th>
+		<th class="hidden-xs">id</th>
+		<th>naam</th>
+		<th>omschrijving</th>
+		<th><button role="button" class="btn btn-xs btn-default edit"><span class="glyphicon glyphicon-plus"></span></button></th>
+	</tr>
+	</thead>
+	<tbody>
+	<?php foreach ( $this->oAssociations as $oAssociation ): ?>
+		<tr>
+			<td><button role="button" class="btn btn-xs btn-default edit" data-id="<?= $oAssociation->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>
+			<td class="hidden-xs"><?= $oAssociation->getId() ?></td>
+			<td><?= $oAssociation->getName() ?></td>
+			<td><?= $oAssociation->getDescription() ?></td>
+			<td><a href="<?= $this->url ?>/?btnsave=remove&associationid=<?= $oAssociation->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+		</tr>
+	<?php endforeach ?>
+	</tbody>
+</table>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="editModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="form-title"></span>
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" role="form">
+				<div class="modal-body form-horizontal">
+					<div id="form-content"></div>
+					<span id="form-waiting" class="glyphicon glyphicon-refresh spin"></span>
+				</div>
+				<div class="modal-footer">
+					<button type="submit" class="btn btn-default" id="btnsave" name="btnsave" value="">opslaan</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var g_sEntity = 'bond';
+	var g_nEditId = <?= $this->editid !== null ? $this->editid : "null" ?>;
+	var g_bAutoFill = false;
+</script>
+

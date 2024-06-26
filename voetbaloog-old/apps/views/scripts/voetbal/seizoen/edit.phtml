@@ -1,0 +1,43 @@
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-4 control-label">naam</label>
+	<div class="col-xs-8 col-sm-6">
+		<input type="text" class="form-control" id="name" name="name" maxlength="<?= Voetbal_Season::MAX_NAME_LENGTH ?>" value="<?= $this->oSeason !== null ? $this->oSeason->getName() : null ?>" placeholder="seizoensnaam">
+	</div>
+</div>
+<?php
+	$sStartDateTime = ( $this->oSeason !== null and $this->oSeason->getStartDateTime() !== null ) ? $this->oSeason->getStartDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+	$sEndDateTime = ( $this->oSeason !== null and $this->oSeason->getEndDateTime() !== null ) ? $this->oSeason->getEndDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+?>
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-4 control-label">startdatum</label>
+	<div class="col-xs-8 col-sm-6">
+		<div class="input-group date">
+		  <input type="text" name="startdatetime" value="<?= $sStartDateTime ?>" class="form-control">
+		  <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-xs-3 col-sm-4 control-label">einddatum</label>
+	<div class="col-xs-8 col-sm-6">
+		<div class="input-group date">
+		  <input type="text" name="enddatetime" value="<?= $sEndDateTime ?>" class="form-control">
+		  <span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<?php if ( $this->bHasImport === true ): ?>
+<div class="form-group">
+	<label for="externid" class="col-xs-3 col-sm-4 control-label">externid</label>
+	<div class="col-xs-8 col-sm-6">
+		<div class="input-group">
+			<div class="input-group-addon">extern-</div>
+			<input type="text" class="form-control" id="externid" name="externid" value="<?= $this->oSeason !== null ? Import_Factory::getIdFromExternId( $this->oSeason->getExternId() ) : null ?>" placeholder="externid">
+		</div>
+	</div>
+</div>
+<?php endif; ?>
+
+<?php if ( $this->oSeason !== null ): ?>
+	<input type="hidden" name="seasonid" value="<?= $this->oSeason->getId() ?>">
+<?php endif; ?>

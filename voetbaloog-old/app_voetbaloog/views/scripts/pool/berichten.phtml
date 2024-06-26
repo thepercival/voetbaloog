@@ -1,0 +1,62 @@
+<?php $this->sHeaderName = "berichtenbord"; ?>
+<?= $this->render("pool/header.phtml") ?>
+
+<div style="max-width: 800px;">
+	<?php if ( $this->oPoolUser !== null ): ?>
+		<?php if( $this->saved === true ): ?>
+			<div class="alert alert-success">
+				<p class="alert-link">je bericht is geplaatst</p>
+			</div>
+		<?php elseif( strlen( $this->messageboarderrormessage ) > 0 ): ?>
+			<div class="alert alert-danger">
+				<p class="alert-link"><?= $this->messageboarderrormessage ?></p>
+			</div>
+		<?php endif ?>
+		<form role="form" class="form-inline" method="POST" action="<?= Zend_Registry::get("baseurl") ?>pool/berichten/">
+			<div>
+				<div class="form-group">
+					<label class="sr-only" for="message">plaats bericht</label>
+					<textarea id="message" name="message" class="form-control" rows="5" cols="78" placeholder="plaats bericht"></textarea>
+
+					<button type="submit" name="btnberichttoevoegen" value="submit" class="btn btn-default">opslaan</button>
+
+					<input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+				</div>
+			</div>
+		</form>
+		<div style="clear:both;"></div>
+		<hr>
+	<?php elseif ( $this->oUser === null ) : ?>
+		<div class="alert alert-warning" style="text-align: center;">
+			om berichten te plaatsen moet je eerst <a href="<?= Zend_Registry::get("baseurl") ?>user/login/?previouscontroller=pool&previousaction=berichten&poolid=<?= $this->oPool ?>" type="button"> inloggen</a>
+		</div>
+	<?php endif; ?>
+
+	<?php
+	$oFilters = Construction_Factory::createOptions();
+	$oFilters->addFilter( "VoetbalOog_Pool::Id", "EqualTo", $this->oPool );
+	$oFilters->addOrder( "VoetbalOog_Message::DateTime", true );
+	$oMessages = VoetbalOog_Message_Factory::createObjectsFromDatabase( $oFilters );
+	?>
+	<?php if ( $oMessages->count() === 0 ): ?>
+		<div class="alert alert-info" style="text-align: center;">er zijn nog geen berichten geplaatst</div>
+		<?php return; ?>
+	<?php endif; ?>
+
+	<table class="table">
+		<tbody>
+		<?php foreach ( $oMessages as $oMessage ): ?>
+			<tr>
+				<td>
+					<div style="white-space:nowrap;">geplaatst door <?= $oMessage->getPoolUser()->getUser()->getName() ?><br>
+						op <?= $oMessage->getDateTime()->toString("D d F Y") ?><br>
+						om <?= $oMessage->getDateTime()->toString("G:i") ?><br>
+						<img width="90" height="90" class="img-rounded img-responsive" src="<?= Zend_Registry::get("baseurl") ?>image/generatecaptcha/userid/<?= $oMessage->getPoolUser()->getUser()->getId() ?>/width/90/">
+					</div>
+				</td>
+				<td><?= str_replace( "\n", "<br>", $oMessage->getMessage() ) ?></td>
+			</tr>
+		<?php endforeach; ?>
+		</tbody>
+	</table>
+</div>

@@ -1,0 +1,66 @@
+<?php if( $this->succescode === true ): ?>
+	<div class="jumbotron">
+		<h1>Gefeliciteerd,</h1>
+		<p>Je bent nu geregistreerd als gebruiker.</p>
+		<p>Je hebt een email gekregen om <span style="font-weight:bold;">je account te activeren.</span></p>
+		<p>Wanneer je binnen enkele minuten geen email hebt ontvangen, kun je eventueel bij je ongewenste email kijken.</p>
+		<p>groet VoetbalOog</p>
+	</div>
+<?php endif ?>
+
+<?php
+	if( $this->succescode === true )
+		return;
+?>
+
+<div class="page-header" style="text-align: center;">
+	<h2>registreren</h2>
+</div>
+
+<?php if( $this->editmessage !== null and count( $this->editmessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<?php foreach ( $this->editmessage as $sMessage): ?>
+			<p class="alert-link"><?= $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+
+<form action="<?= $this->url; ?>/" method="POST" class="form-horizontal" role="form">
+<div class="form-group<?php echo count( $this->messageemail ) > 0 ? " has-error" : null; ?>">
+		<label for="emailaddress" class="col-xs-3 col-sm-4 control-label">emailadres</label>
+		<div class="col-xs-8 col-sm-6">
+		<input type="email" class="form-control" id="emailaddress" name="emailaddress" value="<?= $this->emailaddress; ?>" placeholder="emailadres">
+		</div>
+	</div>
+	<div class="form-group<?php echo count( $this->messageuser ) > 0 ? " has-error" : null; ?>">
+		<label for="username" class="col-xs-3 col-sm-4 control-label">gebruikersnaam</label>
+		<div class="col-xs-8 col-sm-6">
+		<input type="text" class="form-control" id="username" name="username" value="<?= $this->username; ?>" placeholder="gebruikersnaam( max 15 karakters)">
+		</div>
+	</div>	
+	<div class="form-group<?php echo count( $this->messagepassword ) > 0 ? " has-error" : null; ?>">
+		<label for="password" class="col-xs-3 col-sm-4 control-label">nieuw wachtwoord</label>
+		<div class="col-xs-8 col-sm-6">
+		<input type="password" class="form-control" id="password" name="password" placeholder="wachtwoord">
+		</div>
+	</div>
+	<div class="form-group<?php echo count( $this->messagepassword ) > 0 ? " has-error" : null; ?>">
+		<label for="repeatpassword" class="col-xs-3 col-sm-4 control-label">herhaal nieuw wachtwoord</label>
+		<div class="col-xs-8 col-sm-6">
+		<input type="password" class="form-control" id="repeatpassword" name="repeatpassword" placeholder="herhaal wachtwoord">
+		</div>
+	</div>
+    <div class="form-group<?php echo count( $this->messagecaptcha ) > 0 ? " has-error" : null; ?>">
+        <label for="captcha" class="col-xs-3 col-sm-4 control-label"><?= $this->captchadescription ?> =</label>
+        <div class="col-xs-8 col-sm-6">
+            <input type="captcha" class="form-control" id="captchainput" name="captchainput" placeholder="som van de 2 getallen">
+            <input type="hidden" class="form-control" id="captchaindex" name="captchaindex" value="<?= $this->captchaindex ?>">
+        </div>
+    </div>
+	<div class="form-group">
+		<div class="col-xs-offset-3 col-xs-6 col-sm-offset-4 col-sm-6">
+		<button type="submit" class="btn btn-default" name="btnsubmit" value="submitted">opslaan</button>
+		</div>
+	</div>
+</form>
+<div style="margin-bottom:0px; padding-bottom:10px;"></div>

@@ -1,0 +1,211 @@
+
+<?php if( $this->mainsavemessage !== null and is_string( $this->mainsavemessage ) ): ?>
+	<?php $this->mainsavemessage = array( $this->mainsavemessage ); ?>
+<?php endif ?>
+<?php if( $this->mainsavemessage !== null and count( $this->mainsavemessage ) > 0 ): ?>
+	<div class="alert alert-success">
+		<?php foreach ( $this->mainsavemessage as $sMessage): ?>
+			<p class="alert-link"><?php echo $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+<?php if( $this->mainerrormessage !== null and is_string( $this->mainerrormessage ) ): ?>
+	<?php $this->mainerrormessage = array( $this->mainerrormessage ); ?>
+<?php endif ?>
+<?php if( $this->mainerrormessage !== null and count( $this->mainerrormessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<?php foreach ( $this->mainerrormessage as $sMessage): ?>
+			<p class="alert-link"><?php echo $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+<?php if( $this->maindeadlinemessage !== null ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->maindeadlinemessage ?></p></div>
+<?php endif ?>
+
+<?php
+	$oStartDateTime = $this->oGame->getStartDateTime();
+	$sStartDateTime = $oStartDateTime !== null ? $oStartDateTime->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+
+	$oNumbers = Patterns_Factory::createNumbers( 1, 60 );
+	$oNumberComboBox = Controls_Factory::createComboBox( "number" );
+	$oNumberComboBox->putSource( $oNumbers );
+	$oNumberComboBox->putCSSClass( "form-control" );
+	$oNumberComboBox->putWidth( 80 );
+	$oNumberComboBox->putObjectToSelect( $oNumbers[ $this->oGame->getNumber() ] );
+	$oNumberComboBox->putObjectPropertyToShow("**::Id**");
+
+    $oLocations = $this->oCompetitionSeason->getLocations();
+    $oLocationComboBox = null;
+    if ( $oLocations->count() > 0 )
+    {
+        $oLocationComboBox = Controls_Factory::createComboBox( "locationid" );
+        $oLocationComboBox->putSource( $oLocations );
+        $oLocationComboBox->putCSSClass( "form-control" );
+        $oLocation = $this->oGame->getLocation();
+        if ( $oLocation !== null )
+            $oLocationComboBox->putObjectToSelect( $oLocations[ $oLocation->getId() ] );
+        $oLocationComboBox->putObjectPropertyToShow("**Voetbal_Location::Name**");
+    }
+
+?>
+
+<form name="mainform" action="<?= $this->url; ?>/" method="POST" class="form-horizontal" role="form">
+<div class="form-group">
+	<label for="gamedatetime" class="col-xs-3 col-sm-2 control-label">datumtijd</label>
+	<div class="col-xs-9 col-sm-4" style="padding-right: 0px;">
+		<div class="input-group date" style="width: 180px;">
+			<input type="text" name="gamedatetime" value="<?= $sStartDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+	<div class="col-xs-offset-3 col-xs-9 col-sm-offset-0 col-sm-4">
+		<?= $this->ShowTime( "gamedatetime", $oStartDateTime ); ?>
+	</div>
+</div>
+<?php if ( $oLocations->count() > 0 ): ?>
+<div class="form-group">
+	<label for="locationid" class="col-xs-2 control-label">plaats</label>
+	<div class="col-xs-8 col-sm-4">
+        <?= $oLocationComboBox ?>
+	</div>
+</div>
+<?php endif; ?>
+<div class="form-group">
+	<label for="played" class="col-xs-2 control-label">gespeeld</label>
+	<div class="col-xs-8 col-sm-4">
+	        <input type="checkbox" id="played" name="played" <?= $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED ? " checked readonly" : null; ?>>
+	</div>
+</div>
+<?php if ( $this->oRound->getSemiCompetition() and $this->oGame->getState() === Voetbal_Factory::STATE_SCHEDULED ): ?>
+<div class="form-group">
+    <label for="switchhomeaway" class="col-xs-2 control-label">omdraaien</label>
+    <div class="col-xs-8 col-sm-4">
+        <input type="checkbox" id="switchhomeaway" name="switchhomeaway"> (uit-thuis)
+    </div>
+</div>
+<?php endif; ?>
+<div class="form-group">
+	<label for="played" class="col-xs-2 control-label">wed.nr.</label>
+	<div class="col-xs-8 col-sm-4">
+		<?= $oNumberComboBox ?>
+	</div>
+</div>
+
+<?php
+	$oHomeGoalNumbers = Patterns_Factory::createNumbers( -1, 15 );
+	$oAwayGoalNumbers = Patterns_Factory::createNumbers( -1, 15 );
+
+	$oHomeGoalsComboBox = Controls_Factory::createComboBox( "homegoals" );
+	{
+		$oHomeGoalsComboBox->putSource( $oHomeGoalNumbers );
+		if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+			$oHomeGoalsComboBox->putObjectToSelect( $oHomeGoalNumbers[$this->oGame->getHomeGoals()] );
+		else
+			$oHomeGoalsComboBox->putObjectToSelect( $oHomeGoalNumbers[-1] );
+		$oHomeGoalsComboBox->putObjectPropertyToShow("**::Id**");
+		$oHomeGoalsComboBox->putCSSClass( "form-control" );
+	}
+	$oAwayGoalsComboBox = Controls_Factory::createComboBox( "awaygoals" );
+	{
+		$oAwayGoalsComboBox->putSource( $oAwayGoalNumbers );
+		if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+			$oAwayGoalsComboBox->putObjectToSelect( $oAwayGoalNumbers[$this->oGame->getAwayGoals()] );
+		else
+			$oAwayGoalsComboBox->putObjectToSelect( $oAwayGoalNumbers[-1] );
+		$oAwayGoalsComboBox->putObjectPropertyToShow("**::Id**");
+		$oAwayGoalsComboBox->putCSSClass( "form-control" );
+	}
+	if ( $this->oRound->getType() === Voetbal_Round::TYPE_KNOCKOUT )
+	{
+		$oHomeGoalsExtraTimeComboBox = Controls_Factory::createComboBox( "homegoalsextratime" );
+		{
+			$oHomeGoalsExtraTimeComboBox->removeEmptyRow();
+			$oHomeGoalsExtraTimeComboBox->putSource( $oHomeGoalNumbers );
+			if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+				$oHomeGoalsExtraTimeComboBox->putObjectToSelect( $oHomeGoalNumbers[$this->oGame->getHomeGoalsExtraTime()] );
+			else
+				$oHomeGoalsExtraTimeComboBox->putObjectToSelect( $oHomeGoalNumbers[-1] );
+			$oHomeGoalsExtraTimeComboBox->putObjectPropertyToShow("**::Id**");
+			$oHomeGoalsExtraTimeComboBox->putCSSClass( "form-control" );
+		}
+		$oAwayGoalsExtraTimeComboBox = Controls_Factory::createComboBox( "awaygoalsextratime" );
+		{
+			$oAwayGoalsExtraTimeComboBox->removeEmptyRow();
+			$oAwayGoalsExtraTimeComboBox->putSource( $oAwayGoalNumbers );
+			if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+				$oAwayGoalsExtraTimeComboBox->putObjectToSelect( $oAwayGoalNumbers[$this->oGame->getAwayGoalsExtraTime()] );
+			else
+				$oAwayGoalsExtraTimeComboBox->putObjectToSelect( $oAwayGoalNumbers[-1] );
+			$oAwayGoalsExtraTimeComboBox->putObjectPropertyToShow("**::Id**");
+			$oAwayGoalsExtraTimeComboBox->putCSSClass( "form-control" );
+		}
+
+		$oHomeGoalsPenaltyComboBox = Controls_Factory::createComboBox( "homegoalspenalty" );
+		{
+			$oHomeGoalsPenaltyComboBox->removeEmptyRow();
+			$oHomeGoalsPenaltyComboBox->putSource( $oHomeGoalNumbers );
+			if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+				$oHomeGoalsPenaltyComboBox->putObjectToSelect( $oHomeGoalNumbers[$this->oGame->getHomeGoalsPenalty()] );
+			else
+				$oHomeGoalsPenaltyComboBox->putObjectToSelect( $oHomeGoalNumbers[-1] );
+			$oHomeGoalsPenaltyComboBox->putObjectPropertyToShow("**::Id**");
+			$oHomeGoalsPenaltyComboBox->putCSSClass( "form-control" );
+		}
+		$oAwayGoalsPenaltyComboBox = Controls_Factory::createComboBox( "awaygoalspenalty" );
+		{
+			$oAwayGoalsPenaltyComboBox->removeEmptyRow();
+			$oAwayGoalsPenaltyComboBox->putSource( $oAwayGoalNumbers );
+			if ( $this->oGame->getState() === Voetbal_Factory::STATE_PLAYED )
+				$oAwayGoalsPenaltyComboBox->putObjectToSelect( $oAwayGoalNumbers[$this->oGame->getAwayGoalsPenalty()] );
+			else
+				$oAwayGoalsPenaltyComboBox->putObjectToSelect( $oAwayGoalNumbers[-1] );
+			$oAwayGoalsPenaltyComboBox->putObjectPropertyToShow("**::Id**");
+			$oAwayGoalsPenaltyComboBox->putCSSClass( "form-control" );
+		}
+	}
+?>
+
+<div class="form-group">
+	<label for="score" class="col-sm-2 control-label ">uitslag</label>
+	<div class="col-sm-10">
+		<table class="table">
+			<tr>
+				<td></td>
+                <?php $oHomePoulePlace = $this->oGame->getHomePoulePlace(); ?>
+				<td><?= $oHomePoulePlace->getDisplayName() ?></td>
+                <?php $oAwayPoulePlace = $this->oGame->getAwayPoulePlace(); ?>
+                <td><?= $oAwayPoulePlace->getDisplayName() ?></td>
+			</tr>
+			<tr>
+				<td>regulier</td>
+				<td><?= $oHomeGoalsComboBox ?></td>
+				<td><?= $oAwayGoalsComboBox ?></td>
+			</tr>
+			<?php if ( $this->oRound->getType() == Voetbal_Round::TYPE_KNOCKOUT ): ?>
+			<tr>
+				<td>extra tijd</td>
+				<td><?= $oHomeGoalsExtraTimeComboBox ?></td>
+				<td><?= $oAwayGoalsExtraTimeComboBox ?></td>
+			</tr>
+			<tr>
+				<td>penalties</td>
+				<td><?= $oHomeGoalsPenaltyComboBox ?></td>
+				<td><?= $oAwayGoalsPenaltyComboBox ?></td>
+			</tr>
+			<?php endif; ?>
+		</table>
+	</div>
+</div>
+
+<div class="form-group">
+	<div class="col-sm-offset-2 col-sm-10">
+		<button type="submit" class="btn btn-default" name="btnupdate" value="submitted">opslaan</button>
+		<button type="submit" class="btn btn-default" name="btnvalidate" value="submitted">valideren</button>
+	</div>
+</div>
+
+<input type="hidden" name="id" value="<?= $this->oGame->getId() ?>">
+<input type="hidden" name="activetabid" value="<?= $this->tabidmain ?>">
+
+</form>

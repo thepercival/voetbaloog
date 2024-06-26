@@ -1,0 +1,105 @@
+<h2>importeer teams ( <?= $this->importModuleName ?> )</h2>
+
+<div class="alert alert-info">
+    <p class="alert-link">
+        <ul>
+            <li>de teams die worden geimporteerd worden nog niet aan een competitieseizoen toegevoegd</li>
+            <li>alleen teams voor ongepubliceerde competitieseizoenen kunnen worden geimporteerd</li>
+        </ul>
+    </p>
+</div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+    <div class="alert alert-success">
+        <p class="alert-link"><?= $this->successmessage ?></p>
+    </div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+    <div class="alert alert-danger">
+        <p class="alert-link"><?= $this->errormessage ?></p>
+    </div>
+<?php endif ?>
+
+<form method="POST" action="<?= $this->url ?>/" role="form" class="form-horizontal">
+    <div class="form-group">
+        <label for="name" class="col-xs-3 col-sm-4 control-label">competitieseizoen</label>
+        <div class="col-xs-9 col-sm-4">
+            <select name="csid" class="form-control" onchange="this.form.submit();">
+                <options>
+                    <option value=""></option>
+                    <?php foreach( $this->oCompetitionSeasons as $oCompetitionSeason ): ?>
+                    <option value="<?= $oCompetitionSeason->getId() ?>" <?= $oCompetitionSeason === $this->oCompetitionSeason ? "SELECTED" : null ?> ><?= $oCompetitionSeason->getName() ?></option>
+                    <?php endforeach ?>
+                </options>
+            </select>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="assignteamstopouleplaces" class="col-xs-3 col-sm-4 control-label">teams toekennen</label>
+        <div class="col-xs-9 col-sm-4">
+            <input type="checkbox" name="assignteamstopouleplaces">
+        </div>
+    </div>
+    <div class="form-group">
+        <div class="col-xs-offset-3 col-sm-offset-4 col-xs-9 col-sm-4">
+            <button type="submit" class="btn btn-default" name="btnimport" value="submitted">importeer</button>
+        </div>
+    </div>
+</form>
+
+<?php if( $this->oCompetitionSeason === null ){ return; } ?>
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">url:</div>
+        <div style="float:left;"><?= $this->externalurl ?></div>
+        <div style="clear:both;"></div>
+    </li>
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">cache:</div>
+        <div style="float:left;"><?= (int) ( $this->externalurlcache / 60 ) ?> minuten</div>
+        <div style="clear:both;"></div>
+    </li>
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">bond:</div>
+        <div style="float:left;"><?= $this->oCompetitionSeason->getAssociation() !== null ? $this->oCompetitionSeason->getAssociation()->getName() : null ?></div>
+        <div style="clear:both;"></div>
+    </li>
+</ul>
+
+<textarea style="width:100%; height:200px;" name="teamsjson"><?= json_encode( $this->arrTeamsToImport, JSON_PRETTY_PRINT ); ?></textarea>
+
+<table class="table">
+<thead>
+    <tr><th>actie</th><th>externe code</th><th>naam</th><th>lokale naam</th></tr>
+</thead>
+<tbody>
+<?php if( $this->arrTeamsToImport === null or count( $this->arrTeamsToImport ) === 0 ): ?>
+    <tr><td colspan="4">geen teams gevonden</td></tr>
+<?php else: ?>
+    <?php foreach( $this->arrTeamsToImport as $oTeamToImport ): ?>
+        <?php
+        $oOptions = Construction_Factory::createOptions();
+        $oOptions->addFilter("Voetbal_Team::ExternId", "EqualTo", Import_Factory::$m_szExternPrefix . $oTeamToImport->id );
+        $oTeam = Voetbal_Team_Factory::createObjectFromDatabase( $oOptions );
+
+        $bTeamExists = ( $oTeam !== null );
+        $bNameChanged = ( $bTeamExists and $oTeam->getName() !== $oTeamToImport->name );
+        $bChanged =  $bNameChanged;
+        ?>
+        <tr>
+            <td>
+                <?php if ( !$bTeamExists ): ?>
+                    <span class="glyphicon glyphicon-plus"></span>
+                <?php elseif ( $bChanged ): ?>
+                    <span class="glyphicon glyphicon-edit"></span>
+                <?php endif; ?>
+            </td>
+            <td><?= $bTeamExists ? '<a href="'.Zend_Registry::get("baseurl").'voetbal/team/index/?editid='.$oTeam->getId().'">'.$oTeamToImport->id."</a>" : $oTeamToImport->id ?></td>
+            <td><?= $oTeamToImport->name ?></td>
+            <td style="<?= $bNameChanged ? "color:red;" : null ?>"><?= $bTeamExists ? $oTeam->getName() : null ?></td>
+        </tr>
+    <?php endforeach; ?>
+<?php endif; ?>
+</tbody>
+</table>

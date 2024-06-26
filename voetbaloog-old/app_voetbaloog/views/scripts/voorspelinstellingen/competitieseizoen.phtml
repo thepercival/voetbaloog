@@ -1,0 +1,60 @@
+<div id="page-admin-competitionseason-rounbbetconfigs"></div>
+<h1>standaard voorspel-instellingen wijzigen</h1>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+<div class="alert alert-danger"><?= $this->errormessage ?></div>
+<?php endif ?>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+<div class="alert alert-success"><?= $this->successmessage ?></div>
+<?php endif ?>
+
+<table class="table">
+	<thead>
+	<tr>
+		<th></th>
+		<th>id</th>
+		<th>competitie</th>
+		<th>seizoen</th>
+		<th>bond</th>
+		<th>gepubliceerd</th>
+	</tr>
+	</thead>
+	<tbody>
+	<?php foreach ( $this->oCompetitionSeasons as $oCompetitionSeason ): ?>
+		<tr>
+			<td><button data-csid= "<?= $oCompetitionSeason->getId() ?>" class="btn btn-default btn-xs btn-updateroundbetconfigs"><span class="glyphicon glyphicon-pencil"></span></button></td>
+			<td><?= $oCompetitionSeason->getId() ?></td>
+			<td><?= $oCompetitionSeason->getCompetition()->getName() ?></td>
+			<td><?= $oCompetitionSeason->getSeason()->getName() ?></td>
+			<td><?= ( $oCompetitionSeason->getAssociation() !== null ) ? $oCompetitionSeason->getAssociation()->getName() : null; ?></td>
+			<td><?= $oCompetitionSeason->getPublic() ? "<span class=\"glyphicon glyphicon-ok\"></span>" : null ?></td>
+		</tr>
+	<?php endforeach ?>
+	</tbody>
+</table>
+
+<div class="modal fade" id="updateRBCsModal" tabindex="-1" role="dialog" aria-labelledby="updateRBCsModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="updateRBCsModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					voorspel-instellingen aanpassen
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->urlcontroller ?>/verwerken/" >
+				<div class="modal-body">
+					<div id="betconfigdiv" data-loaded="0" style="max-width: 600px;">
+						<div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+				</div>
+				<input type="hidden" id="competitionseasonid" name="competitionseasonid" value="">
+			</form>
+		</div>
+	</div>
+</div>

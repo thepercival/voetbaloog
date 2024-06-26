@@ -1,0 +1,57 @@
+.headerAllBets
+{
+	float: left;
+	color:black;
+	font-weight:bold;
+	text-align:center;
+}
+
+.contentAllBets
+{
+	float: left;
+	color:#000;
+}
+
+.contentAllBetsClear
+{
+	/*background-color:white;*/
+	color:#000;
+}
+
+.contentAllBetsPointsCorrect
+{
+	float: left;
+	background-color:#A9F5A9;
+	color:#000;
+	border-bottom:1px solid #135113;
+	border-left:1px solid #135113;
+	border-right:1px solid #135113;
+}
+
+.contentAllBetsPointsNotCorrect
+{
+	float: left;
+	color:#000;
+	border-bottom:1px solid #135113;
+	border-left:1px solid #135113;
+	border-right:1px solid #135113;
+}
+
+.contentAllBetsTotalPointsCorrect
+{
+	float: right;
+	background-color:#A9F5A9;
+	color:#000;
+	border-top:1px solid #135113;
+	border-left:1px solid #135113;
+	border-right:1px solid #135113;
+}
+
+.contentAllBetsTotalPointsNotCorrect
+{
+	float: right;
+	color:#000;
+	border-top:1px solid #135113;
+	border-left:1px solid #135113;
+	border-right:1px solid #135113;
+}

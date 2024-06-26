@@ -1,0 +1,7 @@
+.on-drag-enter{
+    border: 2px dashed black;
+}
+
+.on-drag-hover {
+    border: 2px dashed white;
+}

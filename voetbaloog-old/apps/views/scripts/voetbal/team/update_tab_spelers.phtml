@@ -1,0 +1,80 @@
+<?php if( strlen( $this->playermembershiplisterrormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->playermembershiplisterrormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->playermembershiplistsavemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->playermembershiplistsavemessage ?></p></div>
+<?php endif ?>
+
+<a type="button" class="btn btn-default" style="margin-bottom: 10px; " href="<?= $this->urlcontroller ?>/update/teamid/<?= $this->oTeam->getId() ?>/activetabid/<?= $this->tabidplayermemberships ?>/btnimportplayerphotos/true/">importeer foto's</a>
+
+<?php
+	$this->oPlayerMemberships->uasort(
+		function( $oPlayerMembershipA, $oPlayerMembershipB )
+		{
+			if ( $oPlayerMembershipA->getStartDateTime() < $oPlayerMembershipB->getStartDateTime() )
+				return -1;
+			elseif ( $oPlayerMembershipA->getStartDateTime() > $oPlayerMembershipB->getStartDateTime() )
+				return 1;
+			return ( $oPlayerMembershipA->getBackNumber() < $oPlayerMembershipB->getBackNumber() ? -1 : 1 );
+		}
+	);
+?>
+
+<?php if( strlen( $this->playermembershipsavemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->playermembershipsavemessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->playermembershiperrormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->playermembershiperrormessage ?></p></div>
+<?php endif ?>
+
+<table class="table">
+<thead>
+	<tr>
+		<th></th>
+		<th>naam</th>
+		<th>startdatum</th>
+		<th>einddatum</th>
+		<th>rug<br>nr.</th>
+		<th><button role="button" class="btn btn-xs btn-default editplayer" data-playerteamid="<?= $this->oTeam->getId() ?>"><span class="glyphicon glyphicon-plus"></span></button></th>
+	</tr>
+</thead>
+<tbody>
+	<?php foreach ( $this->oPlayerMemberships as $oPlayerMembership ): ?>
+	<tr>
+		<td><button role="button" class="btn btn-xs btn-default editplayer" data-playerteamid="<?= $this->oTeam->getId() ?>" data-playerid="<?= $oPlayerMembership->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button></td>
+		<td><?= $oPlayerMembership->getClient()->getFullName() ?></td>
+		<td><?= $oPlayerMembership->getStartDateTime()->toString("d M Y") ?></td>
+		<?php $oEndDate = $oPlayerMembership->getEndDateTime(); ?>
+		<td><?= ( $oEndDate !== null ) ? $oEndDate->toString("d M Y") : null ?></td>
+		<td><?= ( $oPlayerMembership->getBackNumber() > 0 ) ? $oPlayerMembership->getBackNumber() : null ?></td>
+		<td><a href="<?= $this->urlcontroller ?>/update/teamid/<?= $this->oTeam->getId() ?>/activetabid/<?= $this->tabidplayermemberships ?>/btndeleteplayermembership/true/playermembershipid/<?= $oPlayerMembership->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+	</tr>
+	<?php endforeach ?>
+</tbody>
+</table>
+
+<div class="modal fade" id="playermembershipModal" tabindex="-1" role="dialog" aria-labelledby="playermembershipModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="playermembershipModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="form-playermembership-title"></span>
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" enctype="multipart/form-data" role="form">
+			<div class="modal-body form-horizontal">
+				<div id="form-playermembership"></div>
+				<span id="form-playermembership-waiting" class="glyphicon glyphicon-refresh spin"></span>
+				<input type="hidden" name="teamid" value="<?= $this->oTeam->getId() ?>">
+				<input type="hidden" name="activetabid" value="<?= $this->tabidplayermemberships?>">
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" id="btnsaveplayermembership" name="btnsaveplayermembership" value="">opslaan</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>

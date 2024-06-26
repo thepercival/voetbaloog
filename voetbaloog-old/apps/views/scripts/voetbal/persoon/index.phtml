@@ -1,0 +1,95 @@
+<div class="page-default-admin" id="page-admin-person"></div>
+<h2 style="text-align: center;">persoon-overzicht</h2>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->successmessage ?></p></div>
+<?php endif ?>
+<?php if( $this->errormessage !== null and is_string( $this->errormessage ) ): ?>
+	<?php $this->errormessage = array( $this->errormessage ); ?>
+<?php endif ?>
+<?php if( $this->errormessage !== null and count( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<?php foreach ( $this->errormessage as $sMessage): ?>
+			<p class="alert-link"><?php echo $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+<?php if( strlen( $this->warningmessage ) > 0 ): ?>
+    <div class="alert alert-warning"><p class="alert-link"><?= $this->warningmessage ?></p></div>
+<?php endif ?>
+
+<?php if ( $this->oPersons !== null and $this->oPersons->count() > 0 ): ?>
+	<?php
+		$this->oPersons->uasort(
+			function( $oPersonA, $oPersonB ){
+				return ( $oPersonA->getLastName() < $oPersonB->getLastName() ? -1 : 1 );
+			}
+		);
+	?>
+	<table class="table">
+	<thead>
+		<tr>
+			<th></th>
+			<th class="hidden-xs">id</th>
+			<th>naam</th>
+			<th class="hidden-xs">geboortedatum</th>
+			<th class="hidden-xs">extern</th>
+			<th class="hidden-xs"><span class="glyphicon glyphicon-ok visible-sm"></span><span class="hidden-sm">gevalideerd</span></th>
+			<th style="text-align: center;"><button role="button" class="btn btn-xs btn-default edit"><span class="glyphicon glyphicon-plus"></span></button></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ( $this->oPersons as $oPerson ): ?>
+		<tr>
+			<td><button role="button" class="btn btn-xs btn-default edit" data-id="<?= $oPerson->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>
+			<td class="hidden-xs"><?= $oPerson->getId() ?></td>
+			<td><?= $oPerson->getFullName() ?></td>
+			<td class="hidden-xs"><?= $oPerson->getDateOfBirth() !== null ? $oPerson->getDateOfBirth()->toString( Agenda_DateTime::STR_NICEDATE ) : null ?></td>
+			<td class="hidden-xs"><?= Import_Factory::getIdFromExternId( $oPerson->getExternId() ) ?></td>
+			<td class="hidden-xs"><?php if ( $oPerson->isValid() ): ?><span class="glyphicon glyphicon-ok visible-sm"><?php endif; ?></span><?php if ( $oPerson->isValid() ): ?><span class="hidden-sm"><?= $oPerson->getValidatedDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) ?></span><?php endif; ?></td>
+			<td style="text-align: center;"><a href="<?= $this->url ?>/?btnsave=remove&personid=<?= $oPerson->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+		</tr>
+		<?php endforeach ?>
+	</tbody>
+	</table>
+<?php else: ?>
+	<div class="alert alert-info"><p class="alert-link">er zijn geen personen gevonden</p></div>
+<?php endif; ?>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="editModalLabel" style="font-size:18px;">
+					<img height="25" width="25" src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="form-title"></span>
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" role="form">
+			<div class="modal-body form-horizontal">
+				<div id="form-content"></div>
+				<span id="form-waiting" class="glyphicon glyphicon-refresh spin"></span>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" id="btnvalidate" name="btnvalidate" value="validate">valideren</button>
+				<button type="submit" class="btn btn-default" id="btnsave" name="btnsave" value="">opslaan</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<style>
+.datepicker{z-index:1151 !important;}
+</style>
+<script type="text/javascript">
+	var g_sEntity = 'persoon';
+	var g_bAutoFill = <?= $this->autofill ? "true" : "false" ?>;
+	<?php if( $this->autofill ): ?>
+	var g_nExternId = <?= $this->externid ?>;
+	<?php endif; ?>
+	var g_nEditId = <?= $this->editid !== null ? $this->editid : "null" ?>;
+	var g_nTeamId = <?= $this->teamid !== null ? $this->teamid : "null" ?>;
+</script>

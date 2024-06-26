@@ -1,0 +1,131 @@
+<?php
+
+if ( $this->oPlayer === null )
+{
+	$oPersonComboBox = Controls_Factory::createComboBox( "playermembershippersonid" );
+	{
+		$oPersonComboBox->removeEmptyRow();
+
+		$oNames = Patterns_Factory::createValuables();
+		{
+			// $oPersons = Voetbal_Person_Factory::createObjectsFromDatabaseExt( null, null, "Voetbal_Team_Membership" );
+			$oPersons = Voetbal_Person_Factory::createObjectsFromDatabase();
+			foreach( $oPersons as $oPerson )
+			{
+				$oNames->add( Patterns_Factory::createValuable( $oPerson->getId(), $oPerson->getFullName( RAD_Person::CALLTYPE_FULLNAME_ORDER ) ) );
+			}
+			$oNames->uasort(
+				function( $oNameA, $oNameB )
+				{
+					return ( $oNameA->getValue() < $oNameB->getValue() ? -1 : 1 );
+				}
+			);
+		}
+		$oPersonComboBox->putSource( $oNames );
+		$oPersonComboBox->putCSSClass( "form-control" );
+		if ( $this->oPlayer !== null )
+			$oPersonComboBox->putObjectToSelect( $oNames[ $this->oPlayer->getClient()->getId() ] );
+		$oPersonComboBox->putObjectPropertyToShow("**::Value**");
+	}
+}
+
+$sStartDateTime = ( $this->oPlayer !== null and $this->oPlayer->getStartDateTime() !== null ) ? $this->oPlayer->getStartDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+$sEndDateTime = ( $this->oPlayer !== null and $this->oPlayer->getEndDateTime() !== null ) ? $this->oPlayer->getEndDateTime()->toString( Agenda_DateTime::STR_NICEDATE ) : null;
+
+$oLineComboBox = Controls_Factory::createComboBox( "playermembershipline" );
+{
+	$oLineComboBox->removeEmptyRow();
+	$oLineComboBox->putCSSClass( "form-control" );
+	$oLines = Voetbal_Team_Factory::getAvailableLines();
+	$oLineComboBox->putSource( $oLines );
+	if ( $this->oPlayer !== null and $this->oPlayer->getLine() !== null )
+		$oLineComboBox->putObjectToSelect( $oLines[ $this->oPlayer->getLine()->getId() ] );
+	$oLineComboBox->putObjectPropertyToShow("**::Name**");
+}
+
+$oBackNumberComboBox = Controls_Factory::createComboBox( "playermembershipbacknumber" );
+{
+	$oBackNumberComboBox->removeEmptyRow();
+	$oBackNumberComboBox->putCSSClass( "form-control" );
+	$oBackNumbers = Patterns_Factory::createNumbers( 1, Voetbal_Team_Membership_Player::MAX_BACKNUMBER );
+	$oBackNumberComboBox->putSource( $oBackNumbers );
+	if ( $this->oPlayer !== null )
+		$oBackNumberComboBox->putObjectToSelect( $oBackNumbers[ $this->oPlayer->getBackNumber() ] );
+	$oBackNumberComboBox->putObjectPropertyToShow("**::Id**");
+}
+?>
+
+<div class="form-group">
+	<label for="playermembershippersonid" class="col-sm-2 control-label">bestaand persoon</label>
+	<div class="col-sm-10">
+		<?php if ( $this->oPlayer !== null ): ?>
+			<input type="hidden" name="playermembershippersonid" value="<?= $this->oPlayer->getClient()->getId() ?>">
+			<p class="form-control-static"><?= $this->oPlayer->getClient()->getFullName() ?></p>
+		<?php else: ?>
+			<?= $oPersonComboBox ?>
+		<?php endif; ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-sm-2 control-label">startdatum</label>
+	<div class="col-sm-6">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" name="playermembershipstartdatetime" value="<?= $sStartDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="name" class="col-sm-2 control-label">einddatum</label>
+	<div class="col-sm-6">
+		<div class="input-group date" style="max-width: 300px;">
+			<input type="text" name="playermembershipenddatetime" value="<?= $sEndDateTime ?>" class="form-control">
+			<span class="input-group-addon"><i class="glyphicon glyphicon-calendar"></i></span>
+		</div>
+	</div>
+</div>
+<div class="form-group">
+	<label for="playermembershipline" class="col-sm-2 control-label">linie</label>
+	<div class="col-sm-6">
+	<?= $oLineComboBox ?>
+	</div>
+</div>
+<div class="form-group">
+	<label for="playermembershipbacknumber" class="col-sm-2 control-label">rugnr.</label>
+	<div class="col-sm-2">
+	<?= $oBackNumberComboBox ?>
+	</div>
+</div>
+
+<?php if ( false ): ?>
+<div class="form-group">
+	<label for="playermembershipphoto" class="col-sm-2 control-label">foto</label>
+	<div class="col-sm-10">
+	<p class="text-info" style="font-weight: bolder;">min. breedte : 480px, min. hoogte : 640px<br>min. verhouding : breedte 3, lengte 4<br>max. verhouding : breedte 3, lengte 5</p>
+	<input type="file" name="playermembershipphoto" type="image/*">
+	</div>
+</div>
+ <?php endif; ?>
+
+<?php if ( false ): ?>
+	<div class="form-group">
+		<label for="" class="col-sm-2 control-label">foto</label>
+		<div class="col-sm-10">
+			<img src="<?= Zend_Registry::get("baseurl") ?>image/generatecaptcha/playermembershipid/<?= $this->oPlayer->getId() ?>/" style="width:100px;" alt="foto">
+		</div>
+	</div>
+	<div class="form-group">
+		<label for="removeplayermembershipphoto" class="col-sm-2 control-label">verwijder foto</label>
+		<div class="col-sm-10">
+			<input type="checkbox" name="removeplayermembershipphoto">
+		</div>
+	</div>
+<?php endif; ?>
+
+<?php if ( $this->oPlayer !== null ): ?>
+	<input type="hidden" name="playermembershipid" value="<?= $this->oPlayer->getId() ?>">
+<?php endif; ?>
+<input type="hidden" name="playermembershipteamid" value="<?= $this->playermembershipteamid ?>">
+
+<input type="hidden" name="MAX_FILE_SIZE" value="500000"> <!-- 500KB -->
+

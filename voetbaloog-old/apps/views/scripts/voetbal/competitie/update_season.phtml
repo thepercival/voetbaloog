@@ -1,0 +1,117 @@
+<?php if( strlen( $this->seasonerrormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->seasonerrormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->seasonsavemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->seasonsavemessage ?></p></div>
+<?php endif ?>
+
+<?php
+	$oCompetitionSeasons = $this->oCompetition->getSeasons();
+
+	$oSeasons = Voetbal_Season_Factory::createObjectsFromDatabase();
+	foreach( $oCompetitionSeasons as $oCompetitionSeason )
+		$oSeasons->remove( $oCompetitionSeason->getSeason() );
+	$oSeasons->uasort(
+		function( $oSeasonA, $oSeasonB ){
+			return ( $oSeasonA->getStartDateTime() > $oSeasonB->getStartDateTime() ? -1 : 1 );
+		}
+	);
+	$oSeasonComboBox = Controls_Factory::createComboBox( "seasonid" );
+	$oSeasonComboBox->putCSSClass( "form-control" );
+	$oSeasonComboBox->addAttribute( "data-width=\"auto\"" );
+	$oSeasonComboBox->putSource( $oSeasons );
+	$oSeasonComboBox->putObjectPropertyToShow( "**Voetbal_Season::Name**");
+
+	$oCompetitionSeasons->uasort(
+		function( $oCompetitionSeasonA, $oCompetitionSeasonB ){
+			return ( $oCompetitionSeasonA->getSeason()->getName() > $oCompetitionSeasonB->getSeason()->getName() ? -1 : 1 );
+		}
+	);
+?>
+
+<table class="table">
+<thead>
+	<tr>
+		<th><button id="btn-season-add" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-plus"></span></button></th>
+		<th>id</th>
+		<th>seizoen</th>
+		<th>bond</th>
+		<?php if ( $this->bHasImport === true ): ?>
+			<th>externid</th>
+		<?php endif; ?>
+		<th>gepubliceerd</th>
+		<th></th>
+	</tr>
+</thead>
+<tbody>
+	<?php foreach ( $oCompetitionSeasons as $oCompetitionSeason ): ?>
+	<tr>
+		<td><a href="<?= Zend_Registry::get('baseurl') ?>voetbal/competitieseizoen/index/?id=<?= $oCompetitionSeason->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></a></td>
+		<td><?= $oCompetitionSeason->getId() ?></td>
+		<td><?= $oCompetitionSeason->getSeason()->getName() ?></td>
+		<td><?= ( $oCompetitionSeason->getAssociation() !== null ) ? $oCompetitionSeason->getAssociation()->getName() : null; ?></td>
+		<?php if ( $this->bHasImport === true ): ?>
+			<td><?= Import_Factory::getIdFromExternId( $oCompetitionSeason->getExternId() ) ?></td>
+		<?php endif; ?>
+		<td><?= $oCompetitionSeason->getPublic() ? "<span class=\"glyphicon glyphicon-ok\"></span>" : null ?></td>
+		<td><a href="<?= $this->url ?>/btndeleteseason/true/competitionid/<?= $this->oCompetition->getId() ?>/competitionseasonid/<?= $oCompetitionSeason->getId() ?>/" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+	</tr>
+	<?php endforeach ?>
+</tbody>
+</table>
+
+<div class="modal fade" id="addModal" tabindex="-1" role="dialog" aria-labelledby="addModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="addModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					seizoen toevoegen
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" class="form-horizontal" role="form">
+			<div class="modal-body">
+				<div class="form-group">
+					<label for="seasonid" class="col-xs-3 col-sm-4 control-label">seizoen</label>
+					<div class="col-xs-8 col-sm-6"><?= $oSeasonComboBox ?></div>
+				</div>
+				<?php if ( $oCompetitionSeasons->count() === 0 ): ?>
+					<?php
+					$oAssociations = Voetbal_Association_Factory::createObjectsFromDatabase();
+					$oDefAssociationComboBox = Controls_Factory::createComboBox("defaultassociationid");
+					$oDefAssociationComboBox->putSource( $oAssociations );
+					$oDefAssociationComboBox->putCSSClass( "form-control" );
+					$oDefAssociationComboBox->putObjectPropertyToShow( "**Voetbal_Association::Name** ( **Voetbal_Association::Description** )" );
+					?>
+					<div class="form-group">
+						<label for="defaultassociationid" class="col-xs-3 col-sm-4 control-label">bond</label>
+						<div class="col-xs-8 col-sm-6">
+							<div class="input-group">
+								<?= $oDefAssociationComboBox; ?>
+							</div>
+
+						</div>
+					</div>
+				<?php endif; ?>
+				<?php if ( $this->bHasImport === true ): ?>
+				<div class="form-group">
+					<label for="externid" class="col-xs-3 col-sm-4 control-label">externid</label>
+					<div class="col-xs-8 col-sm-6">
+						<div class="input-group">
+							<div class="input-group-addon">extern-</div>
+							<input type="text" class="form-control" id="externid" name="externid" placeholder="externid">
+						</div>
+					</div>
+				</div>
+				<?php endif; ?>
+			</div>
+			<div class="modal-footer">
+				<button name="btnaddseason" type="submit" class="btn btn-default" value="voeg toe">voeg toe</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			<input type="hidden" name="competitionid" value="<?= $this->oCompetition->getId() ?>">
+			</form>
+		</div>
+	</div>
+</div>

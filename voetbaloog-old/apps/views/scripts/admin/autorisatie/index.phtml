@@ -1,0 +1,45 @@
+<?php
+
+$cfgApp = new Zend_Config_Ini( APPLICATION_PATH.'/configs/config.ini', 'application');
+
+$sXML = "";
+$sXMLPath = APPLICATION_PATH."/model/installer/setup.xml";
+
+$objXMLDb = Source_XML_Reader::fileToSimpleXML( $sXMLPath );
+
+if ( $objXMLDb instanceof SimpleXMLElement )
+{
+	foreach ( $objXMLDb->children() as $xmlCollection )
+	{
+		if ( $xmlCollection->getName() === "Actions"
+			or $xmlCollection->getName() === "MenuItems"
+			or $xmlCollection->getName() === "Roles"
+		)
+		{
+			$sXML .= $xmlCollection->asXML().PHP_EOL;
+		}
+	}
+}
+
+$sPath = APPLICATION_PATH . DIRECTORY_SEPARATOR . "configs" . DIRECTORY_SEPARATOR . "config.ini";
+?>
+
+<div class="panel panel-default">
+	<div class="panel-heading">
+    	<h3 class="panel-title">rollen, acties en menuitems</h3>
+  	</div>
+  	<div class="panel-body">
+		<form method="POST" action="<?= $this->url ?>/">
+		<?php if( Zend_Registry::isRegistered( "dbxmllog" ) ): ?>
+			<?php $arrLogs = Zend_Registry::get("dbxmllog"); ?>
+			<?php foreach( $arrLogs as $arrLog ): ?>
+				<div class="alert alert-<?= ( $arrLog[0] === Zend_Log::EMERG ? "danger" : "success" ) ?>" style="margin-bottom: 2px;"><p class="alert-link"><?= $arrLog[1] ?></p></div>
+			<?php endforeach; ?>
+		<?php endif ?>
+		<div style="margin-bottom: 10px;">
+			<input type="submit" class="btn btn-default" name="btnexecsetupxml" value="bijwerken">
+		</div>
+		<textarea class="form-control" cols=105 rows=20><?= $sXML ?></textarea>
+		</form>
+	</div>
+</div>

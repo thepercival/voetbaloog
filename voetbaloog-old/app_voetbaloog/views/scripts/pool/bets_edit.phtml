@@ -1,0 +1,129 @@
+<?php if ( APPLICATION_ENV === "development" ): ?>
+    <script src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetEdit.js"></script>
+    <script  src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetHelper.js"></script>
+<?php endif; ?>
+
+<?php if ( $this->oPoolUser === null /*and $this->bPoolHasEnded === false*/ ): ?>
+    <?php return; ?>
+<?php endif; ?>
+
+
+<?php
+$oPoolFromComboBox = null; $oPoolToComboBox = null;
+if ( $this->bShowCopy === true )
+{
+    $oPoolFromComboBox = Controls_Factory::createComboBox( "pooltocopyfromid" );
+    $oPoolFromComboBox->putSource( $this->oPoolsToCopy );
+    $oPoolFromComboBox->putObjectPropertyToShow( "**VoetbalOog_Pool::Name**" );
+    $oPoolFromComboBox->putCSSClass( "form-control copypool" );
+
+    $oPoolToComboBox = Controls_Factory::createComboBox( "pooltocopytoid" );
+    $oPoolToComboBox->putSource( $this->oPoolsToCopy );
+    $oPoolToComboBox->putObjectToSelect( $this->oPool );
+    $oPoolToComboBox->putObjectPropertyToShow( "**VoetbalOog_Pool::Name**" );
+    $oPoolToComboBox->putCSSClass( "form-control copypool" );
+}
+?>
+
+<?php if( strlen( $this->copybetssuccessmessage ) > 0 ): ?>
+    <div class="alert alert-success"><p class="alert-link"><?= $this->copybetssuccessmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->copybetserrormessage ) > 0 ): ?>
+    <div class="alert alert-danger"><p class="alert-link"><?= $this->copybetserrormessage ?></p></div>
+<?php endif ?>
+
+<?php if( $this->messagesavebets !== null ): ?>
+    <?php if( $this->messagesavebets === true ): ?>
+        <div class="alert alert-success">
+            <p class="alert-link">voorspellingen opgeslagen</p>
+        </div>
+    <?php else: ?>
+        <div class="alert alert-danger">
+            <p class="alert-link"><?= $this->messagesavebets ?></p>
+        </div>
+    <?php endif ?>
+<?php endif ?>
+
+<form method="POST" action="<?= Zend_Registry::get("baseurl") ?>pool/voorspellingen/">
+    <div id="<?= $this->sbeteditcontrolid ?>">
+        <div align="center"><h2><span class="glyphicon glyphicon-refresh spin"></span></h2></div>
+    </div>
+    <input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+</form>
+
+<!-- CopyModal -->
+<div class="modal fade" id="copyModal" tabindex="-1" role="dialog" aria-labelledby="copyModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="copyModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					voorspellingen kopi&euml;ren
+				</span>
+            </div>
+
+            <form role="form" class="form-horizontal" name="poolcopyvoorspellingenform" method="POST" action="<?= Zend_Registry::get('baseurl') ?>pool/index/">
+                <div class="modal-body">
+                    <div class="alert alert-info">
+                        alleen ronden met hetzelfde voorspeltype en dezelfde deadline kunnen worden gekopi&euml;erd
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3">
+                            <span style="font-weight: bold;">competitie</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <span ><?= $this->oPool->getCompetitionSeason()->getName() ?></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3">
+                            <span style="font-weight: bold;">van pool (bron)</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <span ><?= $oPoolFromComboBox ?></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-3">
+                            <span style="font-weight: bold;">naar pool (doel)</span>
+                        </div>
+                        <div class="col-sm-9">
+                            <span ><?= $oPoolToComboBox ?></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button name="btncopybets" value="kopieer" type="submit" class="btn btn-custom">kopi&euml;er</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+                </div>
+                <input type="hidden" name="poolid" value="<?= $this->oPool->getId() ?>">
+            </form>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->
+
+<!-- betsStatisticsModal -->
+<div class="modal fade" id="betsStatisticsModal" tabindex="-1" role="dialog" aria-labelledby="betStatModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="betStatModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					statistieken bekijken
+				</span>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    In "mijn"-kolom is een vakje rood als het percentage van de uitslag
+                    meer dan 5% onder het laagste percentage of boven het hoogste percentage ligt.
+                </div>
+                <div id="div_bethelper"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

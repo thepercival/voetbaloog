@@ -1,0 +1,95 @@
+<?php if ( $this->oPlayer === null ): ?>
+	<?php if( $this->bHome === true ): ?>
+	<td colspan="2"></td>
+	<td colspan="3" class="hidden-xs"></td>
+	<td colspan="4" class="hidden-xs hidden-sm"></td>
+	<?php else: ?>
+	<td colspan="4" class="hidden-xs hidden-sm"></td>
+	<td colspan="3" class="hidden-xs"></td>
+	<td colspan="2"></td>
+	<?php endif; ?>
+	<?php return; ?>
+<?php endif; ?>
+
+<?php
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "Voetbal_Game_Participation::Game", "EqualTo", $this->oGame );
+	$oOptions->addFilter( "Voetbal_Game_Participation::TeamMembershipPlayer", "EqualTo", $this->oPlayer );
+	$oParticipation = Voetbal_Game_Participation_Factory::createObjectFromDatabase( $oOptions );
+?>
+
+<?php if( $this->bHome === true ): ?>
+	<?php if ( $oParticipation === null ): ?>
+	<td colspan="1" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<td colspan="3" class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<td colspan="3" class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<?php else: ?>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getIn() > 0 ) ? $oParticipation->getIn() : null ?></span>
+	</td>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getOut() > 0 ) ? $oParticipation->getOut() : null ?></span>
+	</td>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<?php $nGoals = $oParticipation->getGoals()->count(); ?>
+		<span><?= ( $nGoals > 0 ) ? $nGoals : null ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getRedCard() > 0 ) ? $oParticipation->getRedCard() : null ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getYellowCardTwo() > 0 ) ? $oParticipation->getYellowCardTwo() : null ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getYellowCardOne() > 0 ) ? $oParticipation->getYellowCardOne() : null ?></span>
+	</td>
+	<td data-playerid="<?= $this->oPlayer->getId() ?>">
+		<?php if ( $oParticipation->getIn() === 0 ): ?>
+		<span class="glyphicon glyphicon-ok"></span>
+		<?php endif; ?>
+	</td>
+	<?php endif; ?>
+	<td data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><a href="<?= Zend_Registry::get("baseurl") ?>voetbal/persoon/index/?editid=<?= $this->oPlayer->getClient()->getId() ?>"><?= $this->oPlayer->getClient()->getFullName( RAD_Person::CALLTYPE_FULLNAME_FIRSTNAMELETTER ) ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= $this->oPlayer->getBackNumber() ?></span>
+	</td>
+<?php else: ?>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= $this->oPlayer->getBackNumber() ?></span>
+	</td>
+	<td data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><a href="<?= Zend_Registry::get("baseurl") ?>voetbal/persoon/index/?editid=<?= $this->oPlayer->getClient()->getId() ?>"><?= $this->oPlayer->getClient()->getFullName( RAD_Person::CALLTYPE_FULLNAME_FIRSTNAMELETTER ) ?></a></span>
+	</td>
+	<?php if ( $oParticipation === null ): ?>
+	<td colspan="3" class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<td colspan="3" class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<td colspan="1" data-playerid="<?= $this->oPlayer->getId() ?>"></td>
+	<?php else: ?>
+	<td data-playerid="<?= $this->oPlayer->getId() ?>">
+		<?php if ( $oParticipation->getIn() === 0 ): ?>
+		<span class="glyphicon glyphicon-ok"></span>
+		<?php endif; ?>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getYellowCardOne() > 0 ) ? $oParticipation->getYellowCardOne() : null ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getYellowCardTwo() > 0 ) ? $oParticipation->getYellowCardTwo() : null ?></span>
+	</td>
+	<td class="hidden-xs hidden-sm" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getRedCard() > 0 ) ? $oParticipation->getRedCard() : null ?></span>
+	</td>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<?php $nGoals = $oParticipation->getGoals()->count(); ?>
+		<span><?= ( $nGoals > 0 ) ? $nGoals : null ?></span>
+	</td>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getOut() > 0 ) ? $oParticipation->getOut() : null ?></span>
+	</td>
+	<td class="hidden-xs" data-playerid="<?= $this->oPlayer->getId() ?>">
+		<span><?= ( $oParticipation->getIn() > 0 ) ? $oParticipation->getIn() : null ?></span>
+	</td>
+	<?php endif; ?>
+<?php endif; ?>

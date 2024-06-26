@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<db>
+	<Additions>
+		<Version>V1.00</Version>
+		
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Messages</Name></table>
+		</Addition>
+		
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>MenuItemsPerRole</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>MenuItemHierarchy</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>MenuItems</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>ActionsPerRole</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Actions</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>UsersPerRole</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Roles</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>UsersExt</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Help</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>Modules</Name></table>
+		</Addition>		
+		
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>ImportDetails</Name></table>
+		</Addition>
+		<Addition>
+			<Name>TableRemove</Name>	
+			<table><Name>ImportRuns</Name></table>
+		</Addition>
+	</Additions>
+</db>

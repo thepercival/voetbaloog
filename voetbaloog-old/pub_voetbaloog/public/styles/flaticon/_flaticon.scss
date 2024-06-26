@@ -1,0 +1,69 @@
+    /*
+    Flaticon icon font: Flaticon
+    Creation date: 01/05/2016 12:37
+    */
+
+    @font-face {
+  font-family: "Flaticon";
+  src: url("./Flaticon.eot");
+  src: url("./Flaticon.eot?#iefix") format("embedded-opentype"),
+       url("./Flaticon.woff") format("woff"),
+       url("./Flaticon.ttf") format("truetype"),
+       url("./Flaticon.svg#Flaticon") format("svg");
+  font-weight: normal;
+  font-style: normal;
+}
+
+@media screen and (-webkit-min-device-pixel-ratio:0) {
+  @font-face {
+    font-family: "Flaticon";
+    src: url("./Flaticon.svg#Flaticon") format("svg");
+  }
+}
+
+    .fi:before{
+        display: inline-block;
+  font-family: "Flaticon";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-decoration: inherit;
+  text-rendering: optimizeLegibility;
+  text-transform: none;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  font-smoothing: antialiased;
+    }
+
+    .flaticon-berichtenbord:before { content: "\f100"; }
+.flaticon-gelekaart:before { content: "\f101"; }
+.flaticon-goals:before { content: "\f102"; }
+.flaticon-grafiek:before { content: "\f103"; }
+.flaticon-instellingen:before { content: "\f104"; }
+.flaticon-kaarten:before { content: "\f105"; }
+.flaticon-nultegengoals:before { content: "\f106"; }
+.flaticon-programma:before { content: "\f107"; }
+.flaticon-rodekaart:before { content: "\f108"; }
+.flaticon-score:before { content: "\f109"; }
+.flaticon-stand:before { content: "\f10a"; }
+.flaticon-tegengoals:before { content: "\f10b"; }
+.flaticon-three:before { content: "\f10c"; }
+.flaticon-uitleg:before { content: "\f10d"; }
+.flaticon-voorspellingen:before { content: "\f10e"; }
+    
+    $font-Flaticon-berichtenbord: "\f100";
+    $font-Flaticon-gelekaart: "\f101";
+    $font-Flaticon-goals: "\f102";
+    $font-Flaticon-grafiek: "\f103";
+    $font-Flaticon-instellingen: "\f104";
+    $font-Flaticon-kaarten: "\f105";
+    $font-Flaticon-nultegengoals: "\f106";
+    $font-Flaticon-programma: "\f107";
+    $font-Flaticon-rodekaart: "\f108";
+    $font-Flaticon-score: "\f109";
+    $font-Flaticon-stand: "\f10a";
+    $font-Flaticon-tegengoals: "\f10b";
+    $font-Flaticon-three: "\f10c";
+    $font-Flaticon-uitleg: "\f10d";
+    $font-Flaticon-voorspellingen: "\f10e";

@@ -1,0 +1,47 @@
+<?php
+
+echo "<div style=\"float:left;\">";
+{
+	// Kies een competitie die je wilt zien
+	if ( $this->oPools->count() > 0 )
+	{
+		$sStyle = "font-weight: bold; font-size: 12px;	letter-spacing: 2px; color: #FF6100;";
+		echo "<div style=\"float:left; ".$sStyle."\">";
+		if ( $this->bMyGroups === true )
+			echo 'Mijn Pools';
+		else
+			echo 'Pools';
+		echo "</div>";
+
+		$sEvent = "onchange=\"this.form.submit();\"";
+		$oComboBox = Controls_Factory::createComboBox( "poolid" );
+		$oComboBox->putObjectToSelect( $this->oPool );
+		$oComboBox->putSource( $this->oPools );
+		$oComboBox->removeEmptyRow();
+		$oComboBox->putObjectPropertyToShow("**VoetbalOog_Pool::Name** ( **VoetbalOog_Pool::CompetitionSeason::Abbreviation** )");
+		$oComboBox->addEvent( $sEvent );
+
+		echo "<div style=\"float:left;\">";
+		echo "<form name=\"pooluserform\" method=\"POST\" action=\"".$this->url."/\">";
+		echo "<div style=\"float:left;\">&nbsp;&nbsp;&nbsp;&nbsp;".$oComboBox."</div>";
+		if ( $this->oPool !== null and $this->oUser !== null and $this->oPoolUser === null and $this->bPoolHasStarted !== true )
+			echo "<div style=\"float:left;\">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href=\"".$this->urlcontroller."/meedoen/competitionseasonid/".$this->oPool->getCompetitionSeason()->getId()."/poolid/".$this->oPool->getId()."/\">meedoen</a></div>";
+		echo "</form>";
+		echo "</div>";
+		if ( $this->oPool !== null and $this->bPoolHasStarted === true )
+			echo "
+				<div style=\"margin-left:5px; float:left;\">
+						<a target=\"_blank\" href=\"".$this->urlcontroller."/totaaloverzichtpdf/poolid/".$this->oPool->getId()."/\"><img width=\"16\" height=\"16\" src=\"".Zend_Registry::get("baseurl")."public/images/pdf.gif\" alt=\"pool overzicht\"></a>
+				</div>
+			";
+	}
+	else
+	{
+		echo "<div class=\"message-error\">Er zijn geen pools aanwezig.</div>";
+		echo "<div class=\"message-error\">Klik <a href=\"".Zend_Registry::get("baseurl")."pool/meedoen/\">hier</a> om mee te doen met een pool.</div>";
+	}
+	echo "<div style=\"clear:both;\"></div>";
+}
+echo "</div>";
+
+?>

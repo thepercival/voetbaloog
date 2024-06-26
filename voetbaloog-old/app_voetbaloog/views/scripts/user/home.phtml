@@ -1,0 +1,89 @@
+<div class="page-header" style="text-align: center;">
+	<h2>mijn instellingen</h2>
+</div>
+<?php if( $this->savemessage !== null && count( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success">
+		<?php foreach ( $this->savemessage as $sMessage): ?>
+			<p class="alert-link"><?= $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+<?php if( $this->editmessage !== null && count( $this->editmessage ) > 0 ): ?>
+	<div class="alert alert-danger">
+		<?php foreach ( $this->editmessage as $sMessage): ?>
+			<p class="alert-link"><?= $sMessage ?></p>
+		<?php endforeach ?>
+	</div>
+<?php endif ?>
+<style>
+	.form-horizontal .form-group {
+		margin-right: 0px;
+		margin-left: 0px;
+	}
+</style>
+<div class="container">
+	<div class="row">
+		<form name="userhomeform" action="<?= $this->url; ?>/" method="POST" enctype="multipart/form-data" class="form-horizontal" role="form">
+			<div class="form-group">
+				<label for="username" class="col-xs-12 col-sm-2 control-label">gebruikersnaam</label>
+				<div class="col-xs-12 col-sm-10">
+					<input type="text" class="form-control" id="username" name="username" value="<?= $this->username; ?>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="emailaddress" class="col-sm-2 control-label">emailadres</label>
+				<div class="col-sm-10">
+					<input type="email" class="form-control" id="emailaddress" name="emailaddress" value="<?= $this->emailaddress; ?>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="password" class="col-sm-2 control-label">nieuw wachtwoord</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="password" name="password" placeholder="wachtwoord">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="repeatpassword" class="col-sm-2 control-label">herhaal nieuw wachtwoord</label>
+				<div class="col-sm-10">
+					<input type="password" class="form-control" id="repeatpassword" name="repeatpassword" placeholder="herhaal wachtwoord">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="gender" class="col-sm-2 control-label">geslacht</label>
+				<div class="col-sm-10">
+					<label class="checkbox-inline">
+						<input type="checkbox" id="genderm" name="genderm" value="m" <?= $this->oUser->getGender() === "m" ? "CHECKED" : null; ?>>m
+					</label>
+					<label class="checkbox-inline">
+						<input type="checkbox" id="genderf" name="genderf" value="v" <?= $this->oUser->getGender() === "v" ? "CHECKED" : null; ?>>v
+					</label>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="dateofbirth" class="col-sm-2 control-label">geboortedatum</label>
+				<div class="col-sm-10 date">
+					<?php $sBirthDate = $this->oUser->getDateOfBirth() !== null ? $this->oUser->getDateOfBirth()->toString( Agenda_DateTime::STR_SQLDATE ) : null; ?>
+					<input type="date" class="form-control" id="dateofbirth" name="dateofbirth" value="<?= $sBirthDate ?>">
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="avatar" class="col-sm-2 control-label">avatar</label>
+				<div class="col-sm-10">
+					<input type="file" class="form-control" id="avatar" name="avatar">
+					<p class="help-block">De huidige avatar wordt vervangen wanneer je een nieuwe afbeelding kiest.</p>
+					<img class="img-rounded img-responsive" src=<?= Zend_Registry::get("baseurl")."image/generatecaptcha/userid/".$this->oUser."/"; ?> title="avatar">
+				</div>
+			</div>
+
+			<div class="form-group">
+				<div class="col-sm-offset-2 col-sm-10">
+					<button type="submit" class="btn btn-default" name="btnchange" value="submitted">opslaan</button>
+
+					<a href="<?= $this->urlcontroller; ?>/logout/" type="button" class="btn btn-danger pull-right">uitloggen</a>
+				</div>
+			</div>
+
+			<input type="hidden" name="MAX_FILE_SIZE" value="500000"> <!-- 500KB -->
+		</form>
+	</div>
+</div>

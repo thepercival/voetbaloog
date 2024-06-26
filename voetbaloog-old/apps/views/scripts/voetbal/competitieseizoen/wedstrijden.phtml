@@ -1,0 +1,175 @@
+
+<ul class="progress-indicator">
+    <li class="completed">
+        <a href="#" style=""><span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>teams<?= $this->oCompetitionSeason->hasGames() ? ", velden & scheidsrechters" : null ?></a>
+    </li>
+    <li class="completed">
+        <span class="bubble"></span><i class="glyphicon glyphicon-check"></i>structuur
+    </li>
+    <li class="<?= !$this->oCompetitionSeason->hasGames() ? 'danger' : null ?>">
+        <span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>planning
+    </li>
+</ul>
+
+<?php
+/*
+ * wanneer er een gespeelde wedstrijd is voor een ronde dan kun je hiervoor geen wedstrijden in plannen
+ * maak planning in een uitklap venster
+ */
+?>
+
+<div ng-controller="GameController as csgames" model="csgames.csid" ng-init="csgames.csid=<?= $this->oCompetitionSeason->getId() ?>">
+
+    <div class="container-fluid row">
+        <h3 class="pull-left" style="display: inline-block">{{ csgames.competitionseason.name }} <span ng-if="csgames.competitionseason.public" class="glyphicon glyphicon-cloud" title="gepubliceerd"></span><span ng-if="!csgames.competitionseason.public" class="glyphicon glyphicon-lock" title="nog niet gepubliceerd, klik rechts op instellingen"></span></h3>
+        <h3 class="pull-right"><button class="btn btn-default btn-sm" ng-click="csgames.cssettingsIsCollapsed = !csgames.cssettingsIsCollapsed"><span class="glyphicon glyphicon-cog"></span></button></h3>
+    </div>
+    <div ngif="csgames.plansavestate != undefined" class="alert alert-{{ csgames.plansavestate.type }}"><p class="alert-link">{{ csgames.plansavestate.message }}</p></div>
+    <hr>
+    <div uib-collapse="csgames.cssettingsIsCollapsed">
+        <div class="well well-lg" style="min-height:200px;">
+            <form ng-submit="csgames.updateSettingsCS()" class="form-horizontal" role="form">
+                <div class="form-group">
+                    <label for="locations" class="col-sm-4 control-label">{{ csgames.competitionseason.public ? "de-" : null }}publiceer</label>
+                    <div class="col-sm-8">
+                        <input type="checkbox" ng-model="csgames.competitionseason.public">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-sm-offset-4 col-sm-8">
+                        <button type="submit" class="btn btn-default">opslaan</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div ngif="!csgames.hasPlayedGames( round )">
+        <button type="button" class="btn btn-default" ng-click="csgames.allocateIsCollapsed = !csgames.allocateIsCollapsed">wedstrijden plannen</button>
+        <hr>
+        <div uib-collapse="csgames.allocateIsCollapsed">
+            <div class="well well-lg" style="min-height:400px;">
+                <form ng-submit="csgames.planGames()" class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label for="startdatetimedate" class="col-sm-4 control-label">startdatum</label>
+                        <div class="col-sm-8">
+                            <p class="input-group">
+                                <input type="text" class="form-control" uib-datepicker-popup="{{dateFormat}}" ng-model="csgames.csStartDateTime" is-open="csgames.datePopup.opened"  datepicker-options="csgames.dateOptions" ng-required="true" close-text="sluiten" />
+                            <span class="input-group-btn">
+                                <button type="button" class="btn btn-default" ng-click="csgames.openCSStartDateTime()"><i class="glyphicon glyphicon-calendar"></i></button>
+                            </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="startdatetimedate" class="col-sm-4 control-label">starttijd</label>
+                        <div class="col-sm-8">
+                            <uib-timepicker ng-model="csgames.csStartDateTime" hour-step="1" minute-step="5" show-meridian="false" readonly-input="true"></uib-timepicker>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="locations" class="col-sm-4 control-label">aantal velden</label>
+                        <div class="col-sm-8">
+                            aantal velden
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="arbiters" class="col-sm-4 control-label">aantal arbiters</label>
+                        <div class="col-sm-8">
+                            aantal arbiters
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="timebetween" class="col-sm-4 control-label">tijd voor ronde</label>
+                        <div class="col-sm-8">
+                            tijd voor elke ronde
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <div class="col-sm-offset-4 col-sm-8">
+                            <button type="submit" class="btn btn-default">plan</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+
+    <div ng-repeat="round in csgames.competitionseason.rounds">
+        <h2 ng-bind-html="csgames.getRoundName( round )"></h2>
+        <table ng-if="csgames.hasGames( round )" class="table" style="max-width:800px">
+            <thead>
+            <tr class="tableheader">
+                <th></th>
+                <th>
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'startdatetime'; csgames.sortReverse = !csgames.sortReverse">
+                        datum
+                        <span ng-show="csgames.sortType == 'startdatetime' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'startdatetime' && csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th>tijd</th>
+                <th class="hidden-xs">
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'location'; csgames.sortReverse = !csgames.sortReverse">
+                        plaats
+                        <span ng-show="csgames.sortType == 'location' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'location' &&!csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th>
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'poule'; csgames.sortReverse = !csgames.sortReverse">
+                        p
+                        <span ng-show="csgames.sortType == 'poule' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'poule' &&!csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th style="text-align:right;">
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'homepouleplace.team.name'; csgames.sortReverse = !csgames.sortReverse">
+                        thuisteam
+                        <span ng-show="csgames.sortType == 'homepouleplace.team.name' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'homepouleplace.team.name' && csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th style="text-align:center;">
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'result'; csgames.sortReverse = !csgames.sortReverse">
+                        uitslag
+                        <span ng-show="csgames.sortType == 'result' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'result' && csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th>
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'awaypouleplace.team.name'; csgames.sortReverse = !csgames.sortReverse">
+                        uitteam
+                        <span ng-show="csgames.sortType == 'awaypouleplace.team.name' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'awaypouleplace.team.name' && csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+                <th>
+                    <a class="inverted" href="#" ng-click="csgames.sortType = 'valid'; csgames.sortReverse = !csgames.sortReverse">
+                        <span class="glyphicon glyphicon-ok-sign"></span>
+                        <span ng-show="csgames.sortType == 'valid' && !csgames.sortReverse" class="glyphicon glyphicon-sort-by-order"></span>
+                        <span ng-show="csgames.sortType == 'valid' && csgames.sortReverse" class="glyphicon glyphicon-sort-by-order-alt"></span>
+                    </a>
+                </th>
+            </tr>
+            </thead>
+            <tbody ng-repeat="poule in round.poules">
+            <tr ng-repeat="game in poule.games | orderBy:csgames.sortType:csgames.sortReverse | filter:csgames.filterGames">
+                <td><a role="button" class="btn btn-default btn-xs" href="<?= Zend_Registry::get("baseurl") ?>voetbal/wedstrijd/index/?id={{ game.id }}"><span class="glyphicon glyphicon-pencil"></span></a></td>
+                <td>{{ game.startdatetime | date : "d MMM y" }}</td>
+                <td>{{ game.startdatetime | date : "HH:mm" }}</td>
+                <td class="hidden-xs">{{ game.location != null ? game.location.name : null }} </td>
+                <td>{{ csgames.getPouleName( game.homepouleplace.poule, false ) }}</td>
+                <td style="text-align:right;">{{ csgames.getPoulePlaceName( game.homepouleplace ) }} <span class="spriteteam-16 sprite-{{ game.homepouleplace.team != null ? game.homepouleplace.team.imagename : null }}-16" style="display: inline-block;">&nbsp;</span></td>
+                <td style="text-align:center;">{{ csgames.getResult( game ) }}</td>
+                <td><span class="spriteteam-16 sprite-{{ game.awaypouleplace.team != null ? game.awaypouleplace.team.imagename : null }}-16" style="display: inline-block;">&nbsp;</span> {{ csgames.getPoulePlaceName( game.awaypouleplace ) }}</td>
+                <td><span class="glyphicon glyphicon-{{ game.valid ? 'ok-sign' : null }}"></span></td>
+            </tr>
+            </tbody>
+        </table>
+        <div ng-if="!csgames.hasGames( round )" class="alert alert-danger">
+            <p class="alert-link">geen wedstrijden gepland</p>
+        </div>
+    </div>
+</div>

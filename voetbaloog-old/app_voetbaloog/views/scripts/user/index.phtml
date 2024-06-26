@@ -1,0 +1,43 @@
+<?php
+
+
+$sidentity = Zend_Auth::getInstance()->getIdentity();
+if ( $sidentity === null )
+{
+	$sErrorCode = "";
+	if ( $this->InlogErrorCode !== null )
+		$sErrorCode = $this->InlogErrorCode;
+
+	echo("
+		Inloggen</br>
+		<font color=\"red\" size=\"1\"><b>".$sErrorCode."</b></font><br /><br />
+		<form action=\"".Zend_Registry::get("baseurl")."user/login\" method=\"post\" name=\"loginform\" id=\"loginform\">
+			<img src=\"".Zend_Registry::get("baseurl")."public/images/user.jpg\" alt=\"user\" /> Gebruikersnaam:<br />
+			<input size=\"17\" type=\"text\" name=\"username\" id=\"username\" /><br /><br />
+			<img width=\"20\" height=\"16\" src=\"".Zend_Registry::get("baseurl")."public/images/password.jpg\" alt=\"pass\" /> Wachtwoord:<br />
+			<input size=\"17\" type=\"password\" name=\"password\" /><br />
+			<br />
+			<input type=\"submit\" value=\"Login\" class=\"button\" />
+		</form><br/>
+
+		<a href=\"mailto:coendunnink@hotmail.com\">wachtwoord vergeten</a><br/>
+		<br/>
+	");
+}
+else
+{
+	$oOptions = FilterFactory::createFilters();
+	$oOptions->addFilter( "User::Id", "EqualTo", $sidentity );
+	$oUser = UserFactory::createObjectFromDatabase( $oOptions );
+
+	echo("
+		Hallo ".$sidentity.",</br>
+		</br>
+	");
+
+	echo("
+			<a href=\"".Zend_Registry::get("baseurl")."user/logout\">uitloggen</a><br/>
+			<br/>
+	");
+}
+?>

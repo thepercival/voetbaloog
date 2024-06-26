@@ -1,0 +1,66 @@
+<?php if ( $this->oPlayer === null ) { return; } ?>
+<?php
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "Voetbal_Game_Participation::Game", "EqualTo", $this->oGame );
+	$oOptions->addFilter( "Voetbal_Game_Participation::TeamMembershipPlayer", "EqualTo", $this->oPlayer );
+	$oParticipation = Voetbal_Game_Participation_Factory::createObjectFromDatabase( $oOptions );
+
+	$oGoals = $oParticipation !== null ? $oParticipation->getGoals() : Voetbal_Goal_Factory::createObjects();
+?>
+
+<div class="form-group">
+	<label for="starts" class="col-xs-3 col-sm-4 control-label">basis, <span class="glyphicon glyphicon-log-out"></span>, <span class="glyphicon glyphicon-log-in"></span> </label>
+	<div class="col-xs-2 col-sm-1">
+		  <input type="checkbox" class="form-control" name="starts" <?= ( $oParticipation !== null and $oParticipation->getIn() === 0 ) ? "CHECKED" : null ?>>
+	</div>
+	<div class="col-xs-3 col-sm-2">
+		  <input type="text" class="form-control" name="out" value="<?= $oParticipation !== null ? $oParticipation->getOut() : null ?>">
+	</div>
+	<div class="col-xs-3 col-sm-2">
+			<input type="text" class="form-control" name="in" value="<?= $oParticipation !== null ? $oParticipation->getIn() : null ?>">
+	</div>
+</div>
+<div class="form-group">
+	<label for="yellowcardone" class="col-xs-3 col-sm-4 control-label">gele kaarten</label>
+	<div class="col-xs-3 col-sm-2">
+		<input type="text" class="form-control" name="yellowcardone" value="<?= $oParticipation !== null ? $oParticipation->getYellowCardOne() : null ?>">
+	</div>
+	<div class="col-xs-3 col-sm-2">
+		<input type="text" class="form-control" name="yellowcardtwo" value="<?= $oParticipation !== null ? $oParticipation->getYellowCardTwo() : null ?>">
+	</div>
+</div>
+<div class="form-group">
+	<label for="redcard" class="col-xs-3 col-sm-4 control-label">rode kaart</label>
+	<div class="col-xs-3 col-sm-2">
+	<input type="text" class="form-control" name="redcard" value="<?= $oParticipation !== null ? $oParticipation->getRedCard() : null ?>">
+	</div>
+</div>
+<div class="form-group">
+	<label for="score" class="col-xs-3 col-sm-4 control-label ">goals</label>
+	<div class="col-xs-6 col-sm-5">
+		<table class="table">
+			<tr>
+				<td>minuut</td>
+				<td>pen.</td>
+				<td>own</td>
+			</tr>
+			<?php $nI = 1; ?>
+			<?php foreach( $oGoals as $oGoal ): ?>
+			<tr>
+				<td><input type="text" class="form-control" name="goal<?= $nI ?>-m" value="<?= $oGoal->getMinute() ?>"></td>
+				<td><input type="checkbox" class="form-control" name="goal<?= $nI ?>-p" <?= $oGoal->getPenalty() ? "CHECKED" : null ?>></td>
+				<td><input type="checkbox" class="form-control" name="goal<?= $nI ?>-o" <?= $oGoal->getOwnGoal() ? "CHECKED" : null ?>></td>
+			</tr>
+			<?php $nI++; ?>
+			<?php endforeach; ?>
+			<?php for ( $nJ = $nI ; $nJ < 6 ; $nJ++ ): ?>
+			<tr>
+				<td><input type="text" class="form-control" name="goal<?= $nJ ?>-m" value=""></td>
+				<td><input type="checkbox" class="form-control" name="goal<?= $nJ ?>-p"></td>
+				<td><input type="checkbox" class="form-control" name="goal<?= $nJ ?>-o"></td>
+			</tr>
+			<?php endfor;?>
+		</table>
+	</div>
+</div>
+<input type="hidden" name="playerid" value="<?= $this->oPlayer ?>">

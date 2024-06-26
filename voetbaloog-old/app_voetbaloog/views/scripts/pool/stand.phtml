@@ -1,0 +1,41 @@
+<div id="page-pool-stand" style="max-width: 800px;">
+	<?php $this->sHeaderName = "stand"; ?>
+	<?php if( $this->bShowAlltimes ){ $this->subheader = '<a class="headerlink" href="'.$this->urlcontroller.'/standallertijden/poolid/'.$this->oPool->getId().'/">aller tijden</a>'; } ?>
+	<?= $this->render("pool/header.phtml") ?>
+
+	<?php
+	$oOptions = Construction_Factory::createOptions();
+	$oOptions->addFilter( "VoetbalOog_Round_BetConfig::Pool", "EqualTo", $this->oPool );
+	?>
+	<?php if ( !$this->bPoolHasStarted and $this->oPool->getUsers()->count() <= 1 or VoetbalOog_Bet_Factory::getNrOfObjectsFromDatabase( $oOptions ) === 0 ): ?>
+		<div class="alert alert-danger"><p class="alert-link">deze pool wordt verwijderd na de eerste deadline omdat er geen voorspellingen gedaan zijn of omdat er maar 1 deelnemer meedoet</p></div>
+	<?php endif ?>
+
+	<?php
+	try
+	{
+		$oCache = ZendExt_Cache::getDefaultCache();
+		$sCacheId = "pool" . $this->oPool->getId() . "stand";
+		$sHtml = $oCache->load( $sCacheId );
+		if( $sHtml === false or APPLICATION_ENV !== "production" )
+		{
+			$sHtml = "<div>" . $this->render( "pool/stand_helper.phtml" ) . "</div>";
+			$oCache->save( $sHtml, $sCacheId, array( 'competitionseason'.$this->oPool->getCompetitionSeason()->getId(), 'pool'.$this->oPool->getId() ) );
+		}
+		echo $sHtml;
+	}
+	catch ( Exception $e )
+	{
+		?>
+		<div class="alert alert-danger"><p class="alert-link"><?= $e->getMessage() ?></p></div>
+		<?php
+	}
+	?>
+</div>
+
+
+<script>
+	var g_nPoolId = <?= $this->oPool->getId(); ?>;
+	var g_nPoolUserId = <?= $this->oPoolUser !== null ? $this->oPoolUser->getId() : "null" ?>;
+    var g_bShowAlltimes = <?= $this->bShowAlltimes ? "true" : "false" ?>;
+</script>

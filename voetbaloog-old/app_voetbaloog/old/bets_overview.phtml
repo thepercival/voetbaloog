@@ -1,0 +1,192 @@
+<!-- YUI -->
+<script type="text/javascript" src="<?= Zend_Registry::get("jsthirdparties"); ?>yui/build/yahoo/yahoo-min.js"></script>
+<script type="text/javascript">
+	YAHOO.namespace("voetbaloog");
+</script>
+
+<?php if ( APPLICATION_ENV === "development" ): ?>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetView.js"></script>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetView/PoolUsers.js"></script>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetView/Matrix.js"></script>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetView/Matrix/Games.js"></script>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/BetView/Matrix/Bets.js"></script>
+	<script type="text/javascript" src="<?= Zend_Registry::get("jslibraryvo") ?>VoetbalOog/Control/Factory.js"></script>
+<?php endif; ?>
+
+<?php
+if ( $this->oPool === null )
+	return;
+
+echo "<div id=\"".$this->sbetviewcontrolid."\"></div>";
+?>
+
+<script type="text/javascript">
+	var sDivId = '<?php echo $this->sbetviewcontrolid; ?>';
+	var nContainerWidth = document.getElementById( 'container' ).clientWidth;
+	var nWidth = nContainerWidth - 24; // 24 is some borders, paddings and margins
+	var g_oBetView = new Ctrl_BetView( g_oPool, g_oPoolUser, sDivId, nWidth );
+
+var g_Dom = YAHOO.util.Dom;
+var g_Event = YAHOO.util.Event;
+var g_DDM = YAHOO.util.DragDropMgr;
+
+//////////////////////////////////////////////////////////////////////////////
+// custom drag and drop implementation
+//////////////////////////////////////////////////////////////////////////////
+
+YAHOO.voetbaloog.DDList = function(id, sGroup, config) {
+
+	YAHOO.voetbaloog.DDList.superclass.constructor.call(this, id, sGroup, config);
+
+	this.logger = this.logger || YAHOO;
+	var el = this.getDragEl();
+	g_Dom.setStyle(el, "opacity", 0.67); // The proxy is slightly transparent
+
+	this.goingUp = false;
+	this.lastY = 0;
+};
+
+YAHOO.extend(YAHOO.voetbaloog.DDList, YAHOO.util.DDProxy, {
+	startDrag: function(x, y) {
+		//return;
+		// alert('startDrag');
+		this.logger.log(this.id + " startDrag");
+
+		// make the proxy look like the source element
+		var dragEl = this.getDragEl();
+		var clickEl = this.getEl();
+		g_Dom.setStyle(clickEl, "visibility", "hidden");
+
+		dragEl.innerHTML = clickEl.innerHTML;
+
+		g_Dom.setStyle(dragEl, "color", g_Dom.getStyle(clickEl, "color"));
+		g_Dom.setStyle(dragEl, "backgroundColor", g_Dom.getStyle(clickEl, "backgroundColor"));
+		g_Dom.setStyle(dragEl, "border", "2px solid gray");
+	},
+
+	endDrag: function(e) {
+		//return;
+		//console.log('endDrag');
+		var srcEl = this.getEl();
+		var proxy = this.getDragEl();
+
+		// Show the proxy element and animate it to the src element's location
+		g_Dom.setStyle(proxy, "visibility", "");
+		var a = new YAHOO.util.Motion(
+			proxy, {
+				points: {
+					to: g_Dom.getXY(srcEl)
+				}
+			},
+			0.2,
+			YAHOO.util.Easing.easeOut
+		);
+		var proxyid = proxy.id;
+		var thisid = this.id;
+
+		// Hide the proxy and show the source element when finished with the animation
+		a.onComplete.subscribe(function() {
+				g_Dom.setStyle(proxyid, "visibility", "hidden");
+				g_Dom.setStyle(thisid, "visibility", "");
+			});
+		a.animate();
+
+		g_oBetView.refreshBackgrounds();
+	},
+
+	onDragDrop: function(e, id) {
+		//return;
+		//console.log('onDragDrop');
+		// If there is one drop interaction, the li was dropped either on the list,
+		// or it was dropped on the current location of the source element.
+		if (g_DDM.interactionInfo.drop.length === 1) {
+
+			// The position of the cursor at the time of the drop (YAHOO.util.Point)
+			var pt = g_DDM.interactionInfo.point;
+
+			// The region occupied by the source element at the time of the drop
+			var region = g_DDM.interactionInfo.sourceRegion;
+
+			// Check to see if we are over the source element's location.  We will
+			// append to the bottom of the list once we are sure it was a drop in
+			// the negative space (the area of the list without any list items)
+			if (!region.intersect(pt)) {
+				var destEl = g_Dom.get(id);
+				var destDD = g_DDM.getDDById(id);
+				destEl.appendChild(this.getEl());
+				destDD.isEmpty = false;
+				g_DDM.refreshCache();
+			}
+		}
+	},
+
+	onDrag: function(e) {
+		//return;
+		//console.log('onDrag');
+		// Keep track of the direction of the drag for use during onDragOver
+		var y = g_Event.getPageY(e);
+
+		if (y < this.lastY) {
+			this.goingUp = true;
+		} else if (y > this.lastY) {
+			this.goingUp = false;
+		}
+
+		this.lastY = y;
+	},
+
+	onDragOver: function(e, id) {
+		//return;
+		//console.log('onDragOver');
+		var srcEl = this.getEl();
+		var destEl = g_Dom.get(id);
+
+		// We are only concerned with list items, we ignore the dragover
+		// notifications for the list.
+		if (destEl.nodeName.toLowerCase() == "li") {
+			var orig_p = srcEl.parentNode;
+			var p = destEl.parentNode;
+
+			var nAction;
+			if (this.goingUp) {
+
+				// console.log('goingUp');
+				p.insertBefore(srcEl, destEl); // insert above
+				nAction = Ctrl_BetView.nMovePoolUserForwards;
+
+			} else {
+				p.insertBefore(srcEl, destEl.nextSibling); // insert below
+				// console.log('goingDown');
+				nAction = Ctrl_BetView.nMovePoolUserBackwards;
+			}
+
+			// begin : update matrix
+			var oPoolUsers = g_oPool.getUsers();
+			var sPoolUserSrcId = srcEl.id.substr( 4 );
+			var sPoolUserDestId = destEl.id.substr( 4 );
+			var oPoolUserSrc = oPoolUsers[sPoolUserSrcId];
+			var oPoolUserDest = oPoolUsers[sPoolUserDestId];
+
+			if ( orig_p != p ) {
+				if ( p.id == 'ul1' ) {
+					g_oBetView.refreshMatrix( oPoolUserSrc, oPoolUserDest, Ctrl_BetView.nAppendPoolUser );
+				}
+				else {
+					g_oBetView.refreshMatrix( oPoolUserSrc, null, Ctrl_BetView.nRemovePoolUser );
+				}
+			}
+			else if ( p.id ==  "ul1" ) {
+				g_oBetView.refreshMatrix( oPoolUserSrc, oPoolUserDest, nAction );
+			}
+			else if ( p.id ==  "ul2" ) {
+				g_oBetView.refreshMatrix( oPoolUserSrc, null, Ctrl_BetView.nRemovePoolUser );
+			}
+
+		 // end : update matrix
+
+			g_DDM.refreshCache();
+		}
+	}
+});
+
+</script>

@@ -1,0 +1,49 @@
+<?php
+
+$objRoleChooser = Controls_Factory::createCheckBoxes( "roles" );
+$objRoleChooser->putSource( $this->oInputRoles );
+$objRoleChooser->putAuth( $this->m_nRoleAuth );
+$objRoleChooser->putObjectsToSelect( $this->objSelectedUser->getRoles( APPLICATION_NAME ) );
+
+$objRoleChooser->putObjectPropertyToShow( "**Role::Id**" );
+
+echo "<form name=\"changerolesform\" method=\"POST\" action=\"".$this->url."/\">";
+echo "<fieldset><legend>Eigenschappen van databasegebruiker ".$this->objSelectedUser->getName()."</legend>";
+echo "<table>";
+if ( $this->message !== null )
+	echo "<tr><td colspan=3>".$this->message."<br></td></tr>";
+echo "<tr><td>Laatste keer ingelogd datumtijd</td><td> : </td><td>".$this->objSelectedUser->getLatestLoginDateTime()."</td></tr>";
+echo "<tr><td>Laatste keer ingelogd ipadres</td><td> : </td><td>".$this->objSelectedUser->getLatestLoginIpAddress()."</td></tr>";
+echo "<tr><td>Voorkeuren</td><td> : </td><td>".$this->objSelectedUser->getPreferences()."</td></tr>";
+
+$cfgAuth = new Zend_Config_Ini(APPLICATION_PATH.'/configs/config.ini', 'auth');
+if ( $cfgAuth->logintype === "database" )
+{
+	echo "<tr><td>Wachtwoord</td><td> : </td><td><input type=\"password\" name=\"password\"></td></tr>";
+	echo "<tr><td>Herhaal wachtwoord</td><td> : </td><td><input type=\"password\" name=\"repeatpassword\"></td></tr>";
+}
+
+echo "<input type=\"hidden\" name=\"userid\" value=\"".$this->objSelectedUser->getId()."\">";
+try
+{
+
+	echo "<tr><td colspan=3><fieldset><legend>Rollen</legend>".$objRoleChooser."</fieldset></td></tr>";
+}
+catch( Exception $e )
+{
+	echo $e->getMessage();
+}
+
+echo "<tr>";
+if ( ( Source_Db::ACTION_UPDATE & $this->auth ) === Source_Db::ACTION_UPDATE )
+	echo "<td><input type=\"submit\" name=\"btnedit\" value=\"Opslaan\"></td>";
+if ( ( Source_Db::ACTION_DELETE & $this->auth ) === Source_Db::ACTION_DELETE )
+	echo "<td></td><td><input type=\"submit\" name=\"btnremove\" value=\"Verwijder\"></td>";
+echo "</tr>";
+echo "</table>";
+echo "</fieldset>";
+echo "</form><br>";
+
+
+?>
+

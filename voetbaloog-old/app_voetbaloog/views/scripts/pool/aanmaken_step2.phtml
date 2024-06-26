@@ -1,0 +1,53 @@
+<?php
+	$oComboBox = Controls_Factory::createComboBox( "existingname" );
+	$oComboBox->putSource( VoetbalOog_Pool_Factory::createObjects() );
+	$oComboBox->putObjectPropertyToShow("**VoetbalOog_Pool::Name**");
+	$oComboBox->putCSSClass( "form-control" );
+?>
+
+<div class="panel panel-default">
+	<div class="panel-body">
+
+		<div id="errordiv_step2" class="alert alert-danger">
+			<p class="alert-link">de naam die je gekozen hebt bestaat al. Kies een andere naam</p>
+		</div>
+
+		<form role="form">
+			<div class="form-group">
+				<label for="step2_competitionseasonid" class="control-label">competitie</label>
+				<div id="step2_competitionseasonid"></div>
+			</div>
+			<div id="form-group-name-new" class="form-group">
+				<label for="newnamenew" class="control-label">naam</label>
+				<input type="text" maxlength="20" class="form-control" id="newnamenew" name="newnamenew" placeholder="naam">
+			</div>
+			<div id="form-group-name-both" class="form-group">
+				<label for="nametypenew" class="control-label input-group">naam</label>
+				<div class="btn-group" data-toggle="buttons">
+					<label id="label-newname" class="btn btn-default active">
+						<input type="radio" id="nametypenew" name="nametypenew">nieuw
+					</label>
+					<label id="label-existingname" class="btn btn-default">
+						<input type="radio" id="nametypeexisting" name="nametypeexisting">bestaand
+					</label>
+				</div>
+				<div id="formgroup-newname" class="form-group">
+					<input type="text" maxlength="20" class="form-control" id="newname" name="newname" placeholder="naam">
+				</div>
+				<div id="formgroup-existingname" class="form-group">
+					<p class="text-info">Wanneer je een bestaande pool kiest, dan wordt er ook historie bijgehouden zoals een ranglijst allertijden.</p>
+					<?= $oComboBox ?>
+				</div>
+			</div>
+		</form>
+	</div>
+	<div class="panel-footer">
+		<div class="pull-left">
+			<button id="btn_step2_previous" type="button" class="btn btn-default"><span class="glyphicon glyphicon-circle-arrow-left"></span> vorige</button>
+		</div>
+		<div class="pull-right">
+			<button id="btn_step2_next" type="button" class="btn btn-default">volgende <span class="glyphicon glyphicon-circle-arrow-right"></span></button>
+		</div>
+		<div style="clear:both"></div>
+	</div>
+</div>

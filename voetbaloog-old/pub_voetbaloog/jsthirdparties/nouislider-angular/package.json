@@ -1,0 +1,33 @@
+{
+  "name": "nouislider-angular",
+  "version": "2.0.0",
+  "description": "Angular wrapper for nouislider",
+  "main": "nouislider-angular.js",
+  "directories": {
+    "example": "example"
+  },
+  "keywords": [
+    "angular",
+    "angularjs",
+    "slider",
+    "nouislider"
+  ],
+  "devDependencies": {
+    "ng-annotate": "^1.0.2",
+    "uglify-js": "^2.4.24"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ng-annotate --add nouislider.js | uglifyjs > nouislider.min.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Yankovsky/nouislider-angular.git"
+  },
+  "author": "Yankovsky <YankovskyAndrey@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Yankovsky/nouislider-angular/issues"
+  },
+  "homepage": "https://github.com/Yankovsky/nouislider-angular#readme"
+}

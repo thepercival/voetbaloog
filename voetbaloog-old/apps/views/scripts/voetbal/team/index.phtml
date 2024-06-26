@@ -1,0 +1,74 @@
+<div class="page-default-admin"></div>
+<h2 style="text-align: center;">team-overzicht</h2>
+
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->savemessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->savemessage ?></p></div>
+<?php endif ?>
+
+<?php if ( $this->oTeams !== null and $this->oTeams->count() > 0 ): ?>
+	<table class="table">
+	<thead>
+		<tr>
+			<th></th>
+			<th class="hidden-xs">id</th>
+			<th>logo</th>
+			<th>naam</th>
+			<th class="hidden-xs">afkorting</th>
+			<th class="hidden-xs">iso</th>
+			<th>bond</th>
+			<th style="text-align: center;" colspan="2"><button role="button" class="btn btn-xs btn-default edit"><span class="glyphicon glyphicon-plus"></span></button></th>
+		</tr>
+	</thead>
+	<tbody>
+		<?php foreach ( $this->oTeams as $oTeam ): ?>
+		<tr>
+			<td><button role="button" class="btn btn-xs btn-default edit" data-id="<?= $oTeam->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-pencil"></span></button>
+			<td class="hidden-xs"><?= $oTeam->getId() ?></td>
+			<td><div class="spriteteam-16 sprite-<?= $oTeam->getImageName() ?>-16"></div></td>
+			<td><?= $oTeam->getName() ?></td>
+			<td class="hidden-xs"><?= $oTeam->getAbbreviation() ?></td>
+			<td class="hidden-xs"><?= $oTeam->getImageName() ?></td>
+			<td><?= $sAssociationName = $oAssociation = $oTeam->getAssociation() !== null ? $oTeam->getAssociation()->getName() : null; ?></td>
+			<td><a href="<?= $this->url ?>/?btnsave=remove&teamid=<?= $oTeam->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-remove"></span></a></td>
+			<td style="text-align: right;"><a href="<?= $this->urlcontroller ?>/update?teamid=<?= $oTeam->getId() ?>" type="button" class="btn btn-default btn-xs"><span class="glyphicon glyphicon-list"></span></a></td>
+		</tr>
+		<?php endforeach ?>
+	</tbody>
+	</table>
+<?php else: ?>
+	<div class="alert alert-info"><p class="alert-link">er zijn geen teams gevonden</p></div>
+<?php endif; ?>
+
+<div class="modal fade" id="editModal" tabindex="-1" role="dialog" aria-labelledby="editModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+				<span class="modal-title" id="editModalLabel" style="font-size:18px;">
+					<img height=25 width=25 src="<?= Zend_Registry::get("baseurl") ?>public/images/logo_25.png">
+					<span id="form-title"></span>
+				</span>
+			</div>
+			<form method="POST" action="<?= $this->url ?>/" role="form">
+			<div class="modal-body form-horizontal">
+				<div id="form-content"></div>
+				<span id="form-waiting" class="glyphicon glyphicon-refresh spin"></span>
+			</div>
+			<div class="modal-footer">
+				<button type="submit" class="btn btn-default" id="btnsave" name="btnsave" value="">opslaan</button>
+				<button type="button" class="btn btn-default" data-dismiss="modal">sluit</button>
+			</div>
+			</form>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	var g_sEntity = 'team';
+	var g_bAutoFill = false;
+	var g_nEditId = <?= $this->editid !== null ? $this->editid : "null" ?>;
+</script>
+

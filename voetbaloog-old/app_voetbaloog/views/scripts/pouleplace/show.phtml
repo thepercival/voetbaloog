@@ -1,0 +1,18 @@
+<?php $oPoulePlace = $this->oPoulePlace ?>
+<?php $bAway = $this->bAway ?>
+<?php $bAbbreviation= $this->bAbbreviation ?>
+
+<?php $oTeam = $oPoulePlace->getTeam(); ?>
+<?php if ( $oTeam != null ): ?>
+	<span style="line-height: 16px; height: 16px';">
+		<?php if ( $bAway === true ): ?>
+		<span class="spriteteam-16 sprite-<?= $oTeam->getImageName() ?>-16" style="display: inline-block;">&nbsp;</span>
+		<span style="display: inline-block;"><?= $this->bAbbreviation ? $oTeam->getAbbreviation() : $oTeam->getName() ?></span>
+		<?php else: ?>
+		<span style="display: inline-block;"><?= $this->bAbbreviation ? $oTeam->getAbbreviation() : $oTeam->getName() ?></span>
+		<span class="spriteteam-16 sprite-<?= $oTeam->getImageName() ?>-16" style="display: inline-block;">&nbsp;</span>
+		<?php endif; ?>
+	</span>
+<?php else: ?>
+	<?= $oPoulePlace->getDisplayName(); ?>
+<?php endif; ?>

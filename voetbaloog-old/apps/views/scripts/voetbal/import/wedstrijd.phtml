@@ -1,0 +1,120 @@
+<h2>importeer wedstrijd ( <?= $this->importModuleName ?> )</h2>
+
+<form method="POST" action="<?= $this->url ?>/" role="form" class="form-horizontal">
+    <div class="form-group">
+        <label for="name" class="col-xs-3 col-sm-4 control-label">competitieseizoen</label>
+        <div class="col-xs-9 col-sm-6 col-md-5">
+            <select name="csid" class="form-control" onchange="this.form.submit();">
+                <options>
+                    <option value=""></option>
+                    <?php foreach( $this->oCompetitionSeasons as $oCompetitionSeason ): ?>
+                        <option value="<?= $oCompetitionSeason->getId() ?>" <?= $oCompetitionSeason === $this->oCompetitionSeason ? "SELECTED" : null ?> ><?= $oCompetitionSeason->getName() ?></option>
+                    <?php endforeach ?>
+                </options>
+            </select>
+        </div>
+    </div>
+    <?php if ( $this->oCompetitionSeason !== null ): ?>
+    <div class="form-group">
+        <label for="gameid" class="col-xs-3 col-sm-4 control-label">wedstrijd</label>
+        <div class="col-xs-9 col-sm-6 col-md-5">
+            <?php $oRounds = $this->oCompetitionSeason->getRounds(); ?>
+            <select id="gameid" name="gameid" class="form-control" onchange="this.form.submit();">
+                <?php foreach( $oRounds as $oRound ): ?>
+                    <optgroup id="<?= $oRound->getName() ?>" label="<?= $oRound->getName() ?>">
+                        <option value=""></option>
+                        <?php $oGames = $oRound->getGames( true );?>
+                        <?php foreach( $oGames as $oGame ): ?>
+                            <option value="<?= $oGame->getId(); ?>" <?= $this->oGame === $oGame ? "SELECTED" : null ?>>
+                                <span style="width: 140px;"><?= $oGame->getStartDateTime() !== null ? $oGame->getStartDateTime()->toString( Agenda_DateTime::STR_SQLDATETIME ) : "-" ?></span>
+                                <span><?= $oGame->getState() === Voetbal_Factory::STATE_PLAYED ? " v " : null ?></span>
+                                <span style="width: 140px; text-align: right;"><?= $oGame->getHomePoulePlace()->getTeam()->getName() ?></span>
+                                <span>&nbsp;-&nbsp;</span>
+                                <span style="width: 140px; text-align: right;"><?= $oGame->getAwayPoulePlace()->getTeam()->getName() ?></span>
+                            </option>
+                        <?php endforeach; ?>
+                    </optgroup>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+    <?php endif; ?>
+    <div class="form-group">
+        <div class="col-xs-offset-3 col-sm-offset-4 col-xs-9 col-sm-4">
+            <button type="submit" class="btn btn-default" name="btnimport" value="submitted">importeer</button>
+            <?php if( $this->oGame !== null ) : ?>
+            <a style="margin-left: 20px;" href="<?= Zend_Registry::get("baseurl") ?>voetbal/wedstrijd/index/?id=<?= $this->oGame->getId() ?>">bewerk</a>
+            <?php endif; ?>
+        </div>
+    </div>
+</form>
+
+<?php if( $this->oGame === null ){ return; } ?>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+    <div class="alert alert-success">
+        <p class="alert-link"><?= $this->successmessage ?></p>
+    </div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+    <div class="alert alert-danger">
+        <p class="alert-link"><?= $this->errormessage ?></p>
+    </div>
+<?php endif ?>
+
+<ul class="list-group">
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">url:</div>
+        <div style="float:left;"><a href="<?= $this->externalurl ?>" target="_blank"><?= $this->externalurl ?></a></div>
+        <div style="clear:both;"></div>
+    </li>
+    <li class="list-group-item">
+        <div style="float:left; width: 50px;">cache:</div>
+        <div style="float:left;"><?= (int) ( $this->externalurlcache / 60 ) ?> minuten</div>
+        <div style="clear:both;"></div>
+    </li>
+</ul>
+<?php return; ?>
+<textarea style="width:100%; height:200px;" name="teamsjson"><?= json_encode( $this->oGameToImport, JSON_PRETTY_PRINT ); ?></textarea>
+<?php return; ?>
+<table class="table">
+    <thead>
+    <tr><th>actie</th><th>externe code</th><th>thuis</th><th>uit</th><th>datumtijd</th><th>lokale datumtijd</th></tr>
+    </thead>
+    <tbody>
+    <?php if( $this->arrGamesToImport === null or count( $this->arrGamesToImport ) === 0 ): ?>
+        <tr><td colspan="4">geen wedstrijden gevonden</td></tr>
+    <?php else: ?>
+        <?php foreach( $this->arrGamesToImport as $oGameToImport ): ?>
+            <?php
+            $oOptions = Construction_Factory::createOptions();
+            $oOptions->addFilter("Voetbal_Game::ExternId", "EqualTo", Import_Factory::$m_szExternPrefix . $oGameToImport->id );
+            $oGame = Voetbal_Game_Factory::createObjectFromDatabase( $oOptions );
+
+            $bGameExists = ( $oGame !== null );
+            $oImportDateTime = Agenda_Factory::createDateTime( $oGameToImport->startdatetime );
+            $bDateTimeChanged = ( $bGameExists and $oGame->getStartDateTime() != $oImportDateTime );
+            $bChanged =  $bDateTimeChanged;
+            ?>
+            <tr>
+                <td>
+                    <?php if ( !$bGameExists ): ?>
+                        <span class="glyphicon glyphicon-plus"></span>
+                    <?php elseif ( $bChanged ): ?>
+                        <span class="glyphicon glyphicon-edit"></span>
+                    <?php endif; ?>
+                </td>
+                <td><?= $bGameExists ? '<a href="'.Zend_Registry::get("baseurl").'voetbal/team/index/?editid='.$oGame->getId().'">'.$oGameToImport->id."</a>" : $oGameToImport->id ?></td>
+                <?php
+                $oHomePoulePlace = Voetbal_PoulePlace_Factory::createObjectByExternTeamId( $this->oCompetitionSeason, $oGameToImport->hometeamid );
+                $oAwayPoulePlace = Voetbal_PoulePlace_Factory::createObjectByExternTeamId( $this->oCompetitionSeason, $oGameToImport->awayteamid );
+                ?>
+                <td><?= $oHomePoulePlace->getTeam()->getName() ?></td>
+                <td><?= $oAwayPoulePlace->getTeam()->getName() ?></td>
+                <td><?= $oGameToImport->startdatetime ?></td>
+                <td style="<?= $bDateTimeChanged ? "color:red;" : null ?>"><?= $bGameExists ? $oGame->getStartDateTime() : null ?></td>
+            </tr>
+        <?php endforeach; ?>
+    <?php endif; ?>
+    </tbody>
+</table>

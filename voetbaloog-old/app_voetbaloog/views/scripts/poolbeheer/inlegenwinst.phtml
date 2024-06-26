@@ -1,0 +1,66 @@
+<?php $this->sHeaderName = "inleg & winst"; ?>
+<?= $this->render("poolbeheer/header.phtml") ?>
+
+<div id="page-pool-admin-stakepayments"></div>
+
+<?php if( strlen( $this->successmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->successmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->errormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->errormessage ?></p></div>
+<?php endif ?>
+
+<form name="stakeform" class="form-inline" role="form" method="POST" action="<?= $this->url ?>/">
+
+<div>
+	<h3>inleg per deelnemer</h3>
+	<?php if( $this->bPoolUsersNoAdminJoined ): ?>
+		<div class="alert alert-warning"><p class="alert-link">de inleg kan niet meer gewijzigd worden, omdat er zich al deelnemers hebben aangemeld</p></div>
+	<?php endif ?>
+	<div class="input-group">
+		<span class="input-group-addon"><span class="glyphicon glyphicon-euro"></span></span>
+		<input id="poolstake" name="poolstake" type="number" class="form-control" value="<?= $this->oPool->getStake() ?>">
+		<span class="input-group-addon">.00</span>
+	</div>
+	<?php if ( $this->bPoolUsersNoAdminJoined != true ): ?>
+	<input type="submit" class="btn btn-default" name="btninleg" value="opslaan">
+	<?php endif ?>
+</div>
+
+<input type="hidden" name="poolid" value="<?php echo $this->oPool->getId(); ?>">
+
+<?php if ( $this->oPool->getStake() === 0 ): ?>
+	</form>
+	<?php return; ?>
+<?php endif; ?>
+
+<hr>
+
+<div id='parentpayments'>
+	<h3>winstuitkeringen</h3>
+<?php if( strlen( $this->paymentseditmessage ) > 0 ): ?>
+	<div class="alert alert-success"><p class="alert-link"><?= $this->paymentseditmessage ?></p></div>
+<?php endif ?>
+<?php if( strlen( $this->paymentsediterrormessage ) > 0 ): ?>
+	<div class="alert alert-danger"><p class="alert-link"><?= $this->paymentsediterrormessage ?></p></div>
+<?php endif ?>
+</div>
+
+</form>
+
+
+<?php
+$nDataFlag = VoetbalOog_JSON::$nPool_CompetitionSeason;
+$nDataFlag += Voetbal_JSON::$nCompetitionSeason_Rounds;
+$nDataFlag += VoetbalOog_JSON::$nPool_BetConfigs;
+if ( $this->bPoolHasStarted === false )
+	$nDataFlag += VoetbalOog_JSON::$nPool_Payments;
+?>
+
+<script>
+	var g_nPoolId = <?= $this->oPool->getId() ?>;
+	var g_nDataFlag = <?= $nDataFlag ?>;
+	var g_bPoolHasStarted = <?= $this->bPoolHasStarted ? "true" : "false" ?>;
+	var g_nPoolStake = <?= $this->oPool->getStake() ?>;
+	var g_nNrOfPoolUsers = <?= $this->oPool->getUsers()->count() ?>;
+</script>

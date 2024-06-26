@@ -1,0 +1,152 @@
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 11px;
+	margin:0;
+	padding:0;	
+	background-color:#135113;	
+}
+
+#container {
+	border-top: 5px solid #135113;
+	border-bottom: 2px solid #135113;
+	margin:auto;
+	text-align:left;
+	width:900px;
+}
+
+a {
+	color: #FF6600;
+}
+
+p {
+	text-align: justify;
+	margin: 0 10px 10px 10px;
+	font-size: 12px;
+}
+
+h1 {
+	font-weight: bold;
+	font-size: 12px;
+	letter-spacing: 2px;
+	color: #FF6100;
+	margin: 0 0 10px 0;
+}
+
+select {	
+	margin:1px 0px 1px 0px;	
+}
+
+img {
+	/*display:block;*/
+	border-width : 0px;
+	margin:0;
+	padding:0;
+}
+
+fieldset {
+    display: block;
+    margin: 2px;
+    border-radius: 8px; 
+    position: relative;  /* ie 6 */
+}
+
+
+legend{
+	color:#FF6600;
+	font-weight:bold;
+	padding:3px;
+	margin:0;
+}
+
+/* Custom tags */
+#hd {	
+	height:108px;
+}
+
+#hd_left {
+	background-color:white;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	float:left;
+	width:680px;	
+}
+
+#hd_left_top {
+	margin-left: 15px;
+	background-image: url(../images/bg_header.png);
+	background-repeat: no-repeat;
+	height:85px;
+	background-position:0px -10px;		
+}
+
+#hd_left_bottom {
+	height:23px;
+}
+
+#hd_right {
+	background-color:white;
+	border-top-left-radius: 15px;
+	border-top-right-radius: 15px;
+	border-bottom-right-radius: 15px;
+	float:right;
+	height:93px;
+	width:205px;	
+}
+
+/* bevat left en right*/
+#content {
+	background-color:white;
+	border-top-right-radius: 15px;
+	padding:7px;
+	min-height:200px;
+}
+
+#ft {
+	background-color:white;
+	border-bottom-left-radius: 15px;
+	border-bottom-right-radius: 15px;
+	color: #135113;
+	clear:both;
+	font-weight: bold;
+	font-size: 12px;
+	letter-spacing: 1px;
+	padding:2px;	
+	border-top: 1px solid #135113;
+	text-align:center;
+}
+
+#ftlicense {
+	color: #135113;
+	margin-top: 3px;
+	font-weight: normal;
+	font-size: 9px;
+	padding:2px;	
+	text-align:center;
+}
+
+.message-error 
+{
+	font-weight: bold;
+	color: red;
+}		
+
+.message-good
+{
+	font-weight: bold;
+	color: green;
+}
+
+.floatleft
+{
+	float: left;
+}
+
+.floatright
+{
+	float: right;
+}
+
+.smallcombobox
+{
+	font-size: 10px;
+}

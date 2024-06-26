@@ -1,0 +1,60 @@
+<div class="container" id="page-pool-aanmaken">
+	<div style="max-width:800px;">
+		<h2 class="hidden-xs">je eigen pool organiseren</h2>
+		<h2 class="visible-xs">pool organiseren</h2>
+	</div>
+</div>
+
+<?php if ( $this->oUser === null ): ?>
+	<div class="alert alert-danger">
+		<p class="alert-link">
+			<div>Wanneer je een eigen pool wilt organiseren, dien je ingelogd te zijn.</div>
+			<div><a href="<?= Zend_Registry::get("baseurl") ?>user/login/previouscontroller/pool/previousaction/aanmaken/" id="login" type="button" class="btn btn-default"><span class="glyphicon glyphicon-log-in"></span> log in</a> wanneer je al een account heeft.</div>
+			<div style="margin-top:5px;"><a href="<?= Zend_Registry::get("baseurl") ?>user/register/" id="register" type="button" class="btn btn-default"><span class="glyphicon glyphicon-pencil"></span> registreer</a> wanneer je nog geen account hebt.</div>
+		</p>
+	</div>
+	<?php return; ?>
+<?php endif ?>
+
+<?php if ( $this->oCompetitionSeasons->count() === 0 ): ?>
+	<div class="alert alert-danger">
+		<p class="alert-link">Er zijn momenteel geen competities waarvoor je een pool kunt organiseren</p>
+	</div>
+	<?php return; ?>
+<?php endif ?>
+
+<div class="container">
+	<div style="max-width:800px;">
+
+		<?php if ( $this->adderrormessage !== null ): ?>
+			<div class="alert alert-danger"><p class="alert-link"><?= $this->adderrormessage ?></p></div>
+		<?php endif ?>
+
+		<div>
+			<ul class="nav nav-tabs nav-pills" style='width: 100%' id="aanmaakTab">
+				<li class="active" style="display: table-cell; width: 33%; text-align: center; margin-left: 0px;"><a href="#step1" data-toggle="pill">stap 1</a></li>
+				<li style="display: table-cell; width: 34%; text-align: center; margin-left: 0px;"><a href="#step2" data-toggle="pill">stap 2</a></li>
+				<li style="display: table-cell; width: 33%; text-align: center; margin-left: 0px;"><a href="#step3" data-toggle="pill">stap 3</a></li>
+			</ul>
+
+			<div class="tab-content">
+				<div class="tab-pane active" id="step1"><?php echo $this->render( "pool/aanmaken_step1.phtml" ); ?></div>
+				<div class="tab-pane" id="step2"><?php echo $this->render( "pool/aanmaken_step2.phtml" ); ?></div>
+				<div class="tab-pane" id="step3"><?php echo $this->render( "pool/aanmaken_step3.phtml" ); ?></div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+	g_oPoolData = {
+		CompetitionSeasonId : null,
+		CompetitionSeasonName : null,
+		Name : null,
+		Stake : null
+	};
+
+	var g_bStepOneClick = <?= $this->oCompetitionSeasons->count() === 1 ? "true" : "false" ?>;
+
+
+</script>

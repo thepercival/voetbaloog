@@ -1,0 +1,30 @@
+<?php
+
+$oUserComboBox = Controls_Factory::createComboBox( "userid" );
+$oUserComboBox->putSource( $this->oUsers );
+$oUserComboBox->putObjectPropertyToShow( "**RAD_Auth_User::Name**");
+$oUserComboBox->putObjectToSelect( $this->objSelectedUser );
+$szForm = "userselectform";
+$szEvent = "onchange='this.form.submit();'";
+$oUserComboBox->addEvent( $szEvent );
+
+echo "
+	<h2>".$this->pageTitle."</h2>
+	<fieldset>
+	<legend>Kies een gebruiker</legend>
+	<form name=\"".$szForm."\" method=\"POST\" action=\"".$this->url."/\">
+	".$oUserComboBox."
+";
+
+if ( $this->hiddenparams !== null )
+{
+	foreach( $this->hiddenparams as $vtId => $vtValue )
+		echo "<input type=\"hidden\" name=\"".$vtId."\" value=\"".$vtValue."\">";
+}
+
+echo "
+	</form>
+	</fieldset>
+";
+
+?>

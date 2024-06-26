@@ -1,0 +1,83 @@
+<?php if ( $this->oRound === null ):?>
+    <div class="alert alert-danger"><p class="alert-link">er is geen eerste ronde beschikbaar</p></div>
+    <?php return; ?>
+<?php endif; ?>
+
+<ul class="progress-indicator">
+    <li class="completed">
+        <a href="#" style=""><span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>teams<?= $this->oCompetitionSeason->hasGames() ? ", velden & scheidsrechters" : null ?></a>
+</li>
+<li class="completed">
+    <span class="bubble"></span><i class="glyphicon glyphicon-check"></i>structuur
+</li>
+<li class="<?= !$this->oCompetitionSeason->hasGames() ? 'danger' : null ?>">
+    <span class="bubble"></span><?= $this->oCompetitionSeason->hasGames() ? '<i class="glyphicon glyphicon-check"></i>' : null ?>planning
+</li>
+</ul>
+
+<div ng-controller="TeamController as csteams" model="csteams.csid" ng-init="csteams.csid=<?= $this->oCompetitionSeason->getId() ?>">
+    <?php $bInputTypeTeamsSelect = Voetbal_Factory::getConfigValue( "csadmin", "teams", "inputtypeselect" ); ?>
+    <div model="csteams.inputtypeselect" ng-init="csteams.inputtypeselect=<?= $bInputTypeTeamsSelect == true ? "true" : "false" ?>" style="display: none"></div>
+
+    <div ng-repeat="poule in csteams.firstRound.poules" class="row panel panel-round">
+        <div class="col-xs-3 col-sm-2 panel-heading" style="text-align: center;">
+            <div style="margin-bottom: 12px;" ng-bind-html="csteams.getPouleName( poule, true )"></div>
+        </div>
+        <div class="col-xs-9 col-sm-10 panel-body" style="padding-left: 0px; padding-right: 0px; min-height: 140px;">
+            <div class="container-fluid">
+                <div class="row" style="margin-left:0; margin-right:0;">
+                    <div class="col-xs-12 col-sm-12" align="center" style="padding-left: 15px; padding-right: 0px;">
+                        <div ng-repeat="pouleplace in poule.places" style="display:inline-block;">
+                            <div align="center" class="panel panel-default panel-poule" style="width: 150px;">
+								<div class="panel-heading">
+									<h4>
+										<span class="label label-default">{{ pouleplace.number + 1 }}</span>
+										<button role="button" class="btn btn-default btn-sm pull-right" ng-click="csteams.togglePoulePlaceState( pouleplace )"><span class="glyphicon glyphicon-{{ pouleplace.editable ? 'chevron-up' : 'pencil' }}"></span></button>
+									</h4>
+								</div>
+								<div class="panel-body" style="">
+									<div ng-if="!pouleplace.editable" style="font-size: 18px; margin: 5px;">
+										<h4>
+                                            <span class="label label-default">{{ pouleplace.team.name }}</span>
+                                        </h4>
+									</div>
+									<div ng-if="pouleplace.editable" style="margin: 5px;">
+                                        <div ng-if="csteams.inputtypeselect">
+                                            <select class="form-control" ng-model="pouleplace.team" ng-options="obj as obj.name for obj in csteams.teams">
+                                            </select>
+                                        </div>
+                                        <div ng-if="!csteams.inputtypeselect">
+                                            <input ng-model="pouleplace.team.name" type="text" class="form-control" style="width:100%" name="">
+										    <textarea type="text" class="form-control" style="width:100%" name="" value="omschrijving" placeholder="extra informatie.."></textarea>
+                                        </div>
+									</div>
+
+									<!--
+									<div>
+										<button ng-if="round.type == roundtype_poule && round.number == 0" role="button" class="btn btn-default btn-sm" ng-click="popPoulePlace( poule )"><span class="glyphicon glyphicon-minus"></span></button>
+										<button ng-if="round.type == roundtype_poule && round.number == 0" role="button" class="btn btn-default btn-sm" ng-click="addPoulePlace( poule )"><span class="glyphicon glyphicon-plus"></span></button>
+									</div>
+									<div style="width: 150px;">
+										<div ng-repeat="pouleplace in poule.places" class="pull-left label label-default {{ getPoulePlaceClassName( pouleplace ) }}" style="font-size: 18px; margin: 2px;">{{ getPoulePlaceName( pouleplace ) }}</div>
+									</div>
+									-->
+								</div>
+							</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <form ng-submit="csteams.processTeamsForm()">
+        <div style="text-align: center; margin-top:10px;">
+            <div ngif="csteams.savestate != undefined" class="alert alert-{{ csteams.savestate.type }}"><p class="alert-link">{{ csteams.savestate.message }}</p></div>
+            <button role="button" class="btn btn-primary save-round"><span class="glyphicon glyphicon-save"></span>&nbsp;opslaan</button>
+        </div>
+    </form>
+    <hr>
+	<textarea style="width:100%" rows="30">
+	</textarea>
+
+</div>
