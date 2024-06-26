@@ -29,9 +29,6 @@ rm $MAPDIR/lazyload.js
 mv $MAPDIR/lazyload.js.tmp $MAPDIR/lazyload.js
 echo "javascript neergezet op $MAPDIR/lazyload.js"
 
-exit 
-return
-
 # jslibrary
 LIBDIR=$PUBLICHTML/jslibrary
 MINIFIEDJS=min-1.0.0.js
