@@ -126,44 +126,57 @@ class Voetbal_Ranking implements Patterns_Singleton_Interface
 
 	public static function getBestPoulePlaces( $oPoulePlaces, $oGames = null, $bSkip = false )
 	{
+    $nrOfStartingPoulePlaces = count($oPoulePlaces);
 		$arrFunctions = static::getPromotionRuleFunctions();
 		$arrDefinitions = static::getDefinitions();
 		foreach( $arrFunctions as $nFunction )
 		{
-			if ( $nFunction === static::$m_nBestPoulePlacesAgainstEachOther
-			     and ( $bSkip === true or $oGames === null )
-			)
+			if ( $nFunction === static::$m_nBestPoulePlacesAgainstEachOther and ( $bSkip === true or $oGames === null ) ) {
 				continue;
+      }
 
-			if ( $nFunction === static::$m_nBestPoulePlacesAgainstEachOther )
+			if ( $nFunction === static::$m_nBestPoulePlacesAgainstEachOther ) {
 				static::$m_bSubtractPenaltyPoints = false;
-
+        if( count($oPoulePlaces) === $nrOfStartingPoulePlaces) {
+          continue;
+        }
+      }
 			$fnFunction = $arrDefinitions[ $nFunction ];
 
 			$oPoulePlaces = $fnFunction( $oPoulePlaces, $oGames );
 
-			if ( $oPoulePlaces->count() < 2 )
-				break;
+			if ( $oPoulePlaces->count() < 2 ) {
+        break;
+      }
 		}
 		static::$m_bSubtractPenaltyPoints = true;
-        if ( $oPoulePlaces->count() > 1 ) {
-            static::doManualSorting($oPoulePlaces);
-        }
+    if ( $oPoulePlaces->count() > 1 ) {
+        static::doManualSorting($oPoulePlaces);
+    }
 		return $oPoulePlaces;
 	}
 
-    private static function doManualSorting($oPoulePlaces): void {
-        $seasonName = $oPoulePlaces->first()->getPoule()->getRound()->getCompetitionSeason()->getSeason()->getName();
-        if( $seasonName === "2024" ) {
-            $oPoulePlaces->uasort(
-                function ( $oPoulePlaceA, $oPoulePlaceB )
-                {
-                    // Denmark before Slovenie, because less yellow cards
-                    return ( $oPoulePlaceA->getTeam()->getName() < $oPoulePlaceB->getTeam()->getName() ? -1 : 1 );
-                }
-            );
-        }
+  private static function doManualSorting($oPoulePlaces): void {
+      $seasonName = $oPoulePlaces->first()->getPoule()->getRound()->getCompetitionSeason()->getSeason()->getName();
+      if( $seasonName === "2024" and static::allFromSamePoule(2, $oPoulePlaces)) {
+          $oPoulePlaces->uasort(
+              function ( $oPoulePlaceA, $oPoulePlaceB )
+              {
+                  // Denmark before Slovenie, because less yellow cards
+                  return ( $oPoulePlaceA->getTeam()->getName() < $oPoulePlaceB->getTeam()->getName() ? -1 : 1 );
+              }
+          );
+      }
+  }
+
+  private static function allFromSamePoule(int $pouleNr, $oPoulePlaces): bool {
+    foreach( $oPoulePlaces as $oPoulePlace) {
+      if( $oPoulePlace->getPoule()->getNumber() !== $pouleNr) {
+        return false;
+      }
     }
+    return true;
+  }
 
 	public static function getPromotionRuleDescriptions()
 	{
