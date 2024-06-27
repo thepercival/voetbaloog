@@ -1,5 +1,5 @@
-function AssociativeArray() 
-{		
+function AssociativeArray()
+{
 	var m_nLength = 0;
 	this.Items = new Object();
 	/*
@@ -10,46 +10,59 @@ function AssociativeArray()
 		}
 	}
 	*/
-   
+
 	this.remove = function( oIdable )
 	{
 		var vtId = oIdable.getId();
-		if ( this.has( oIdable ) == true ) 
+		if ( this.has( oIdable ) == true )
 		{
 			m_nLength--;
 			delete this.Items[ vtId ];
 		}
 	};
-	
+
 	this.flush = function()
 	{
-		for ( var nI in this.Items) 
+		for ( var nI in this.Items)
 			delete this.Items[ nI ];
-		
+
 		m_nLength = 0;
 	};
 
 	this.add = function( oIdable )
 	{
 		var vtId = oIdable.getId();
-		if ( this.has( oIdable ) == false ) 
+		if ( this.has( oIdable ) == false )
 		{
 			m_nLength++;
 			this.Items[ vtId ] = oIdable;
-		}				
+		}
 	};
 
 	this.get = function( vtId ) {
 		return this.Items[ vtId ];
 	};
-	
+
 	this.has = function( oIdable )
 	{
 		return typeof( this.Items[ oIdable.getId() ] ) != 'undefined';
 	};
-	
+
 	this.count = function()
 	{
 		return m_nLength;
 	};
+
+  this.toArray = function() {
+    var items = new Array();
+
+    for ( var nI in this.Items ) {
+      if (!(this.Items.hasOwnProperty(nI))){
+        continue;
+      }
+
+      items.push(this.Items[nI]);
+    }
+    return items;
+  };
 }
