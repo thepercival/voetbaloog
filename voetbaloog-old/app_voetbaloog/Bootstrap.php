@@ -105,11 +105,7 @@ class Bootstrap extends Apps_Bootstrap
 
 		parent::initView();
 
-		$sTitle = "VoetbalOog";
-
 		$this->initViewLayout( $oView );
-
-		$oView->googleanalyticsid = "UA-13137855-1";
 	}
 
 	protected function initViewLayout( $oView )
