@@ -73,6 +73,17 @@ function VoetbalOog_Poule()
 	};
 
 	this.getGames = function(){ return m_oGames; };
+  this.getGamesAsArray = function() {
+    var asarrRetVal = new AssociativeArray();
+    var oGames = this.getGames(); // fill m_arrGamesByDate
+    for (var nI in oGames) {
+      if (!(oGames.hasOwnProperty(nI)))
+        continue;
+
+      asarrRetVal.add(oGames[nI]);
+    }
+    return asarrRetVal.toArray();
+  }
 	this.putGames = function( oGames ){ m_oGames = oGames; };
 
 	this.getGamesByDate = function()
@@ -89,26 +100,34 @@ function VoetbalOog_Poule()
 
 				m_arrGamesByDate.push( oGames[nI] );
 			}
-
-			// sort m_arrGamesByDate
-			m_arrGamesByDate.sort(
-				function ( oGameA, oGameB )
-				{
-					if ( oGameA.getStartDateTime() < oGameB.getStartDateTime() )
-						return -1;
-					else if ( oGameA.getStartDateTime() > oGameB.getStartDateTime() )
-						return 1;
-					return ( oGameA.getViewOrder() > oGameB.getViewOrder() );
-				}
-			);
+			// sort
+      orderGames(m_arrGamesByDate);
 		}
 
 		return m_arrGamesByDate;
 	};
 
+  function orderGames(arrGames) {
+    arrGames.sort(
+      function ( oGameA, oGameB )
+      {
+        if ( oGameA.getStartDateTime() < oGameB.getStartDateTime() )
+          return -1;
+        else if ( oGameA.getStartDateTime() > oGameB.getStartDateTime() )
+          return 1;
+        return ( oGameA.getViewOrder() > oGameB.getViewOrder() );
+      }
+    );
+}
+
   this.getStartDateTime = function() {
-    var gamesByDateCopy  = [...this.getGamesByDate()];
-    return gamesByDateCopy.shift()?.getStartDateTime();
+    var games = this.getGamesAsArray();
+    orderGames(games);
+    firstGame = games.shift();
+    if( firstGame == null) {
+      return null;
+    }
+    return firstGame.getStartDateTime();
   }
 
 	this.getState = function()
