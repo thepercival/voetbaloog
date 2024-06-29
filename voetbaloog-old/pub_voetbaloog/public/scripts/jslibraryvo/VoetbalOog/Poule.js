@@ -106,6 +106,11 @@ function VoetbalOog_Poule()
 		return m_arrGamesByDate;
 	};
 
+  this.getStartDateTime = function() {
+    var gamesByDateCopy  = [...this.getGamesByDate()];
+    return gamesByDateCopy.shift()?.getStartDateTime();
+  }
+
 	this.getState = function()
 	{
 		if ( m_nState == null )

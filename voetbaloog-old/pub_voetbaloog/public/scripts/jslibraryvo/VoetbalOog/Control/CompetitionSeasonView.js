@@ -49,15 +49,21 @@ function Ctrl_CompetitionSeasonView( oCompetitionSeason, tsNow, sDivId, jsonOpti
 		oHeader.style.textAlign = "center";
 		oHeader.style.fontWeight = "bold";
 
-		var oPoules = oRound.getPoules();
+    var arrPoules = [...oRound.getPoulesAsArray()];
+    var oneGamePerPoule = poulesHaveMaximumOneGame(arrPoules);
+    if( oneGamePerPoule ) {
+      arrPoules.sort(function (oPouleA, oPouleB) {
+        if( oPouleA.getStartDateTime() === null || oPouleB.getStartDateTime() === null ) {
+          return 0;
+        }
+        return (oPouleA.getStartDateTime().getTime() < oPouleB.getStartDateTime().getTime() ? -1 : 1);
+      });
+    }
+
 		var oTable = null;
-		for ( var nJ in oPoules )
+    var oPoule = null;
+		while( oPoule = arrPoules.shift() )
 		{
-			if ( !( oPoules.hasOwnProperty( nJ ) ) )
-				continue;
-
-			var oPoule = oPoules[nJ];
-
 			if ( oPoule.needsRanking() == true )
 			{
 				showPoule( oContainer, oPoule );
@@ -66,17 +72,17 @@ function Ctrl_CompetitionSeasonView( oCompetitionSeason, tsNow, sDivId, jsonOpti
 			else
 			{
 				var nNrOfPoulePlaces = Object_Factory().count( oPoule.getPlaces() );
-				var bShowGames = nNrOfPoulePlaces > 1;
+				var canHaveGames = nNrOfPoulePlaces > 1;
 
 				if ( oTable == null )
 				{
 					oTable = document.createElement("table");
 					oTable.className = m_sTableClassName;
 					oContainer.appendChild( oTable );
-					if ( bShowGames == true )
+					if ( canHaveGames )
 						showPouleGamesHeaders( oTable, oPoule );
 				}
-				if ( bShowGames == true )
+				if ( canHaveGames )
 					showPouleGames( oTable, oPoule );
 				else
 				{
@@ -86,6 +92,20 @@ function Ctrl_CompetitionSeasonView( oCompetitionSeason, tsNow, sDivId, jsonOpti
 			}
 		}
 	}
+
+  function poulesHaveMaximumOneGame( asarrPoules )
+  {
+    for ( var nI in asarrPoules.Items) {
+      if (!( asarrPoules.Items.hasOwnProperty(nI) ))
+        continue;
+
+      var oPoule = asarrPoules.Items[nI];
+      if ( oPoule.getGames().count() > 1) {
+        return false;
+      }
+    }
+    return true;
+  }
 
 	function showPoule( oContainer, oPoule )
 	{

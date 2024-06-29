@@ -20,7 +20,7 @@ function VoetbalOog_Round()
 	var m_bGamesByDateSorted = false;
 	var m_bInitPreviousRound = false;
 	var m_oPreviousRound = null;
-	var m_nState = null;	
+	var m_nState = null;
 
 	this.getName = function(){ return m_sName; };
 	this.putName = function( sName ){ m_sName = sName; };
@@ -43,6 +43,17 @@ function VoetbalOog_Round()
 	this.putCompetitionSeason = function( oCompetitionSeason ){ m_oCompetitionSeason = oCompetitionSeason; };
 
 	this.getPoules = function(){ return m_oPoules; };
+  this.getPoulesAsArray = function() {
+    var asarrRetVal = new AssociativeArray();
+    var oPoules = this.getPoules(); // fill m_arrGamesByDate
+    for (var nI in oPoules) {
+      if (!(oPoules.hasOwnProperty(nI)))
+        continue;
+
+      asarrRetVal.add(oPoules[nI]);
+    }
+    return asarrRetVal.toArray();
+  }
 	this.putPoules = function( oPoules ){ m_oPoules = oPoules; };
 
 	this.poulesNeedRanking = function()
