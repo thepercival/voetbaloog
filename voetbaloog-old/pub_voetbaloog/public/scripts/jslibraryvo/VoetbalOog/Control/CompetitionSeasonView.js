@@ -49,7 +49,7 @@ function Ctrl_CompetitionSeasonView( oCompetitionSeason, tsNow, sDivId, jsonOpti
 		oHeader.style.textAlign = "center";
 		oHeader.style.fontWeight = "bold";
 
-    var arrPoules = [...oRound.getPoulesAsArray()];
+    var arrPoules = oRound.getPoulesAsArray();
     var oneGamePerPoule = poulesHaveMaximumOneGame(arrPoules);
     if( oneGamePerPoule ) {
       arrPoules.sort(function (oPouleA, oPouleB) {
