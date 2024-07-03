@@ -7,6 +7,17 @@
                 "name": "stvoetbaloog",
                  "sku": "Standard_LRS"
             }
+        },
+        "appServicePlan": {
+            "value": {
+                "name": "asp-voetbaloog",
+                "sku": "F1"
+            }
+        },
+        "website": {
+            "value": {
+                "name": "webapp-voetbaloog"
+            }
         }
     }
 }

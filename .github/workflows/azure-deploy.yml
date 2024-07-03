@@ -19,6 +19,5 @@ jobs:
         subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ secrets.AZURE_RG }}
         template: ./bicep/main.bicep
-        #parameters: 'storagePrefix=mystore storageSKU=Standard_LRS'
         parameters: ./bicep/parameters.json
         failOnStdErr: false
