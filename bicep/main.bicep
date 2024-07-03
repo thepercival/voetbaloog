@@ -1,12 +1,12 @@
-param storagePrefix string
-// 'examplestg1'
+param storageAccount object
 
-var uniqueStorageName = '${storagePrefix}${uniqueString(resourceGroup().id)}'
+var uniqueStorageName = '${storageAccount.prefix}${uniqueString(resourceGroup().id)}'
 
 module modStorageAccount 'modules/storage-account.bicep' = {
   name: 'storageDeploy'
   params: {
     name: uniqueStorageName
+    sku: storageAccount.sku
   }
 }
 

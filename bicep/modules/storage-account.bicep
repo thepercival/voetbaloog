@@ -12,17 +12,15 @@ param name string
   'Standard_GZRS'
   'Standard_RAGZRS'
 ])
-param storageSKU string = 'Standard_LRS'
+param sku string
 
 param location string = resourceGroup().location
-
-
 
 resource stg 'Microsoft.Storage/storageAccounts@2021-04-01' = {
   name: name
   location: location
   sku: {
-    name: storageSKU
+    name: sku
   }
   kind: 'StorageV2'
   properties: {
