@@ -10,8 +10,6 @@ module modStorageAccount 'modules/storage-account.bicep' = {
   }
 }
 
-// output storageEndpoint object = modStorageAccount.outputs.storageEndpoint
-
 module modAppServicePlan 'modules/app-serviceplan.bicep' = {
   name: 'appserviceplan'
   params: {
@@ -24,7 +22,7 @@ module modWebsite 'modules/website.bicep' = {
   name: 'website'
   params: {
     name: website.name
-    appServicePlanId: appServicePlan.id
+    appServicePlanId: modAppServicePlan.outputs.id
   }
 }
 

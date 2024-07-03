@@ -12,3 +12,4 @@ resource resAppServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
     name: sku
   }
 }
+output id string = resAppServicePlan.id
