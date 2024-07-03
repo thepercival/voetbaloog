@@ -28,6 +28,7 @@ module modWebsite 'modules/website.bicep' = {
   }
 }
 
+// added res prov
 // resource srcControls 'Microsoft.Web/sites/sourcecontrols@2021-01-01' = {
 //   name: '${appService.name}/web'
 //   properties: {
