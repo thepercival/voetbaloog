@@ -4,7 +4,7 @@
     "parameters": {
         "storageAccount": {
             "value": {
-                "prefix": "stvbaloog",
+                "name": "stvoetbaloog",
                  "sku": "Standard_LRS"
             }
         }
