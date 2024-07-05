@@ -10,7 +10,7 @@ env:
   AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
   AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
 
-  AZURE_WEBAPP_NAME: voetbaloog
+  AZURE_WEBAPP_NAME: webapp-voetbaloog
   AZURE_WEBAPP_PACKAGE_PATH: ''      # set this to the path to your web app project, defaults to the repository root
   NODE_VERSION: '20.x'         
 
