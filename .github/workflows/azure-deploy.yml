@@ -1,5 +1,21 @@
 name: Deploy Bicep file
+
 on: [push]
+
+permissions:
+      id-token: write
+      contents: read
+
+env:
+  SECRET_AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  AZURE_SUBSCRIPTION: ${{ secrets.AZURE_SUBSCRIPTION }}
+  AZURE_RG: ${{ secrets.AZURE_RG }}
+
+  AZURE_WEBAPP_NAME: voetbaloog
+  AZURE_WEBAPP_PACKAGE_PATH: ''      # set this to the path to your web app project, defaults to the repository root
+  NODE_VERSION: '18.x'         
+
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -11,13 +27,36 @@ jobs:
     - name: Log into Azure
       uses: azure/login@v2
       with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}
+        creds: ${{ env.SECRET_AZURE_CREDENTIALS }}
 
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v2
       with:
-        subscriptionId: ${{ secrets.AZURE_SUBSCRIPTION }}
-        resourceGroupName: ${{ secrets.AZURE_RG }}
+        subscriptionId: ${{ env.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ env.AZURE_RG }}
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json
         failOnStdErr: false
+        
+    - name: Setup Node ${{ env.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ env.NODE_VERSION }}
+    
+    - name: 'npm install, build, and test'
+      run: |
+        npm install
+        npm run build --if-present
+        npm run test --if-present
+      working-directory:  my-app-path
+               
+    # deploy web app using Azure credentials
+    - uses: azure/webapps-deploy@v3
+      with:
+        app-name: ${{ env.AZURE_WEBAPP_NAME }}
+        package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+
+    # Azure logout 
+    - name: logout
+      run: |
+        az logout
