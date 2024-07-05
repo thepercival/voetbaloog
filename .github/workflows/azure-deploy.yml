@@ -7,9 +7,8 @@ permissions:
       contents: read
 
 env:
-  SECRET_AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
   AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
-  AZURE_RG: ${{ vars.AZURE_RG }}
+  AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
 
   AZURE_WEBAPP_NAME: voetbaloog
   AZURE_WEBAPP_PACKAGE_PATH: ''      # set this to the path to your web app project, defaults to the repository root
@@ -27,13 +26,13 @@ jobs:
     - name: Log into Azure
       uses: azure/login@v2
       with:
-        creds: ${{ env.SECRET_AZURE_CREDENTIALS }}
+        creds: ${{ secrets.AZURE_CREDENTIALS }}
 
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v2
       with:
         subscriptionId: ${{ env.AZURE_SUBSCRIPTION }}
-        resourceGroupName: ${{ env.AZURE_RG }}
+        resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json
         failOnStdErr: false
@@ -48,7 +47,7 @@ jobs:
         npm install
         npm run build --if-present
         npm run test --if-present
-      #working-directory: 
+      working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
                
     # deploy web app using Azure credentials
     - uses: azure/webapps-deploy@v3
