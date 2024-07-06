@@ -26,15 +26,15 @@ jobs:
       with:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-    # - name: Deploy Bicep file
-    #   uses: azure/arm-deploy@v2
-    #   with:
-    #     scope: resourcegroup
-    #     subscriptionId: ${{ env.AZURE_SUBSCRIPTION }}
-    #     resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
-    #     template: ./bicep/main.bicep
-    #     parameters: ./bicep/parameters.json
-    #     failOnStdErr: false
+    - name: Deploy Bicep file
+      uses: azure/arm-deploy@v2
+      with:
+        scope: resourcegroup
+        subscriptionId: ${{ env.AZURE_SUBSCRIPTION }}
+        resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
+        template: ./bicep/main.bicep
+        parameters: ./bicep/parameters.json
+        failOnStdErr: false
         
     - name: Setup Node ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
@@ -49,13 +49,13 @@ jobs:
            
     - name: Zip artifact for deployment
       working-directory: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
-      run: zip /release.zip ./* -r
+      run: zip release.zip ./* -r
 
     - name: Upload artifact for deployment job
       uses: actions/upload-artifact@v4
       with:
         name: node-app
-        path: release.zip
+        path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/release.zip
 
     # Azure logout 
     - name: logout
