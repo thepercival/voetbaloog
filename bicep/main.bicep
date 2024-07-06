@@ -2,9 +2,9 @@ param storageAccount object
 param appServicePlan object
 param website object
 
-output storageAccountName string = storageAccount.name
-output appServicePlanName string = appServicePlan.name
-output websiteName string = website.name
+// output storageAccountName string = storageAccount.name
+// output appServicePlanName string = appServicePlan.name
+// output websiteName string = website.name
 
 // module modStorageAccount 'modules/storage-account.bicep' = {
 //   name: 'storageDeploy'
