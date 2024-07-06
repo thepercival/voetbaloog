@@ -8,10 +8,9 @@ permissions:
 
 env:
   AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
-  AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
-  
+  AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}  
   AZURE_WEBAPP_NAME: webapp-voetbaloog
-  AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
+  AZURE_WEBAPP_PACKAGE_PATH: ''
   NODE_VERSION: '20.x'
 
 jobs:
