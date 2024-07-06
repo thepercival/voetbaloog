@@ -14,7 +14,8 @@ env:
   NODE_VERSION: '20.x'
 
 jobs:
-  build:
+
+  azure:
     runs-on: ubuntu-latest
     steps:
 
@@ -34,7 +35,19 @@ jobs:
         resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json
-        failOnStdErr: false
+        failOnStdErr: false 
+
+    - name: logout
+      run: |
+        az logout
+
+  build:
+    runs-on: ubuntu-latest
+    needs: azure
+    steps:
+
+    - name: Checkout code
+      uses: actions/checkout@main
         
     - name: Setup Node ${{ env.NODE_VERSION }}
       uses: actions/setup-node@v4
@@ -56,11 +69,6 @@ jobs:
       with:
         name: node-app
         path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/release.zip
-
-    # Azure logout 
-    - name: logout
-      run: |
-        az logout
 
   deploy:
     runs-on: ubuntu-latest
@@ -85,6 +93,5 @@ jobs:
           app-name: ${{ env.AZURE_WEBAPP_NAME }}
           slot-name: 'production'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-          #package: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
 
     
