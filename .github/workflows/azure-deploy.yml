@@ -10,7 +10,7 @@ env:
   AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
   AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}  
   AZURE_WEBAPP_NAME: webapp-voetbaloog
-  AZURE_WEBAPP_PACKAGE_PATH: ''
+  AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
   NODE_VERSION: '20.x'
 
 jobs:
@@ -29,6 +29,7 @@ jobs:
     - name: Deploy Bicep file
       uses: azure/arm-deploy@v2
       with:
+        scope: resourcegroup
         subscriptionId: ${{ env.AZURE_SUBSCRIPTION }}
         resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
         template: ./bicep/main.bicep
