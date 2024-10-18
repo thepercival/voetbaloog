@@ -8,6 +8,15 @@
                  "sku": "Standard_LRS"
             }
         },
+        "logWorkspace" : {
+            "value": {
+                "name": "log-voetbaloog",
+                "sku": "PerGB2018",
+                "retentionInDays": 120,
+                "resourcePermissions": true,
+                "heartbeatTableRetention": 30
+            }            
+        },
         "appServicePlan": {
             "value": {
                 "name": "asp-voetbaloog",
