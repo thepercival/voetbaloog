@@ -22,7 +22,6 @@ param retentionInDays int
 @description('true to use resource or workspace permissions. false to require workspace permissions.')
 param resourcePermissions bool
 
-@description('Number of days to retain data in Heartbeat table.')
 param heartbeatTableRetention int
 
 resource workspace 'Microsoft.OperationalInsights/workspaces@2023-09-01' = {
