@@ -26,7 +26,7 @@ module modAppServicePlan 'modules/app-serviceplan.bicep' = {
 module modWebsite 'modules/website.bicep' = {
   name: 'website'
   params: {
-    name: website.name
+    name: '${website.name}-${environment}'
     appServicePlanId: modAppServicePlan.outputs.id
   }
 }

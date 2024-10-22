@@ -14,7 +14,7 @@ on:
 env:
   AZURE_SUBSCRIPTION_BASENAME: "sub-${{ vars.AZURE_SUBSCRIPTION }}"
   AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}  
-  AZURE_WEBAPP_NAME: webapp-voetbaloog
+  AZURE_WEBAPP_BASENAME: webapp-voetbaloog
   AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
   NODE_VERSION: '20.x'
 
@@ -84,8 +84,8 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: 'production'
+          app-name: "${{ env.AZURE_WEBAPP_BASENAME }}-dev"
+          slot-name: 'dev'
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
     
