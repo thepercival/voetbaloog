@@ -2,7 +2,7 @@
 // pipeline parameters
 param environment sys.string
 
-// parameters.json
+// parameters.json, this change should not be possible
 param storageAccount object
 param appServicePlan object
 param website object
