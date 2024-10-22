@@ -14,14 +14,14 @@ on:
 env:
   AZURE_SUBSCRIPTION_BASENAME: "sub-${{ vars.AZURE_SUBSCRIPTION }}"
   AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}  
-  AZURE_WEBAPP_NAME: webapp-voetbaloog
+  AZURE_WEBAPP_BASENAME: webapp-voetbaloog
   AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
   NODE_VERSION: '20.x'
 
 jobs:
   AzureDeployInfraDev:
     name: Azure Infra Deploy to Dev 
-    # if: github.event_name == 'pull_request'
+    if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
     environment: "github-voetbaloog-dev"
     steps:
@@ -39,6 +39,31 @@ jobs:
         resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json environment=dev
+        failOnStdErr: true
+    - name: logout
+      run: |
+        az logout 
+
+  AzureDeployInfraAcc:
+    name: Azure Infra Deploy to Acc
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    environment: "github-voetbaloog-acc"
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main
+    - name: Log into Azure
+      uses: azure/login@v2
+      with:
+        creds: ${{ secrets.AZURE_CREDENTIALS }}            
+    - name: Bicep Deploy
+      uses: azure/arm-deploy@v2
+      with:
+        scope: resourcegroup
+        subscriptionId: "${{ env.AZURE_SUBSCRIPTION_BASENAME }}-acc"
+        resourceGroupName: ${{ env.AZURE_RESOURCEGROUP }}
+        template: ./bicep/main.bicep
+        parameters: ./bicep/parameters.json environment=acc
         failOnStdErr: true
     - name: logout
       run: |
@@ -69,6 +94,7 @@ jobs:
 
   AzureDeployWebAppDev:
     runs-on: ubuntu-latest
+    if: github.event_name != 'pull_request'
     needs: [AzureDeployInfraDev,Build]
     environment:
       name: github-voetbaloog-dev
@@ -84,8 +110,26 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          slot-name: 'production'
+          app-name: "${{ env.AZURE_WEBAPP_BASENAME }}-dev"
           publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
-    
+  AzureDeployWebAppAcc:
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: [AzureDeployInfraAcc,Build]
+    environment:
+      name: github-voetbaloog-acc
+      url: ${{ steps.deploy-to-webapp.outputs.webapp-url }}
+    steps:
+      - name: Download artifact from build job
+        uses: actions/download-artifact@v4
+        with:
+          name: node-app
+      - name: Unzip artifact for deployment
+        run: unzip release.zip
+      - name: 'Deploy to Azure Web App'
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: "${{ env.AZURE_WEBAPP_BASENAME }}-acc"
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}

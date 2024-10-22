@@ -2,7 +2,7 @@
 // pipeline parameters
 param environment sys.string
 
-// parameters.json, this change should not be possible
+// parameters.json, add resprov storage, web
 param storageAccount object
 param appServicePlan object
 param website object
@@ -26,7 +26,7 @@ module modAppServicePlan 'modules/app-serviceplan.bicep' = {
 module modWebsite 'modules/website.bicep' = {
   name: 'website'
   params: {
-    name: website.name
+    name: '${website.name}-${environment}'
     appServicePlanId: modAppServicePlan.outputs.id
   }
 }
