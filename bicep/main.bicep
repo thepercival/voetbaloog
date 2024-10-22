@@ -1,24 +1,17 @@
+
+// pipeline parameters
+param environment sys.string
+
+// parameters.json
 param storageAccount object
-param logWorkspace object
 param appServicePlan object
 param website object
 
 module modStorageAccount 'modules/storage-account.bicep' = {
   name: 'storageDeploy'
   params: {
-    name: storageAccount.name
+    name: '${storageAccount.name}${environment}'
     sku: storageAccount.sku
-  }
-}
-
-module modLogWorkspace 'modules/log-analytics-workspace.bicep' = {
-  name: 'logWorkspace'
-  params: {
-    workspaceName: logWorkspace.name
-    sku: logWorkspace.sku
-    retentionInDays: logWorkspace.retentionInDays
-    resourcePermissions: logWorkspace.resourcePermissions
-    heartbeatTableRetention: logWorkspace.heartbeatTableRetention
   }
 }
 
@@ -37,4 +30,3 @@ module modWebsite 'modules/website.bicep' = {
     appServicePlanId: modAppServicePlan.outputs.id
   }
 }
-
