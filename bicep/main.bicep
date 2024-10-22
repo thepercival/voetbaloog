@@ -2,7 +2,7 @@
 // pipeline parameters
 param environment sys.string
 
-// parameters.json
+// parameters.json, add resprov storage, web
 param storageAccount object
 param appServicePlan object
 param website object
