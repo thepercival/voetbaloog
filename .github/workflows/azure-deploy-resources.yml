@@ -1,4 +1,4 @@
-name: deploy resources
+name: deploy azure resources
 
 on:
   workflow_call:
