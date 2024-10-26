@@ -27,19 +27,6 @@ jobs:
       NODE_VERSION: '20.x'
       AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
 
-#   DeployResourcesDev:
-#     name: Deploy to Dev    
-#     uses: ./.github/workflows/azure-deployment.yml
-#     needs: [Build]    
-#     with:
-#       AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
-#       AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
-#       AZURE_WEBAPP_BASENAME: webapp-${{ vars.AZURE_RESOURCEGROUP }}-dev
-#       environment: dev
-#     secrets:
-#       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
-#       AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-
   DeployResourcesDev:
     name: Deploy Resources Dev
     uses: ./.github/workflows/azure-deploy-resources.yml
