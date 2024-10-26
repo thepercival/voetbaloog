@@ -23,8 +23,7 @@ on:
 
 jobs:
   DeployResources:
-    name: Deploy Resources
-    uses: ./.github/workflows/deployment/azure-deploy-resources.yml
+    uses: ./.github/workflows/deployment/azure-deploy-resources.yml        
     with:
       AZURE_SUBSCRIPTION: ${{ inputs.AZURE_SUBSCRIPTION }}
       AZURE_RESOURCEGROUP: ${{ inputs.AZURE_RESOURCEGROUP }}

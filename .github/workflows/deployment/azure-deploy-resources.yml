@@ -1,4 +1,4 @@
-name: deploy resources
+name: deploy resources for rg-${{ inputs.AZURE_RESOURCEGROUP }} and env => ${{ inputs.environment }}
 
 on:
   workflow_call:
@@ -18,7 +18,7 @@ on:
 
 jobs:
   deploy_resources_job:
-    environment: "github-${{ inputs.AZURE_RESOURCEGROUP }}-${{ inputs.environment }}"    
+    environment: "github-${{ inputs.AZURE_RESOURCEGROUP }}-${{ inputs.environment }}"
     runs-on: ubuntu-latest
     steps:
     - name: Checkout code
