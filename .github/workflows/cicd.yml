@@ -54,7 +54,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
   DeployWebAppAcc:
-    needs: [Build,DeployResourcesAcc]
+    needs: [Build,DeployResourcesAcc,DeployWebAppDev]
     name: Deploy WebApp Acc
     uses: ./.github/workflows/azure-deploy-webapp.yml
     with:
@@ -78,7 +78,7 @@ jobs:
 
   DeployWebAppPrd:
     if: github.event.pull_request.merged == true
-    needs: [Build,DeployResourcesPrd]    
+    needs: [Build,DeployResourcesPrd,DeployWebAppAcc]    
     name: Deploy WebApp Prd
     uses: ./.github/workflows/azure-deploy-webapp.yml
     with:
