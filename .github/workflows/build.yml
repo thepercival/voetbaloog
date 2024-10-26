@@ -1,0 +1,35 @@
+name: build
+
+on:
+  workflow_call:
+    inputs:
+      NODE_VERSION:
+        required: true
+        type: string
+      AZURE_WEBAPP_PACKAGE_PATH:
+        required: true
+        type: string
+
+jobs:
+  Build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@main        
+    - name: Setup Node ${{ inputs.NODE_VERSION }}
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.NODE_VERSION }}    
+    - name: 'npm install, build, and test'
+      run: |
+        npm install
+        npm run build --if-present              
+    # npm run test --if-present           
+    - name: Zip artifact for deployment
+      working-directory: ${{ inputs.AZURE_WEBAPP_PACKAGE_PATH }}
+      run: zip release.zip ./* -r
+    - name: Upload artifact for deployment job
+      uses: actions/upload-artifact@v4
+      with:
+        name: node-app
+        path: ${{ inputs.AZURE_WEBAPP_PACKAGE_PATH }}/release.zip

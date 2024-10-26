@@ -1,0 +1,89 @@
+name: CI + CD
+
+permissions:
+  id-token: write
+  contents: read
+
+on:
+  push:
+    branches-ignore: [ main ]
+  pull_request:
+    branches: [ main ]
+    types:
+      - opened
+      - closed
+
+jobs:
+  Build:
+    uses: ./.github/workflows/build.yml
+    with:
+      NODE_VERSION: '20.x'
+      AZURE_WEBAPP_PACKAGE_PATH: 'dist/voetbaloog/browser'
+
+  DeployResourcesDev:
+    name: Deploy Resources Dev
+    uses: ./.github/workflows/azure-deploy-resources.yml
+    with:
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: dev
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  DeployWebAppDev:
+    needs: [Build,DeployResourcesDev]
+    name: Deploy WebApp Dev
+    uses: ./.github/workflows/azure-deploy-webapp.yml
+    with:
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: dev
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+  DeployResourcesAcc:
+    if: github.event_name == 'pull_request' || github.event.pull_request.merged == true
+    needs: [DeployResourcesDev]
+    name: Deploy Resources Acc
+    uses: ./.github/workflows/azure-deploy-resources.yml
+    with:
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: acc
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  DeployWebAppAcc:
+    needs: [Build,DeployResourcesAcc]
+    name: Deploy WebApp Acc
+    uses: ./.github/workflows/azure-deploy-webapp.yml
+    with:
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: acc
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+  DeployResourcesPrd:
+    if: github.event.pull_request.merged == true
+    needs: [DeployResourcesAcc]
+    name: Deploy Resources Prd
+    uses: ./.github/workflows/azure-deploy-resources.yml
+    with:
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: prd
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  DeployWebAppPrd:
+    if: github.event.pull_request.merged == true
+    needs: [Build,DeployResourcesPrd]    
+    name: Deploy WebApp Prd
+    uses: ./.github/workflows/azure-deploy-webapp.yml
+    with:
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: prd
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
