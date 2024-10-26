@@ -42,7 +42,7 @@ jobs:
 
   DeployResourcesDev:
     name: Deploy Resources Dev
-    uses: ./.github/workflows/deployment/azure-deploy-resources.yml
+    uses: ./.github/workflows/azure-deploy-resources.yml
     with:
       AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
       AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
@@ -52,7 +52,7 @@ jobs:
 
   DeployWebAppDev:
     name: Deploy WebApp Dev
-    uses: ./.github/workflows/deployment/azure-deploy-webapp.yml
+    uses: ./.github/workflows/azure-deploy-webapp.yml
     with:
       AZURE_WEBAPP_BASENAME: webapp-${{ vars.AZURE_RESOURCEGROUP }}
       environment: dev
