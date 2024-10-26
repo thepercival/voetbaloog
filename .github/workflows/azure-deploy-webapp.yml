@@ -3,7 +3,7 @@ name: deploy webapp
 on:
   workflow_call:
     inputs:
-      AZURE_WEBAPP_BASENAME:
+      AZURE_RESOURCEGROUP:
         required: true
         type: string
       environment:
@@ -12,8 +12,8 @@ on:
     secrets:
       AZURE_CREDENTIALS:
         required: true
-      #AZURE_WEBAPP_PUBLISH_PROFILE:
-       # required: true
+      AZURE_WEBAPP_PUBLISH_PROFILE:
+        required: true
 
 jobs:    
   deploy_webapp_job:
@@ -38,7 +38,7 @@ jobs:
       id: deploy-to-webapp
       uses: azure/webapps-deploy@v3
       with:
-        app-name: "${{ inputs.AZURE_WEBAPP_BASENAME }}-${{ inputs.environment }}"
+        app-name: webapp-"${{ inputs.AZURE_RESOURCEGROUP }}-${{ inputs.environment }}"
         publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
     - name: logout
