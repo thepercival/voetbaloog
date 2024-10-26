@@ -47,7 +47,30 @@ jobs:
     secrets:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-  
+
+  DeployResourcesAcc:
+    if: github.event_name == 'pull_request' || github.event.pull_request.merged == true
+    needs: [DeployResourcesDev]
+    name: Deploy Resources Acc
+    uses: ./.github/workflows/azure-deploy-resources.yml
+    with:
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: acc
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+
+  DeployWebAppAcc:
+    needs: [Build,DeployResourcesAcc]
+    name: Deploy WebApp Acc
+    uses: ./.github/workflows/azure-deploy-webapp.yml
+    with:
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: acc
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
 #   DeployAcc:
 #     name: Deploy to Acc 
 #     if: github.event_name == 'pull_request' || github.event.pull_request.merged == true
