@@ -13,13 +13,6 @@ on:
       - opened
       - closed
 
-# env:
-#     if: github.event_name == 'pull_request' 
-#     environment: dev
-    # if: github.event.pull_request.merged == true
-    # environment: acc
-    # github.event_name == 'pull_request' ? acc : github.event.pull_request.merged == true ? prd : dev
-
 jobs:
   Build:
     uses: ./.github/workflows/build.yml
@@ -71,26 +64,26 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
       AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
-#   DeployAcc:
-#     name: Deploy to Acc 
-#     if: github.event_name == 'pull_request' || github.event.pull_request.merged == true
-#     needs: [DeployDev]
-#     uses: ./.github/workflows/azure-deployment.yml
-#     with:
-#       AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
-#       LOCATION: westeurope
-#       environment: acc
-#     secrets:
-#       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+  DeployResourcesPrd:
+    if: github.event.pull_request.merged == true
+    needs: [DeployResourcesAcc]
+    name: Deploy Resources Prd
+    uses: ./.github/workflows/azure-deploy-resources.yml
+    with:
+      AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: prd
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
-#   DeployPrd:
-#     name: Deploy to Prd
-#     if: github.event.pull_request.merged == true
-#     needs: [DeployAcc]
-#     uses: ./.github/workflows/azure-deployment.yml
-#     with:
-#       AZURE_SUBSCRIPTION: ${{ vars.AZURE_SUBSCRIPTION }}
-#       LOCATION: westeurope
-#       environment: prd
-#     secrets:
-#       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}   
+  DeployWebAppPrd:
+    if: github.event.pull_request.merged == true
+    needs: [Build,DeployResourcesPrd]    
+    name: Deploy WebApp Prd
+    uses: ./.github/workflows/azure-deploy-webapp.yml
+    with:
+      AZURE_RESOURCEGROUP: ${{ vars.AZURE_RESOURCEGROUP }}
+      environment: prd
+    secrets:
+      AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
+      AZURE_WEBAPP_PUBLISH_PROFILE: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
