@@ -51,6 +51,7 @@ jobs:
       AZURE_CREDENTIALS: ${{ secrets.AZURE_CREDENTIALS }}
 
   DeployWebAppDev:
+    needs: [DeployResourcesDev]
     name: Deploy WebApp Dev
     uses: ./.github/workflows/azure-deploy-webapp.yml
     with:
