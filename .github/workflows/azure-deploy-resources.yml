@@ -1,4 +1,4 @@
-name: deploy resources for rg-${{ inputs.AZURE_RESOURCEGROUP }} and env => ${{ inputs.environment }}
+name: deploy resources
 
 on:
   workflow_call:
