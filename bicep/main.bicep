@@ -9,6 +9,8 @@ param mongoDb object
 param appServicePlan object
 param website object
 
+var keyVaultName = '${keyVault.name}-${environment}'
+
 module modStorageAccount 'modules/storage-account.bicep' = {
   name: 'storage'
   params: {
@@ -17,8 +19,8 @@ module modStorageAccount 'modules/storage-account.bicep' = {
   }
 }
 
-resource resKeyVault 'Microsoft.KeyVault/vaults@2019-09-01' existing = {     
-  name: keyVault.name     
+resource resKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {     
+  name: keyVaultName
   scope: resourceGroup(keyVault.resourceGroup)     
 }   
 
