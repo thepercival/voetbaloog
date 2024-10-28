@@ -4,6 +4,10 @@ param clusterName string
 
 param location string
 
+@minLength(3)
+@maxLength(3)
+param environment string
+
 @description('Username for admin user')
 param adminUsername string
 
@@ -14,7 +18,7 @@ param adminUsername string
 param adminPassword string
 
 resource cluster 'Microsoft.DocumentDB/mongoClusters@2024-02-15-preview' = {
-  name: 'msdocs-${clusterName}'
+  name: 'msdocs-${clusterName}-${environment}'
   location: location
   properties: {
     administratorLogin: adminUsername
