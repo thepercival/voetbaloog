@@ -30,6 +30,7 @@ jobs:
         creds: ${{ secrets.AZURE_CREDENTIALS }}
     - name: Bicep Deploy into "rg-${{ inputs.AZURE_RESOURCEGROUP }}"
       uses: azure/arm-deploy@v2
+      id: deploy
       with:
         scope: resourcegroup
         subscriptionId: "sub-${{ inputs.AZURE_SUBSCRIPTION }}-${{ inputs.environment }}"
@@ -37,6 +38,8 @@ jobs:
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json environment=${{ inputs.environment }}
         failOnStdErr: true    
+    - run: echo keyvaultName = {{ steps.deploy.outputs.keyVaultName }}
     - name: logout
       run: |
         az logout
+        
