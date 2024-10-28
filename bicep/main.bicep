@@ -30,6 +30,7 @@ module modMongoDb 'modules/mongodb.bicep' = {
   params: {
     location: resourceGroup().location
     clusterName: mongoDb.clusterName
+    environment: environment
     adminUsername: 'localadmin'
     adminPassword: resKeyVault.getSecret(mongoDb.adminPasswordSecretName)
   }
