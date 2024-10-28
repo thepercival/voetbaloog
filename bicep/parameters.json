@@ -8,6 +8,18 @@
                  "sku": "Standard_LRS"
             }
         },
+       "keyVault": {
+            "value": {
+                "name": "kv-cdk-apps",
+                "resourceGroup": "rg-core"
+            }
+        },
+        "mongoDb": {
+            "value": {
+                "clusterName": "voetbaloog",
+                "adminPasswordSecretName" : "voetbaloog-mongodb-admin-password"
+            }
+        },
         "appServicePlan": {
             "value": {
                 "name": "asp-voetbaloog",
