@@ -25,15 +25,15 @@ resource resKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   scope: resourceGroup(keyVault.resourceGroup)     
 }   
 
-// module modMongoDb 'modules/mongodb.bicep' = {
-//   name: 'monogDb'
-//   params: {
-//     location: resourceGroup().location
-//     clusterName: mongoDb.clusterName
-//     adminUsername: 'localadmin'
-//     adminPassword: resKeyVault.getSecret(mongoDb.adminPasswordSecretName)
-//   }
-// }
+module modMongoDb 'modules/mongodb.bicep' = {
+  name: 'monogDb'
+  params: {
+    location: resourceGroup().location
+    clusterName: mongoDb.clusterName
+    adminUsername: 'localadmin'
+    adminPassword: resKeyVault.getSecret(mongoDb.adminPasswordSecretName)
+  }
+}
 
 module modAppServicePlan 'modules/app-serviceplan.bicep' = {
   name: 'appserviceplan'

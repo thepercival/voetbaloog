@@ -38,7 +38,7 @@ jobs:
         template: ./bicep/main.bicep
         parameters: ./bicep/parameters.json environment=${{ inputs.environment }}
         failOnStdErr: true    
-    - run: echo keyvaultName = {{ steps.deploy.outputs.keyVaultName }}
+    - run: echo {{ steps.deploy.outputs.keyVaultName }}
     - name: logout
       run: |
         az logout
