@@ -31,7 +31,7 @@ resource cluster 'Microsoft.DocumentDB/mongoClusters@2024-02-15-preview' = {
   }
 }
 
-resource firewallRules 'Microsoft.DocumentDB/mongoClusters/firewallRules@2022-10-15-preview' = {
+resource firewallRules 'Microsoft.DocumentDB/mongoClusters/firewallRules@2024-02-15-preview' = {
   parent: cluster
   name: 'AllowAllAzureServices'
   properties: {
