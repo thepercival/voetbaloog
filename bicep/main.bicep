@@ -19,6 +19,7 @@ module modStorageAccount 'modules/storage-account.bicep' = {
   }
 }
 
+
 resource resKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {     
   name: keyVaultName
   scope: resourceGroup(keyVault.resourceGroup)     
