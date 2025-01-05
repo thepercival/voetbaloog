@@ -43,3 +43,12 @@ resource firewallRules 'Microsoft.DocumentDB/mongoClusters/firewallRules@2024-02
     endIpAddress: '0.0.0.0'
   }
 }
+
+resource firewallRulesDev 'Microsoft.DocumentDB/mongoClusters/firewallRules@2024-02-15-preview' = if (environment == 'dev') {
+  parent: cluster
+  name: 'AllowAllServices'
+  properties: {
+    startIpAddress: '0.0.0.0'
+    endIpAddress: '255.255.255.255'
+  }
+}

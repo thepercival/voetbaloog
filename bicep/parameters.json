@@ -20,6 +20,34 @@
                 "adminPasswordSecretName" : "voetbaloog-mongodb-admin-password"
             }
         },
+        "cosmosAccount": {
+            "value": {
+                "name": "cosmon-voetbaloog",
+                "tags": {
+                    "application": "voetbaloog"
+                },
+                "consistencyLevel": "BoundedStaleness",
+                "kind" : "MongoDB",
+                "backupPolicy": {
+                    "type": "Periodic",
+                    "periodicModeProperties": {
+                        "backupIntervalInMinutes": 1440,
+                        "backupRetentionIntervalInHours": 48,
+                        "backupStorageRedundancy": "Geo"
+                    }
+                },
+                "database": {
+                    "name": "voetbaloog",
+                    "collections": [
+                        {
+                            "id": "pools",
+                            "name": "pools",
+                            "indexKey": "owner"
+                        }
+                    ]
+                }                
+            }
+        },  
         "appServicePlan": {
             "value": {
                 "name": "asp-voetbaloog",

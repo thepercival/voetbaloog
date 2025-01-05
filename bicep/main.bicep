@@ -6,6 +6,7 @@ param environment sys.string
 param storageAccount object
 param keyVault object
 param mongoDb object
+param cosmosAccount object
 param appServicePlan object
 param website object
 
@@ -25,16 +26,39 @@ resource resKeyVault 'Microsoft.KeyVault/vaults@2023-07-01' existing = {
   scope: resourceGroup(keyVault.resourceGroup)     
 }   
 
-module modMongoDb 'modules/mongodb.bicep' = {
+// module modMongoDb 'modules/mongodb.bicep' = {
+//   name: 'monogDb'
+//   params: {
+//     location: resourceGroup().location
+//     clusterName: mongoDb.clusterName
+//     environment: environment
+//     adminUsername: 'localadmin'
+//     adminPassword: resKeyVault.getSecret(mongoDb.adminPasswordSecretName)
+//   }
+// }
+
+module modCosmosDb 'modules/mongodbaccount.bicep' = {
   name: 'monogDb'
   params: {
-    location: resourceGroup().location
-    clusterName: mongoDb.clusterName
-    environment: environment
-    adminUsername: 'localadmin'
-    adminPassword: resKeyVault.getSecret(mongoDb.adminPasswordSecretName)
+    cosmosAccount: cosmosAccount
+    name: '${cosmosAccount.name}-${environment}'
+    database: cosmosAccount.databaseName
   }
 }
+
+// module modCosmosAccount 'modules/cosmosdbaccount.bicep' = {
+//   name: 'cosmosAccount'
+//   params: {
+//     accountName: '${cosmosAccount.name}-${environment}'
+//     primaryRegion: resourceGroup().location
+//     secondaryRegion: resourceGroup().location
+//     defaultConsistencyLevel: cosmosAccount.consistencyLevel
+//     databaseName: cosmosAccount.databaseName
+//     defaultCollections: [
+
+//     ]
+//   }
+// }
 
 module modAppServicePlan 'modules/app-serviceplan.bicep' = {
   name: 'appserviceplan'
