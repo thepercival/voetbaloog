@@ -11,6 +11,7 @@ resource resCosmosDbAccount 'Microsoft.DocumentDB/databaseAccounts@2024-05-15' =
   name: name
   tags: cosmosAccount.tags
   kind: cosmosAccount.kind
+  location: resourceGroup().location
   properties: {
     backupPolicy: cosmosAccount.backupPolicy
     databaseAccountOfferType: 'Standard'
