@@ -42,7 +42,7 @@ module modCosmosDb 'modules/mongodbaccount.bicep' = {
   params: {
     cosmosAccount: cosmosAccount
     name: '${cosmosAccount.name}-${environment}'
-    database: cosmosAccount.databaseName
+    database: cosmosAccount.database.name
   }
 }
 
